@@ -7,10 +7,10 @@ class Container_List
 {
 public:
     Container_List();
-    QList<Points> Points_List;
-    QList<Lines> Lines_List;
-    QList<Polygens> Polygens_List;
-    int Layer_numbers;//当前图层数量
+    QList<St_Points> Points_List;
+    QList<St_Lines> Lines_List;
+    QList<St_Polygens> Polygens_List;
+    QList<St_Layers> Layers_List;//图层列表，用以映射以上list
 };
 
 #endif // CONTAINER_LIST_H

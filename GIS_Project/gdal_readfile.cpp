@@ -30,14 +30,17 @@ void GDAL_ReadFile::Get_Data(){
     //    {
     //        qDebug()<<poFeature->GetFieldAsString( iField );
     //    }
-    while( (poFeature = poLayer->GetNextFeature()) != NULL )
+//    St_Layers temp;
+//    temp.Layer_ID
+//    Container->Layers_List.append();
+    while( (poFeature = poLayer->GetNextFeature()) != NULL )//读取几何信息
     {
         poGeometry = poFeature->GetGeometryRef();
         if( poGeometry != NULL
                 && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint )
         {
             OGRPoint *poPoint = (OGRPoint *) poGeometry;
-            Points temp;
+            St_Points temp;
             temp.Point.setX(poPoint->getX());
             temp.Point.setY(poPoint->getY());
             Container->Points_List.append(temp);
