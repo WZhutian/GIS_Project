@@ -1,9 +1,9 @@
 #ifndef GDAL_READFILE_H
 #define GDAL_READFILE_H
 
-#include "include/ogrsf_frmts.h"
-#include "include/gdal_priv.h"
-#include "include/cpl_conv.h"
+#include "GDAL_include/ogrsf_frmts.h"
+#include "GDAL_include/gdal_priv.h"
+#include "GDAL_include/cpl_conv.h"
 #include <container_list.h>
 #include <QDebug>
 #include <QPointF>
