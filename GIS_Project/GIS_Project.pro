@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     container_list.cpp \
-    gdal_readfile.cpp
+    gdal_readfile.cpp \
+    y_mouse.cpp
 
 HEADERS  += mainwindow.h \
     GDAL_include/cpl_atomic_ops.h \
@@ -86,7 +87,8 @@ HEADERS  += mainwindow.h \
     GDAL_include/vrtdataset.h \
     container_list.h \
     gdal_readfile.h \
-    struct_list.h
+    struct_list.h \
+    y_mouse.h
 
 FORMS    += mainwindow.ui
 
