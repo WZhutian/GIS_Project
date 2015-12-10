@@ -26,22 +26,25 @@ void GDAL_ReadFile::Open_Shp(){
 }
 
 void GDAL_ReadFile::Get_Data(){
-//    for(int iField = 0; iField < poFDefn->GetFieldCount(); iField++ )
-//    {
-//        qDebug()<<poFeature->GetFieldAsString( iField );
-//    }
-    if( poGeometry != NULL
-            && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint )
+    //    for(int iField = 0; iField < poFDefn->GetFieldCount(); iField++ )
+    //    {
+    //        qDebug()<<poFeature->GetFieldAsString( iField );
+    //    }
+    while( (poFeature = poLayer->GetNextFeature()) != NULL )
     {
-        OGRPoint *poPoint = (OGRPoint *) poGeometry;
-        Points temp;
-        temp.Point.setX(poPoint->getX());
-        temp.Point.setY(poPoint->getY());
-        Container->Points_List.append(temp);
-        printf( "%.3f,%3.f\n", poPoint->getX(), poPoint->getY() );
-    }
-    else
-    {
-        printf( "no point geometry\n" );
+        poGeometry = poFeature->GetGeometryRef();
+        if( poGeometry != NULL
+                && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint )
+        {
+            OGRPoint *poPoint = (OGRPoint *) poGeometry;
+            Points temp;
+            temp.Point.setX(poPoint->getX());
+            temp.Point.setY(poPoint->getY());
+            Container->Points_List.append(temp);
+        }
+        else
+        {
+            printf( "no point geometry\n" );
+        }
     }
 }
