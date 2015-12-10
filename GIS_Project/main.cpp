@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     test.Get_Data();
     qDebug()<<Container.Points_List.length();
     qDebug()<<Container.Points_List.at(0).Point.x();
+    qDebug()<<Container.Points_List.at(0).Point.y();
     MainWindow w;
     w.show();
 
