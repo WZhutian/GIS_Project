@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include <qDebug>
+#include <iostream>
 #include <gdal_readfile.h>
 #include <tcp_server.h>
 #include <tcp_client.h>
