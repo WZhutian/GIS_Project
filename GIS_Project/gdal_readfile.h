@@ -1,6 +1,5 @@
 #ifndef GDAL_READFILE_H
 #define GDAL_READFILE_H
-
 #include "GDAL_include/ogrsf_frmts.h"
 #include "GDAL_include/gdal_priv.h"
 #include "GDAL_include/cpl_conv.h"
