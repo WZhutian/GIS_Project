@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui network
+CONFIG   -= app_bundle
+CONFIG   += C++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

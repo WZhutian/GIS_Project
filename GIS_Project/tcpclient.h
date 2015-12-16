@@ -7,6 +7,7 @@ class TcpClient
 {
 public:
     TcpClient();
+    ~TcpClient();
 public slots:
     void ReadError(QAbstractSocket::SocketError);
 private:

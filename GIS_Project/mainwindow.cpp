@@ -13,22 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     area=new EditWidget(this);
 
-
-//    QLineF *f=new QLineF(100,100,200,200);
-//    QGraphicsLineItem *l=new QGraphicsLineItem() ;
-//    l->setLine(*f);
-//    l->setFlag(QGraphicsItem::ItemIsMovable, true);
-//    l->setFlag(QGraphicsItem::ItemIsSelectable, true);
-//    area->addItem(l);
     QGraphicsView *view = new QGraphicsView(area,this);
-     //view->resize(1000000,5000000);
-        area->setSceneRect(497000,3518000,3500,3000);
+    area->setSceneRect(497000,3518000,3500,3000);
     view->setMouseTracking(true);
-     setCentralWidget(view);
-     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-     view->setScene(area);
-     view->show();
+    setCentralWidget(view);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setScene(area);
+    view->show();
 
 }
 
@@ -39,14 +31,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_penStyleComboBox_currentIndexChanged(const QString penStyle)
 {
-     if(penStyle == QStringLiteral("实线"))
-     {
-         area->setPenStyle(Qt::SolidLine);   //利用PaintArea类中的枚举变量
-     }
-     else if(penStyle == QStringLiteral("虚线"))
-     {
-         area->setPenStyle(Qt::DotLine);
-     }
+    if(penStyle == QStringLiteral("实线"))
+    {
+        area->setPenStyle(Qt::SolidLine);   //利用PaintArea类中的枚举变量
+    }
+    else if(penStyle == QStringLiteral("虚线"))
+    {
+        area->setPenStyle(Qt::DotLine);
+    }
 }
 void MainWindow::on_shapeComboBox_currentIndexChanged(const QString shape)
 {
@@ -98,13 +90,13 @@ void MainWindow::on_brushColorToolButton_clicked()
 
 void MainWindow::on_action_Draw_triggered()
 {
-   if( ui->action_Draw->isChecked()==true)
-   {
-       area->views()[0]->setCursor(Qt::CrossCursor);
-       area->setState(EditWidget::DrawType);
-       ui->action_Move->setChecked(false);
-       ui->action_Edit->setChecked(false);
-   }
+    if( ui->action_Draw->isChecked()==true)
+    {
+        area->views()[0]->setCursor(Qt::CrossCursor);
+        area->setState(EditWidget::DrawType);
+        ui->action_Move->setChecked(false);
+        ui->action_Edit->setChecked(false);
+    }
 }
 
 void MainWindow::on_action_Move_triggered()
