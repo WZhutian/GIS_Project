@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     container_list.cpp \
-    gdal_readfile.cpp
+    gdal_readfile.cpp \
+    editwidget.cpp
 
 HEADERS  += mainwindow.h \
     GDAL_include/cpl_atomic_ops.h \
@@ -87,11 +88,63 @@ HEADERS  += mainwindow.h \
     container_list.h \
     gdal_readfile.h \
     struct_list.h \
-    mydatastream.h
+    mydatastream.h \
+    editwidget.h
 
 FORMS    += mainwindow.ui
 
 LIBS += D:\GIS_Project\GIS_Project\GIS_Project\DLLs\libgdal.dll
 
 DISTFILES += \
-    DLLs/libgdal.dll
+    DLLs/libgdal.dll \
+    ICON/background.png \
+    ICON/canvas.png \
+    ICON/circle.png \
+    ICON/copy.png \
+    ICON/cut.png \
+    ICON/delete.png \
+    ICON/edit.png \
+    ICON/ellipse.png \
+    ICON/eraser.png \
+    ICON/exit.png \
+    ICON/fill.png \
+    ICON/find.png \
+    ICON/foreground.png \
+    ICON/fullExtent.png \
+    ICON/line.png \
+    ICON/move.png \
+    ICON/new.png \
+    ICON/open.png \
+    ICON/paint.png \
+    ICON/pan.png \
+    ICON/paste.png \
+    ICON/path.png \
+    ICON/pencil.png \
+    ICON/point.png \
+    ICON/polygon.png \
+    ICON/polyline.png \
+    ICON/property.png \
+    ICON/qt.png \
+    ICON/rectangle.png \
+    ICON/redo.png \
+    ICON/save.png \
+    ICON/saveAs.png \
+    ICON/select.png \
+    ICON/selectAll.png \
+    ICON/text.png \
+    ICON/undo.png \
+    ICON/unselect.png \
+    ICON/unselectAll.png \
+    ICON/zoomIn.png \
+    ICON/zoomOut.png \
+    ICON/canvas.ico \
+    ICON/layer_add.ico \
+    ICON/NewShape.ico \
+    ICON/paint.ico \
+    ICON/save.ico \
+    ICON/scene.ico \
+    ICON/zoom_in.ico \
+    ICON/zoom_out.ico
+
+RESOURCES += \
+    ICON/icon.qrc
