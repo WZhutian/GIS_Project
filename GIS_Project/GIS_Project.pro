@@ -16,7 +16,11 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     container_list.cpp \
     gdal_readfile.cpp \
-    editwidget.cpp
+    editwidget.cpp \
+    tcpclient.cpp \
+    tcpserver.cpp \
+    tcpsocket.cpp \
+    threadhandle.cpp
 
 HEADERS  += mainwindow.h \
     GDAL_include/cpl_atomic_ops.h \
@@ -89,7 +93,11 @@ HEADERS  += mainwindow.h \
     gdal_readfile.h \
     struct_list.h \
     mydatastream.h \
-    editwidget.h
+    editwidget.h \
+    tcpclient.h \
+    tcpserver.h \
+    tcpsocket.h \
+    threadhandle.h
 
 FORMS    += mainwindow.ui
 
