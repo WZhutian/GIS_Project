@@ -3,7 +3,6 @@
 #include <QGraphicsView>
 #include <QGraphicsPolygonItem>
 #include <QPainterPath>
-#include "qgraphicspolylineitem.h"
 #include <QMessageBox>
 #include <math.h>
 #include <QDebug>

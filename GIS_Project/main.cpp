@@ -2,8 +2,6 @@
 #include <QApplication>
 #include <iostream>
 #include <gdal_readfile.h>
-#include <tcp_server.h>
-#include <tcp_client.h>
 #include <QDebug>
 int main(int argc, char *argv[])
 {
@@ -13,12 +11,6 @@ int main(int argc, char *argv[])
     test.Get_Data();
     qDebug()<<Container.Points_List.length();
     qDebug()<<Container.Points_List.at(0).Point.x();
-    Tcp_Server New_server;
-    New_server.Get_SqrData(Container);
-    if(!New_server.listen(QHostAddress::LocalHost,6666)){
-        qDebug()<<"wrong";
-    }
-    qDebug()<<"blocked";
     MainWindow w;
     w.show();
 
