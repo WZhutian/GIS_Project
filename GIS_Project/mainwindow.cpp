@@ -5,7 +5,7 @@
 #include <QGraphicsView>
 #include <QGraphicsLineItem>
 #include <QColorDialog>
-
+#include <QMessageBox>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -21,14 +21,38 @@ MainWindow::MainWindow(QWidget *parent) :
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setScene(area);
     view->show();
-
+    //socket部分，客户端client
+    tcpClient = new QTcpSocket(this);
+    ui->pushSent->setEnabled(false);
+    this->ui->timeBut->setEnabled(false);
+    //开始读取
+    tcpClient->abort();
+    connect(tcpClient,&QTcpSocket::readyRead,
+            [&](){
+        qDebug()<<tr("Server Say：%1").arg(QString(this->tcpClient->readAll()));
+    });
+    connect(tcpClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(ReadError(QAbstractSocket::SocketError)));//错误信号
+    connect(&tm,&QTimer::timeout,[&](){
+        int i = qrand() % 6;
+       qDebug()<<tr("%1 Timer Sent: %2").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(list.at(i));
+        tcpClient->write(list.at(i).toUtf8());
+    });//循环
+    connect(tcpClient,&QTcpSocket::disconnected,[](){qDebug()<< "123333" ;});
+    list << "我是谁?" << "渡世白玉" << "hello" << "哈哈哈哈哈" << "你是坏蛋!" <<  "测试一下下了" << "不知道写什么" ;
+    QTime time;
+    time= QTime::currentTime();
+    qsrand(time.msec()+time.second()*1000);
+    ipAdd="127.0.0.1";
+    portd="6666";
+    h_time=1;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete tcpClient;
 }
-
+//绘图部分------------------------------------------------------------
 void MainWindow::on_penStyleComboBox_currentIndexChanged(const QString penStyle)
 {
     if(penStyle == QStringLiteral("实线"))
@@ -147,4 +171,72 @@ void MainWindow::on_action_ZoomOut_triggered()
 void MainWindow::on_drawpoints_clicked()
 {
     area->showpoints();
+}
+//tcp部分------------------------------------------------------------
+
+void MainWindow::on_pushConnect_clicked()//连接服务器
+{
+    qDebug() << "点击连接：" ;
+    if ("连接" == this->ui->pushConnect->text())
+    {
+        tcpClient->connectToHost(ipAdd,portd.toInt());
+        if (tcpClient->waitForConnected(1000))
+        {
+            ui->pushConnect->setText("断开");
+            qDebug()<<"连接服务器成功";
+            ui->pushSent->setEnabled(true);
+            this->ui->timeBut->setEnabled(true);
+        }
+    }
+    else
+    {
+        tcpClient->disconnectFromHost();
+        if (tcpClient->state() == QAbstractSocket::UnconnectedState || tcpClient->waitForDisconnected(1000) )
+        {
+            ui->pushConnect->setText("连接");
+            qDebug()<<"断开服务器";
+            ui->pushSent->setEnabled(false);
+            tm.stop();
+            this->ui->timeBut->setEnabled(false);
+            this->ui->timeBut->setText("启动定时");
+        }
+    }
+}
+
+void MainWindow::on_pushSent_clicked()//发送信息
+{
+    qDebug() << "点击发送：" ;
+    QString data =" this->ui->txtData->text();";
+    if (data.isEmpty())
+    {
+        return ;
+    }
+    tcpClient->write(data.toUtf8());
+}
+
+void MainWindow::ReadError(QAbstractSocket::SocketError)//出错
+{
+    tcpClient->disconnectFromHost();
+    ui->pushConnect->setText("连接");
+    qDebug()<<tr("连接出错：%1").arg(tcpClient->errorString());
+    ui->pushSent->setEnabled(false);
+    tm.stop();
+    this->ui->timeBut->setEnabled(false);
+    this->ui->timeBut->setText("启动定时");
+}
+
+void MainWindow::on_timeBut_clicked()//设置定时
+{
+    if ("启动定时" == this->ui->timeBut->text())
+    {
+        int h;
+        h = h_time*1000;
+        tm.start(h);
+        this->ui->timeBut->setText("停止定时");
+    }
+    else
+    {
+        tm.stop();
+        this->ui->timeBut->setText("启动定时");
+    }
 }
