@@ -5,12 +5,12 @@
 //传单个点
 inline QDataStream& operator<<(QDataStream& out, const St_Points& Points)
 {
-    out<<Points.Point<<Points.Attribute_Point<<Points.Layer_ID;
+    out<<Points.Point<<Points.Attribute_Point<<Points.PC_ID;
     return out;
 }
 inline QDataStream& operator>>(QDataStream& in,St_Points& Points)
 {
-    in>>Points.Point>>Points.Attribute_Point>>Points.Layer_ID;
+    in>>Points.Point>>Points.Attribute_Point>>Points.PC_ID;
     return in;
 }
 #endif // MYDATASTREAM

@@ -15,10 +15,7 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     container_list.cpp \
-    gdal_readfile.cpp \
-    tcp_client.cpp \
-    tcp_server_thread.cpp \
-    tcp_server.cpp
+    gdal_readfile.cpp
 
 HEADERS  += mainwindow.h \
     GDAL_include/cpl_atomic_ops.h \
@@ -90,10 +87,7 @@ HEADERS  += mainwindow.h \
     container_list.h \
     gdal_readfile.h \
     struct_list.h \
-    tcp_client.h \
-    mydatastream.h \
-    tcp_server_thread.h \
-    tcp_server.h
+    mydatastream.h
 
 FORMS    += mainwindow.ui
 

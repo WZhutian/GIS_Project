@@ -11,6 +11,7 @@ public:
     QList<St_Lines> Lines_List;
     QList<St_Polygens> Polygens_List;
     QList<St_Layers> Layers_List;//图层列表，用以映射以上list
+    QList<St_Operates>Operate_List;//操作记录表
 };
 
 #endif // CONTAINER_LIST_H
