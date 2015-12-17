@@ -36,6 +36,17 @@ struct St_Raster_images{//栅格图片
 
 };
 /**
+ * @brief The St_Change struct
+ * 每次增删改都要修改相应图层下
+ * 负责人：W
+ */
+struct St_Change{//保存TCP传输过程中需要重发的图元信息
+    int PC_ID;//修改地方是被哪一个PC所修改的
+    int Index_Part;//修改的索引号
+    QList<int> Sended_PC_ID;//服务端一直保存的，发送给哪个PC就添加对应PC_ID号，下次就不发送了
+    int Change_Way;//0为删除，1为修改，2为添加
+};
+/**
  * @brief The St_Layers struct
  * 用于图层显示以及tcp过程中的首要判断要素
  * 删除要素时候需要添加删除次数
@@ -57,17 +68,7 @@ struct St_Layers{//图层
     //客户机每次发送都清空一次，告诉服务端它此次上传修改了那些地方，服务端永久保存
     //只用作从服务端获取更新
 };
-/**
- * @brief The St_Change struct
- * 每次增删改都要修改相应图层下
- * 负责人：W
- */
-struct St_Change{//保存TCP传输过程中需要重发的图元信息
-    int PC_ID;//修改地方是被哪一个PC所修改的
-    int Index_Part;//修改的索引号
-    QList<int> Sended_PC_ID;//服务端一直保存的，发送给哪个PC就添加对应PC_ID号，下次就不发送了
-    int Change_Way;//0为删除，1为修改，2为添加
-};
+
 
 #endif // STRUCT_LIST
 

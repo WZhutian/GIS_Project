@@ -14,6 +14,8 @@ class TcpServer : public QTcpServer
 public:
     explicit TcpServer(QObject *parent = 0,int numConnections = 10000);
     ~TcpServer();
+    Container_List *Container;//保存当前容器
+    void Get_Container(Container_List &Container_out);
 
     void setMaxPendingConnections(int numConnections);//重写设置最大连接数函数
 signals:

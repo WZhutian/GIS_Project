@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     qDebug()<<Container.Points_List.at(0).Point.x();
     TcpServer ser;
     ser.listen(QHostAddress::Any,6666);
+    ser.Get_Container(Container);
     MainWindow w;
     w.show();
 

@@ -48,16 +48,21 @@ void TcpSocket::disConTcp(int i)
 
 void TcpSocket::readData()
 {
-//    datas.append(this->readAll());
-    auto data  = handleData(this->readAll(),this->peerAddress().toString(),this->peerPort());
-    auto test =this->readAll();
-    qDebug() << data;
-    this->write(test);
-    this->write(data);
-//    if (!watcher.isRunning())//放到异步线程中处理。
-//    {
-//        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue(),this->peerAddress().toString(),this->peerPort()));
-//    }
+    this->readAll();
+    qDebug()<<Container->Points_List.at(2).Point.x();
+    QByteArray str1="test2";
+    QByteArray str2=" of myew";
+    datas.append(str1);
+    datas.append(str2);
+//    auto data  = handleData(this->readAll(),this->peerAddress().toString(),this->peerPort());
+//    auto test =this->readAll();
+//    qDebug() << data;
+//    this->write(test);
+//    this->write(data);
+    if (!watcher.isRunning())//放到异步线程中处理。--这个特么好屌
+    {
+        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue(),this->peerAddress().toString(),this->peerPort()));
+    }
 }
 
 QByteArray TcpSocket::handleData(QByteArray data, const QString &ip, qint16 port)
@@ -80,4 +85,7 @@ void TcpSocket::startNext()
     {
         watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue(),this->peerAddress().toString(),this->peerPort()));
     }
+}
+void TcpSocket::Get_Container(Container_List &Container_out){
+    Container=&Container_out;
 }

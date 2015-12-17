@@ -8,6 +8,7 @@
 
 #include <QTime>
 
+#include <container_list.h>
 
 class TcpSocket : public QTcpSocket
 {
@@ -16,7 +17,8 @@ public:
     explicit TcpSocket(qintptr socketDescriptor, QObject *parent = 0);
     ~TcpSocket();
     QByteArray handleData(QByteArray data,const QString & ip, qint16 port);//用来处理数据的函数
-
+    Container_List *Container;//保存当前容器
+    void Get_Container(Container_List &Container_out);
 signals:
     //void readData(const int,const QString &,const quint16,const QByteArray &);
     void sockDisConnect(const int ,const QString &,const quint16, QThread *);//NOTE:断开连接的用户信息，此信号必须发出！线程管理类根据信号计数的
