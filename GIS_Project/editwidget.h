@@ -53,8 +53,8 @@ public:
     void showShape(QVector<QGraphicsItem*> shapes);
     void setPen();
     QVector<QPointF> points;    //绘制的图形对应的坐标
-    QVector<QGraphicsItem*> shapes;
-    QVector<QGraphicsItem*> tempShapes;
+    QVector<QGraphicsItem*> shapes;//交互操作图形容器
+    QVector<QGraphicsItem*> containerItem;//总的图形容器
     QVector<QPointF> points2; //存从数据库读出来的点
     void showpoints();
     void showpicture();

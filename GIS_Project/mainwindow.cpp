@@ -152,14 +152,9 @@ void MainWindow::on_action_Edit_triggered()
 
 
 
-void MainWindow::on_action_Clear_triggered()
+void MainWindow::on_action_Refresh_triggered()
 {
-    while(area->items().count()>0)
-    {
-        area->removeItem(area->items()[0]);
-    }
 
-    area->points.clear();
 }
 
 void MainWindow::on_action_ZoomIn_triggered()
@@ -245,3 +240,5 @@ void MainWindow::on_timeBut_clicked()//设置定时
         this->ui->timeBut->setText("启动定时");
     }
 }
+
+

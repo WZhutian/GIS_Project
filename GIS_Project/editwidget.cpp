@@ -39,9 +39,9 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
         //                newPointCircle->setBrush(Qt::red);
         //                QGraphicsItem *origPointCricle=
         //                        this->itemAt(points[i],this->items()[0]->transform());
-        //                tempShapes.removeOne(origPointCricle);
-        //                tempShapes.append(newPointCircle);
-        //                showShape(tempShapes);
+        //                shapes.removeOne(origPointCricle);
+        //                shapes.append(newPointCircle);
+        //                showShape(shapes);
         //                editPointIndex=i;
         //            }
     }
@@ -63,12 +63,11 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             cur->setPen(*pen);
             cur->setFlag(QGraphicsItem::ItemIsMovable,true);
             cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
-            tempShapes.append(cur);
-            showShape(tempShapes);
-            tempShapes.clear();
-            qDebug()<<this->items().size();
+            shapes.append(cur);
+            showShape(shapes);
+            shapes.clear();
             this->removeItem(this->items()[1]);
-
+            qDebug()<<this->items().size();
         }
         else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
         {
@@ -78,9 +77,9 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
              QPainterPath *path=new QPainterPath(points[0]);
              cur->setPath(*path);
              cur->setPen(*pen);
-             tempShapes.append(cur);
-             showShape(tempShapes);
-             tempShapes.clear();
+             shapes.append(cur);
+             showShape(shapes);
+             shapes.clear();
             isDrawing=true;
         }
         else if(event->button()==Qt::RightButton && this->isDrawing)
@@ -116,9 +115,9 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             cur->setPen(*pen);
             cur->setBrush(brushColor);
 
-            tempShapes.append(cur);
-            showShape(tempShapes);
-            tempShapes.clear();
+            shapes.append(cur);
+            showShape(shapes);
+            shapes.clear();
         }
         else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
         {
@@ -178,11 +177,11 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
                 newPointCircle->setBrush(Qt::red);
                 QGraphicsItem *origPointCricle=
                         this->itemAt(points[i],this->items()[0]->transform());
-               // tempShapes.removeOne(origPointCricle);
+               // shapes.removeOne(origPointCricle);
                 this->removeItem(origPointCricle);
-                tempShapes.append(newPointCircle);
-                showShape(tempShapes);
-                tempShapes.clear();
+                shapes.append(newPointCircle);
+                showShape(shapes);
+                shapes.clear();
                 editPointIndex=i;
             }
         }
@@ -192,7 +191,7 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
         this->views()[0]->setCursor(Qt::PointingHandCursor);
         points.clear();
         curEditItem = this->itemAt(event->scenePos(), this->items()[0]->transform());
-        //tempShapes=shapes;
+        //shapes=shapes;
         QGraphicsPathItem*curEditPathItem=dynamic_cast<QGraphicsPathItem*>(curEditItem);
         if(curEditPathItem!=NULL)
         {
@@ -204,9 +203,9 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
                 QGraphicsEllipseItem *pointCircle=new
                         QGraphicsEllipseItem(curPoint.x()-3,curPoint.y()-3,6,6);
                 pointCircle->setBrush(Qt::red);
-                tempShapes.append(pointCircle);
-                showShape(tempShapes);
-                tempShapes.clear();
+                shapes.append(pointCircle);
+                showShape(shapes);
+                shapes.clear();
             }
         }
         QGraphicsPolygonItem*curEditPolygonItem=dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
@@ -218,9 +217,9 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
                 QGraphicsEllipseItem *pointCircle=new
                         QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6);
                 pointCircle->setBrush(Qt::red);
-                tempShapes.append(pointCircle);
-                showShape(tempShapes);
-                tempShapes.clear();
+                shapes.append(pointCircle);
+                showShape(shapes);
+                shapes.clear();
             }
         }
         isEditing=true;
@@ -236,7 +235,7 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
         }
         isEditing=false;
         points.clear();
-        tempShapes.clear();
+        shapes.clear();
         curEditItem=NULL;
         editPointIndex=-1;
     }
@@ -276,9 +275,9 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
             cur->setPen(*pen);
             cur->setFlag(QGraphicsItem::ItemIsMovable,true);
             cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
-            tempShapes.append(cur);
-            showShape(tempShapes);
-            tempShapes.clear();
+            shapes.append(cur);
+            showShape(shapes);
+            shapes.clear();
 
         }
         else if(curShape==this->PolygonType)
@@ -290,12 +289,12 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
             cur->setPolygon(*curPolygon);
             cur->setPen(*pen);
             cur->setBrush(brushColor);
-            tempShapes=shapes;
-            tempShapes.append(cur);
-            showShape(tempShapes);
-            while(tempShapes.count()>0)
+            shapes=shapes;
+            shapes.append(cur);
+            showShape(shapes);
+            while(shapes.count()>0)
             {
-                tempShapes.remove(0);
+                shapes.remove(0);
             }
         }
     }
@@ -341,7 +340,7 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
             QPolygonF *curPolygon=new QPolygonF(points);
             curEditPolygonItem->setPolygon(*curPolygon);
         }
-        //tempShapes=shapes;
+        //shapes=shapes;
         for(int i=0;i<points.count();++i)
         {
 
@@ -350,25 +349,25 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
                 QGraphicsEllipseItem *pointCircle=new
                         QGraphicsEllipseItem(points[i].x()-5,points[i].y()-5,10,10);
                 pointCircle->setBrush(Qt::red);
-                tempShapes.append(pointCircle);
+                shapes.append(pointCircle);
             }
             else
             {
                 QGraphicsEllipseItem *pointCircle=new
                         QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6);
                 pointCircle->setBrush(Qt::red);
-                tempShapes.append(pointCircle);
+                shapes.append(pointCircle);
             }
        }
         for(int i=0;i<points.count();i++)
         {
             this->removeItem(this->items()[0]);
         }
-        showShape(tempShapes);
-        tempShapes.clear();
-//        while(tempShapes.count()>0)
+        showShape(shapes);
+        shapes.clear();
+//        while(shapes.count()>0)
 //        {
-//            tempShapes.remove(0);
+//            shapes.remove(0);
 //        }
     }
 }
@@ -388,23 +387,23 @@ void EditWidget::mouseReleaseMove(QGraphicsSceneMouseEvent *)
 void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *)
 {
     this->views()[0]->setCursor(Qt::PointingHandCursor);
-//    tempShapes=shapes;
+//    shapes=shapes;
     for(int i=0;i<points.count();++i)
     {
         QGraphicsEllipseItem *pointCircle=new
                 QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6);
         pointCircle->setBrush(Qt::red);
-        tempShapes.append(pointCircle);
+        shapes.append(pointCircle);
     }
     editPointIndex=-1;
     for(int i=0;i<points.count();i++)
     {
         this->removeItem(this->items()[0]);
     }
-    showShape(tempShapes);
-    while(tempShapes.count()>0)
+    showShape(shapes);
+    while(shapes.count()>0)
     {
-        tempShapes.remove(0);
+        shapes.remove(0);
     }
 }
 
@@ -526,11 +525,11 @@ void EditWidget::showpoints()
                 new QGraphicsEllipseItem(points2[i].x()-1,points2[i].y()-1,2,2);
         newPointCircle->setBrush(Qt::red);
 
-        tempShapes.append(newPointCircle);
+        shapes.append(newPointCircle);
 
     }
-    showShape(tempShapes);
-    tempShapes.clear();
+    showShape(shapes);
+    shapes.clear();
 
 }
 void EditWidget::showpicture()

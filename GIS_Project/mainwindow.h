@@ -43,6 +43,8 @@ private slots:
     void on_pushConnect_clicked();
     void on_timeBut_clicked();
 
+    void on_action_Refresh_triggered();
+
 private:
     Ui::MainWindow *ui;
     //socket部分，客户端client
