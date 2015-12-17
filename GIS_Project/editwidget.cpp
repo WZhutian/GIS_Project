@@ -510,13 +510,11 @@ void EditWidget::setState(viewState state)
 
 void EditWidget::showpoints()
 {
-    Container_List container;
-    GDAL_ReadFile test("D:\\pnt1.shp",container);
-    test.Get_Data();
-    for(int i=0;i<container.Points_List.length();i++)
+
+    for(int i=0;i<Container->Points_List.length();i++)
     {
-        //qDebug()<<container.Points_List.at(i).Point.x()<<container.Points_List.at(i).Point.y()<<endl;
-        QPointF point(container.Points_List.at(i).Point.x(),container.Points_List.at(i).Point.y());
+        //qDebug()<<Container.Points_List.at(i).Point.x()<<Container.Points_List.at(i).Point.y()<<endl;
+        QPointF point(Container->Points_List.at(i).Point.x(),Container->Points_List.at(i).Point.y());
         points2.append(point);
     }
 
