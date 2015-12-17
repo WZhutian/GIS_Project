@@ -47,6 +47,11 @@ MainWindow::MainWindow(QWidget *parent) :
     h_time=1;
 }
 
+void MainWindow::Get_Container(Container_List &Container_Out){
+    Container=&Container_Out;
+    area->Get_Container(*Container);
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;

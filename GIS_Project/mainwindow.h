@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "editwidget.h"
 #include <QtNetwork>
-
+#include "container_list.h"
 namespace Ui {
 class MainWindow;
 }
@@ -15,11 +15,13 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    Container_List *Container;
     EditWidget *area;
     ~MainWindow();
     QString ipAdd;//服务器IP地址
     QString portd;//服务器端口号
     int h_time;//定时器时间
+    void Get_Container(Container_List &Container_Out);
 private slots:
     //绘图部分
     void on_penStyleComboBox_currentIndexChanged(const QString penStyle);

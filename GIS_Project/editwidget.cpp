@@ -22,6 +22,10 @@ EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
     editPointIndex=-1;
 
 }
+void EditWidget::Get_Container(Container_List &Container_Out){
+    Container=&Container_Out;
+}
+
 void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
 {
     setPen();

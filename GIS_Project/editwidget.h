@@ -12,6 +12,7 @@ class EditWidget: public QGraphicsScene
 {
 public:
     EditWidget(QWidget *parent=0);
+    Container_List *Container;
     bool isDrawing;      //false表示结束画图，true表示正在画图
     bool isEditing;
     int editPointIndex;
@@ -21,6 +22,7 @@ public:
 
     QGraphicsItem* curEditItem;
     QGraphicsItem* curdrawitem;
+    void Get_Container(Container_List &Container_Out);
 
     enum ShapeType   //枚举变量,要绘制的图形的类型
     {

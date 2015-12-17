@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     ser.listen(QHostAddress::Any,6666);
     ser.Get_Container(Container);
     MainWindow w;
+    w.Get_Container(Container);
     w.show();
 
     return a.exec();
