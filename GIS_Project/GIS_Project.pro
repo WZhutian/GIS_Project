@@ -19,7 +19,6 @@ SOURCES += main.cpp\
     container_list.cpp \
     gdal_readfile.cpp \
     editwidget.cpp \
-    tcpclient.cpp \
     tcpserver.cpp \
     tcpsocket.cpp \
     threadhandle.cpp
@@ -96,7 +95,6 @@ HEADERS  += mainwindow.h \
     struct_list.h \
     mydatastream.h \
     editwidget.h \
-    tcpclient.h \
     tcpserver.h \
     tcpsocket.h \
     threadhandle.h
