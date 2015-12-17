@@ -23,7 +23,7 @@
      <x>0</x>
      <y>0</y>
      <width>632</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -318,6 +318,13 @@
       </layout>
      </item>
      <item>
+      <widget class="QPushButton" name="pushConnect">
+       <property name="text">
+        <string>连接</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer_5">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -330,6 +337,20 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushSent">
+       <property name="text">
+        <string>发送数据</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="timeBut">
+       <property name="text">
+        <string>启动定时</string>
+       </property>
+      </widget>
+     </item>
     </layout>
     <zorder>verticalSpacer</zorder>
     <zorder>verticalSpacer_2</zorder>
@@ -337,6 +358,9 @@
     <zorder>verticalSpacer_4</zorder>
     <zorder>verticalSpacer_5</zorder>
     <zorder>label_6</zorder>
+    <zorder>pushConnect</zorder>
+    <zorder>timeBut</zorder>
+    <zorder>pushSent</zorder>
    </widget>
   </widget>
   <widget class="QToolBar" name="toolBar">

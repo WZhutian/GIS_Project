@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include "editwidget.h"
-
+#include <QtNetwork>
 
 namespace Ui {
 class MainWindow;
@@ -17,7 +17,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     EditWidget *area;
     ~MainWindow();
-
+    QString ipAdd;//服务器IP地址
+    QString portd;//服务器端口号
+    int h_time;//定时器时间
 private slots:
     //绘图部分
     void on_penStyleComboBox_currentIndexChanged(const QString penStyle);
@@ -32,10 +34,19 @@ private slots:
     void on_action_ZoomIn_triggered();
     void on_action_ZoomOut_triggered();
     void on_drawpoints_clicked();
-    //socket部分
+    //socket部分,客户端client
+    void ReadError(QAbstractSocket::SocketError);
+
+    void on_pushSent_clicked();
+    void on_pushConnect_clicked();
+    void on_timeBut_clicked();
 
 private:
     Ui::MainWindow *ui;
+    //socket部分，客户端client
+    QTcpSocket * tcpClient;
+    QTimer tm;
+    QStringList list;
 };
 
 #endif // MAINWINDOW_H

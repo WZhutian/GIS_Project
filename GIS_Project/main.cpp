@@ -3,6 +3,7 @@
 #include <iostream>
 #include <gdal_readfile.h>
 #include <QDebug>
+#include "tcpserver.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -11,6 +12,8 @@ int main(int argc, char *argv[])
     test.Get_Data();
     qDebug()<<Container.Points_List.length();
     qDebug()<<Container.Points_List.at(0).Point.x();
+    TcpServer ser;
+    ser.listen(QHostAddress::Any,6666);
     MainWindow w;
     w.show();
 
