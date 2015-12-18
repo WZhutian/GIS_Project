@@ -116,11 +116,20 @@
        <item>
         <widget class="QComboBox" name="shapeComboBox">
          <property name="currentText">
-          <string>线</string>
+          <string>点</string>
          </property>
          <property name="maxCount">
           <number>2147483642</number>
          </property>
+         <item>
+          <property name="text">
+           <string>点</string>
+          </property>
+          <property name="icon">
+           <iconset resource="ICON/icon.qrc">
+            <normaloff>:/new/prefix1/circle.png</normaloff>:/new/prefix1/circle.png</iconset>
+          </property>
+         </item>
          <item>
           <property name="text">
            <string>线</string>
