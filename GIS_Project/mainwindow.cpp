@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     view->show();
     //socket部分，客户端client
     tcpClient = new QTcpSocket(this);
-    ui->pushSent->setEnabled(false);
-    this->ui->timeBut->setEnabled(false);
+    ui->action_Tcp_Sent->setEnabled(false);
+    this->ui->action_Tcp_Time->setEnabled(false);
     //开始读取
     tcpClient->abort();
     connect(tcpClient,&QTcpSocket::readyRead,
@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tcpClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(ReadError(QAbstractSocket::SocketError)));//错误信号
     connect(&tm,&QTimer::timeout,[&](){
         int i = qrand() % 6;
-       qDebug()<<tr("%1 Timer Sent: %2").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(list.at(i));
+        qDebug()<<tr("%1 Timer Sent: %2").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(list.at(i));
         tcpClient->write(list.at(i).toUtf8());
     });//循环
     connect(tcpClient,&QTcpSocket::disconnected,[](){qDebug()<< "123333" ;});
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qsrand(time.msec()+time.second()*1000);
     ipAdd="127.0.0.1";
     portd="6666";
-    h_time=1;
+    h_time=10;
 }
 
 void MainWindow::Get_Container(Container_List &Container_Out){
@@ -174,24 +174,33 @@ void MainWindow::on_action_ZoomOut_triggered()
 }
 
 
-void MainWindow::on_drawpoints_clicked()
-{
-    area->showpoints();
-}
 //tcp部分------------------------------------------------------------
 
-void MainWindow::on_pushConnect_clicked()//连接服务器
+
+
+void MainWindow::ReadError(QAbstractSocket::SocketError)//出错
+{
+    tcpClient->disconnectFromHost();
+    ui->action_Tcp_Connect->setText("连接");
+    qDebug()<<tr("连接出错：%1").arg(tcpClient->errorString());
+    ui->action_Tcp_Sent->setEnabled(false);
+    tm.stop();
+    this->ui->action_Tcp_Time->setEnabled(false);
+    this->ui->action_Tcp_Time->setText("启动定时");
+}
+
+void MainWindow::on_action_Tcp_Connect_triggered()
 {
     qDebug() << "点击连接：" ;
-    if ("连接" == this->ui->pushConnect->text())
+    if ("连接" == this->ui->action_Tcp_Connect->text())
     {
         tcpClient->connectToHost(ipAdd,portd.toInt());
         if (tcpClient->waitForConnected(1000))
         {
-            ui->pushConnect->setText("断开");
+            ui->action_Tcp_Connect->setText("断开");
             qDebug()<<"连接服务器成功";
-            ui->pushSent->setEnabled(true);
-            this->ui->timeBut->setEnabled(true);
+            ui->action_Tcp_Sent->setEnabled(true);
+            this->ui->action_Tcp_Time->setEnabled(true);
         }
     }
     else
@@ -199,17 +208,17 @@ void MainWindow::on_pushConnect_clicked()//连接服务器
         tcpClient->disconnectFromHost();
         if (tcpClient->state() == QAbstractSocket::UnconnectedState || tcpClient->waitForDisconnected(1000) )
         {
-            ui->pushConnect->setText("连接");
+            ui->action_Tcp_Connect->setText("连接");
             qDebug()<<"断开服务器";
-            ui->pushSent->setEnabled(false);
+            ui->action_Tcp_Sent->setEnabled(false);
             tm.stop();
-            this->ui->timeBut->setEnabled(false);
-            this->ui->timeBut->setText("启动定时");
+            this->ui->action_Tcp_Time->setEnabled(false);
+            this->ui->action_Tcp_Time->setText("启动定时");
         }
     }
 }
 
-void MainWindow::on_pushSent_clicked()//发送信息
+void MainWindow::on_action_Tcp_Sent_triggered()
 {
     qDebug() << "点击发送：" ;
     QString data =" this->ui->txtData->text();";
@@ -220,31 +229,44 @@ void MainWindow::on_pushSent_clicked()//发送信息
     tcpClient->write(data.toUtf8());
 }
 
-void MainWindow::ReadError(QAbstractSocket::SocketError)//出错
+void MainWindow::on_action_Tcp_Time_triggered()
 {
-    tcpClient->disconnectFromHost();
-    ui->pushConnect->setText("连接");
-    qDebug()<<tr("连接出错：%1").arg(tcpClient->errorString());
-    ui->pushSent->setEnabled(false);
-    tm.stop();
-    this->ui->timeBut->setEnabled(false);
-    this->ui->timeBut->setText("启动定时");
-}
-
-void MainWindow::on_timeBut_clicked()//设置定时
-{
-    if ("启动定时" == this->ui->timeBut->text())
+    if ("启动定时" == this->ui->action_Tcp_Time->text())
     {
         int h;
         h = h_time*1000;
         tm.start(h);
-        this->ui->timeBut->setText("停止定时");
+        this->ui->action_Tcp_Time->setText("停止定时");
     }
     else
     {
         tm.stop();
-        this->ui->timeBut->setText("启动定时");
+        this->ui->action_Tcp_Time->setText("启动定时");
     }
 }
 
+void MainWindow::on_action_ReadShp_triggered()//读shp文件
+{
+    QString path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("Image Files(*.jpg *.png *.shp)"));
+    if(path.right(4)==".shp"){
+        GDAL_ReadFile test(path.toLatin1().data(),*Container);
+        test.Get_Data();
+    }else{
+        St_Raster_images temp;
+        temp.Image=new QImage(path);
+        St_Layers temp_ly;
+        temp_ly.Layer_ID=Container->Layers_List.size();
+        temp_ly.Layer_Name="Image Layer";
+        Container->Images_List.append(temp);
+        Container->Layers_List.append(temp_ly);
+    }
+}
+void MainWindow::Show_TreeView(){
+    //清空
+    //显示所有
+}
 
+void MainWindow::on_action_Edit_2_triggered()
+{
+
+}

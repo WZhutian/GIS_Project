@@ -8,10 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Container_List Container;
-    GDAL_ReadFile test("D:\\pnt1.shp",Container);
-    test.Get_Data();
-    qDebug()<<Container.Points_List.length();
-    qDebug()<<Container.Points_List.at(0).Point.x();
+    Container.PC_ID=0;
     TcpServer ser;
     ser.listen(QHostAddress::Any,6666);
     ser.Get_Container(Container);
