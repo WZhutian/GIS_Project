@@ -2,8 +2,8 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QHostAddress>
 #include <QDebug>
-//#include <struct_list.h>
-//#include <mydatastream.h>
+#include <struct_list.h>
+#include <mydatastream.h>
 TcpSocket::TcpSocket(qintptr socketDescriptor, QObject *parent) : //构造函数在主线程执行，lambda在子线程
     QTcpSocket(parent),socketID(socketDescriptor)
 {
@@ -46,35 +46,47 @@ void TcpSocket::disConTcp(int i)
         this->deleteLater();
     }
 }
-
+QByteArray TcpSocket::intToByte(int i)
+{
+    QByteArray abyte0;
+    abyte0.resize(4);
+    abyte0[0] = (uchar)  (0x000000ff & i);
+    abyte0[1] = (uchar) ((0x0000ff00 & i) >> 8);
+    abyte0[2] = (uchar) ((0x00ff0000 & i) >> 16);
+    abyte0[3] = (uchar) ((0xff000000 & i) >> 24);
+    return abyte0;
+}
+int TcpSocket::bytesToInt(QByteArray bytes) {
+    int addr = bytes[0] & 0x000000FF;
+    addr |= ((bytes[1] << 8) & 0x0000FF00);
+    addr |= ((bytes[2] << 16) & 0x00FF0000);
+    addr |= ((bytes[3] << 24) & 0xFF000000);
+    return addr;
+}
 void TcpSocket::readData()
 {
     this->readAll();
-    qDebug()<<Container->Points_List.at(2).Point.x();
-    QByteArray str1="test2";
-    QByteArray str2=" of myew";
-    datas.append(str1);
-    datas.append(str2);
+    QByteArray block;
+    QDataStream out (&block,QIODevice::WriteOnly);
+    int layer_size=Container->Layers_List.size();
+    out<<intToByte(layer_size);
+    for(int i=0;i<layer_size;i++){
+        out<<Container->Layers_List.at(i);
+    }
+    this->write(block);
 //    auto data  = handleData(this->readAll(),this->peerAddress().toString(),this->peerPort());
 //    auto test =this->readAll();
 //    qDebug() << data;
 //    this->write(test);
 //    this->write(data);
-    if (!watcher.isRunning())//放到异步线程中处理。--这个特么好屌
-    {
-        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
-    }
+//    if (!watcher.isRunning())//放到异步线程中处理。
+//    {
+//        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
+//    }
 }
 
 QByteArray TcpSocket::handleData(QByteArray data)
 {
-    QTime time;
-    time.start();
-
-    QElapsedTimer tm;
-    tm.start();
-    while(tm.elapsed() < 100)
-    {}
     return data;
 }
 

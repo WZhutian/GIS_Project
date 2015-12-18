@@ -35,25 +35,27 @@ inline QDataStream& operator>>(QDataStream& in,St_Lines& Lines)
 //{
 //    return in;
 //}
-//inline QDataStream& operator<<(QDataStream& out, const St_Layers& Layers)
-//{
-//    out<<Layers.Layer_ID<<Layers.Layer_Name<<Layers.Pc_numbers;
-//    for(int i=0;i<10;i++){
-//        out<<Layers.Every_size[i];
-//    }
-//    out<<Layers.Size<<Layers.Ob_Type<<Layers.Delete_Times<<Layers.Change_List_Size;
-//    for(int j=0;j<Layers.Change_List_Size;j++){
-//        out<<Layers.Change_List.at(j).Change_Way;
-//          <<Layers.Change_List.at(j).Index_Part;
-//             <<Layers.Change_List.at(j).PC_ID;
-//               <<Layers.Change_List.at(j).Sended_PC_ID;
-//    }
-//    return out;
-//}
-//inline QDataStream& operator>>(QDataStream& in,St_Layers& Layers)
-//{
-//    in>>Points.Point>>Points.Attribute_Point>>Points.PC_ID;
-//    return in;
-//}
+inline QDataStream& operator<<(QDataStream& out, const St_Layers& Layers)
+{
+    out<<Layers.Layer_ID<<Layers.Layer_Name<<Layers.Pc_numbers;
+    for(int i=0;i<10;i++){
+        out<<Layers.Every_size[i];
+    }
+    out<<Layers.Size<<Layers.Ob_Type<<Layers.Delete_Times;
+    out<<Layers.PC_ID<<Layers.Index_Part<<Layers.Change_Way<<Layers.Accept_PC;
+
+    return out;
+}
+inline QDataStream& operator>>(QDataStream& in,St_Layers& Layers)
+{
+    in>>Layers.Layer_ID>>Layers.Layer_Name>>Layers.Pc_numbers;
+    for(int i=0;i<10;i++){
+        in>>Layers.Every_size[i];
+    }
+    in>>Layers.Size>>Layers.Ob_Type>>Layers.Delete_Times;
+    in>>Layers.PC_ID>>Layers.Index_Part>>Layers.Change_Way>>Layers.Accept_PC;
+
+    return in;
+}
 #endif // MYDATASTREAM
 

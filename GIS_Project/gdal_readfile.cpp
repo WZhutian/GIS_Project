@@ -33,6 +33,7 @@ void GDAL_ReadFile::Get_Data(){
 //    St_Layers temp;
 //    temp.Layer_ID
 //    Container->Layers_List.append();
+    St_Layers temp_ly;
     while( (poFeature = poLayer->GetNextFeature()) != NULL )//读取几何信息
     {
         poGeometry = poFeature->GetGeometryRef();
@@ -43,18 +44,20 @@ void GDAL_ReadFile::Get_Data(){
             St_Points temp;
             temp.Point.setX(poPoint->getX());
             temp.Point.setY(poPoint->getY());
-            St_Layers temp_ly;
+            Container->Points_List.append(temp);
+            //
             temp_ly.Layer_ID=Container->Layers_List.size();
             temp_ly.Layer_Name="Point Layer";
             temp_ly.Size++;
             temp_ly.Every_size[Container->PC_ID]++;
             temp_ly.Ob_Type=0;
-            Container->Points_List.append(temp);
-            Container->Layers_List.append(temp_ly);
+            //
         }
         else
         {
             printf( "no point geometry\n" );
         }
     }
+    Container->Layers_List.append(temp_ly);
+    qDebug()<<Container->Layers_List.size();
 }
