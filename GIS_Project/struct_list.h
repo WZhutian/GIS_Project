@@ -3,6 +3,7 @@
 #include <QList>
 #include <QString>
 #include <QPointF>
+#include <QImage>
 //其中，删除以后，Index_Part值不变，每次添加都按照layers的Size+Delete_Times
 struct St_Points{//点
     QPointF Point;//存储点坐标
@@ -29,11 +30,8 @@ struct St_Polygens{//多边形
 };
 struct St_Raster_images{//栅格图片
     QList<QPointF> Image_Point;//图片四个角的位置
-    //TODO 存储图片
+    QImage *Image;
     int Layer_ID;//图层标记
-    int PC_ID;//客户端标记，当前PC不属于该ID的时候，禁止编辑！！
-    int Index_Part;//在当前PC号对应部分下的索引号
-
 };
 /**
  * @brief The St_Change struct
@@ -55,13 +53,13 @@ struct St_Change{//保存TCP传输过程中需要重发的图元信息
 struct St_Layers{//图层
     int Layer_ID;//（未必需要）与list中的索引号冲突
     QString Layer_Name;//图层名字
-    int Pc_numbers;//保存当前工作集群中的PC数量
-    QList<int> Every_size;//按顺序保存各个PC所对应的图元数量
-    int Size;//保存图层数量
+    int Pc_numbers=0;//保存当前工作集群中的PC数量
+    int Every_size[10] ={0};//按顺序保存各个PC所对应的图元数量，假设不超过10个PC
+    int Size=0;//保存图层中图元的数量
     int Ob_Type;//图元类型，0为点，1为线，2为面
-    bool Visiable;//是否显示
-    bool isEditing;//是否为当前编辑
-    int Delete_Times;//删除次数
+    bool Visiable=false;//是否显示
+    bool isEditing=false;//是否为当前编辑
+    int Delete_Times=0;//删除次数
     //TCP通信判断部分：
     QList<St_Change> Change_List;
     //被修改/删除的图元在第三层PC_ID对应部分中的索引号，用于tcp中重发机制，
