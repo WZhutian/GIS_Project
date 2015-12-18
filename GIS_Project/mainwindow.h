@@ -54,7 +54,7 @@ private slots:
     void on_action_Tcp_Sent_triggered();
     void on_action_Tcp_Time_triggered();
 
-    void on_action_Edit_2_triggered();
+    void on_action_Tcp_Server_triggered();
 
 private:
     Ui::MainWindow *ui;
