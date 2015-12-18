@@ -82,7 +82,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
              shapes.clear();
             isDrawing=true;
         }
-        else if(event->button()==Qt::RightButton && this->isDrawing)
+        else if(event->button()==Qt::RightButton && this->isDrawing) //如果正在画图，右键单击结束画图
         {
             QPainterPath *path=new QPainterPath(points[0]);
             for(int i=1;i<points.count();++i)
@@ -98,6 +98,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             shapes.append(cur);
             showShape(shapes);
             shapes.clear();
+            containerItem.append(cur);
             this->removeItem(this->items()[1]);
             isDrawing=false;
 
@@ -117,6 +118,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
 
             shapes.append(cur);
             showShape(shapes);
+            this->removeItem(this->items()[1]);
             shapes.clear();
         }
         else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
@@ -124,6 +126,13 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
 
             points.clear();
             points.append(event->scenePos());
+            QGraphicsPathItem *cur=new QGraphicsPathItem();
+             QPainterPath *path=new QPainterPath(points[0]);
+             cur->setPath(*path);
+             cur->setPen(*pen);
+             shapes.append(cur);
+             showShape(shapes);
+             shapes.clear();
             isDrawing=true;
         }
         else if(event->button()==Qt::RightButton && this->isDrawing)
@@ -138,7 +147,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             shapes.append(cur);
             showShape(shapes);
             shapes.clear();
-
+            this->removeItem(this->items()[1]);
             isDrawing=false;
         }
     }
@@ -282,6 +291,17 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
         }
         else if(curShape==this->PolygonType)
         {
+            if(this->items().size()!=0)
+            {
+                //curdrawitem=this->itemAt(lastPoint,this->items()[0]->transform());
+                curdrawitem=this->items()[0];
+
+                if(curdrawitem!=NULL)
+                {
+
+                    this->removeItem(curdrawitem);
+                }
+            }
             QVector<QPointF> tempPoints=points;
             tempPoints.append(event->scenePos());
             QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
@@ -289,7 +309,7 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
             cur->setPolygon(*curPolygon);
             cur->setPen(*pen);
             cur->setBrush(brushColor);
-            shapes=shapes;
+         //   shapes=shapes;
             shapes.append(cur);
             showShape(shapes);
             while(shapes.count()>0)
