@@ -65,7 +65,7 @@ void TcpSocket::readData()
     }
 }
 
-QByteArray TcpSocket::handleData(QByteArray data, const QString &ip, qint16 port)
+QByteArray TcpSocket::handleData(QByteArray data)
 {
     QTime time;
     time.start();
