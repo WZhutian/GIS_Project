@@ -9,7 +9,7 @@
 #include<QImage>
 EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
 {
-    curShape = this->PolylineType;
+    curShape = this->PointType;
     curState=this->DrawType;
     isDrawing=false;
     isEditing=false;
@@ -33,6 +33,10 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
     {
                     if(event->button()==Qt::LeftButton && this->isDrawing)
                     {
+                         for(int i=0;i<points.count();i++)
+                         {
+                             this->removeItem(this->items()[0]);
+                         }
                         points.append(event->scenePos());
                         for(int i=0;i<points.count();i++)
                         {
@@ -42,10 +46,12 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
                             newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
                             newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
                             shapes.append(newPointCircle);
-                            showShape(shapes);
-                            this->removeItem(this->items()[1]);
                             editPointIndex=i;
                         }
+                          showShape(shapes);
+                          shapes.clear();
+
+                         // qDebug()<<this->items().size();
                     }
                     else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
                     {
