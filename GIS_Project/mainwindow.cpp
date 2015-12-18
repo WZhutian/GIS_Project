@@ -154,6 +154,12 @@ void MainWindow::on_action_Edit_triggered()
 
 void MainWindow::on_action_Refresh_triggered()
 {
+     area->clear();
+     qDebug()<<area->items().size();
+     for(int i=0;i<area->containerItem.count();i++)
+     {
+         area->addItem(area->containerItem[i]);
+     }
 
 }
 
