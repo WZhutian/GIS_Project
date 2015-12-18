@@ -31,19 +31,37 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
     setPen();
     if(curShape==this->PointType)
     {
-        //            if(event->button()==Qt::LeftButton && this->isDrawing)
-        //            {
-        //                points.append(event->scenePos());
-        //                QGraphicsEllipseItem *newPointCircle=
-        //                        new QGraphicsEllipseItem(points[i].x()-5,points[i].y()-5,10,10);
-        //                newPointCircle->setBrush(Qt::red);
-        //                QGraphicsItem *origPointCricle=
-        //                        this->itemAt(points[i],this->items()[0]->transform());
-        //                shapes.removeOne(origPointCricle);
-        //                shapes.append(newPointCircle);
-        //                showShape(shapes);
-        //                editPointIndex=i;
-        //            }
+                    if(event->button()==Qt::LeftButton && this->isDrawing)
+                    {
+                        points.append(event->scenePos());
+                        for(int i=0;i<points.count();i++)
+                        {
+                            QGraphicsEllipseItem *newPointCircle=
+                                    new QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6);
+                            newPointCircle->setBrush(Qt::red);
+                            newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
+                            newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
+                            shapes.append(newPointCircle);
+                            showShape(shapes);
+                            this->removeItem(this->items()[1]);
+                            editPointIndex=i;
+                        }
+                    }
+                    else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
+                    {
+                        points.clear();
+                        points.append(event->scenePos());
+
+                        QGraphicsEllipseItem *newPointCircle=
+                                new QGraphicsEllipseItem(points[0].x()-3,points[0].y()-3,6,6);
+                        newPointCircle->setBrush(Qt::red);
+                        newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
+                        newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
+                         shapes.append(newPointCircle);
+                         showShape(shapes);
+                         shapes.clear();
+                        isDrawing=true;
+                    }
     }
     else if(curShape==this->PolylineType)
     {
