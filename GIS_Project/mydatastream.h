@@ -5,13 +5,55 @@
 //传单个点
 inline QDataStream& operator<<(QDataStream& out, const St_Points& Points)
 {
-    out<<Points.Point<<Points.Attribute_Point<<Points.PC_ID;
+    out<<Points.Point<<Points.Attribute_Point<<Points.Layer_ID<<Points.PC_ID<<
+         Points.Index_Part;
     return out;
 }
 inline QDataStream& operator>>(QDataStream& in,St_Points& Points)
 {
-    in>>Points.Point>>Points.Attribute_Point>>Points.PC_ID;
+    in>>Points.Point>>Points.Attribute_Point>>Points.Layer_ID>>Points.PC_ID>>
+            Points.Index_Part;
     return in;
 }
+inline QDataStream& operator<<(QDataStream& out, const St_Lines& Lines)
+{
+    out<<Lines.Line_FromTo<<Lines.Attribute_Line<<Lines.Layer_ID<<Lines.PC_ID<<
+         Lines.Index_Part;
+    return out;
+}
+inline QDataStream& operator>>(QDataStream& in,St_Lines& Lines)
+{
+    in>>Lines.Line_FromTo>>Lines.Attribute_Line>>Lines.Layer_ID>>Lines.PC_ID>>
+                           Lines.Index_Part;
+    return in;
+}
+//inline QDataStream& operator<<(QDataStream& out, const St_Polygens& Polygens)
+//{
+//    return out;
+//}
+//inline QDataStream& operator>>(QDataStream& in,St_Polygens& Polygens)
+//{
+//    return in;
+//}
+//inline QDataStream& operator<<(QDataStream& out, const St_Layers& Layers)
+//{
+//    out<<Layers.Layer_ID<<Layers.Layer_Name<<Layers.Pc_numbers;
+//    for(int i=0;i<10;i++){
+//        out<<Layers.Every_size[i];
+//    }
+//    out<<Layers.Size<<Layers.Ob_Type<<Layers.Delete_Times<<Layers.Change_List_Size;
+//    for(int j=0;j<Layers.Change_List_Size;j++){
+//        out<<Layers.Change_List.at(j).Change_Way;
+//          <<Layers.Change_List.at(j).Index_Part;
+//             <<Layers.Change_List.at(j).PC_ID;
+//               <<Layers.Change_List.at(j).Sended_PC_ID;
+//    }
+//    return out;
+//}
+//inline QDataStream& operator>>(QDataStream& in,St_Layers& Layers)
+//{
+//    in>>Points.Point>>Points.Attribute_Point>>Points.PC_ID;
+//    return in;
+//}
 #endif // MYDATASTREAM
 

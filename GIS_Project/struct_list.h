@@ -51,16 +51,19 @@ struct St_Change{//保存TCP传输过程中需要重发的图元信息
  * 负责人：W
  */
 struct St_Layers{//图层
+
+    bool Visiable=false;//是否显示
+    bool isEditing=false;//是否为当前编辑
+
     int Layer_ID;//（未必需要）与list中的索引号冲突
     QString Layer_Name;//图层名字
     int Pc_numbers=0;//保存当前工作集群中的PC数量
     int Every_size[10] ={0};//按顺序保存各个PC所对应的图元数量，假设不超过10个PC
     int Size=0;//保存图层中图元的数量
     int Ob_Type;//图元类型，0为点，1为线，2为面
-    bool Visiable=false;//是否显示
-    bool isEditing=false;//是否为当前编辑
     int Delete_Times=0;//删除次数
     //TCP通信判断部分：
+    int Change_List_Size;//记录changelist大小
     QList<St_Change> Change_List;
     //被修改/删除的图元在第三层PC_ID对应部分中的索引号，用于tcp中重发机制，
     //客户机每次发送都清空一次，告诉服务端它此次上传修改了那些地方，服务端永久保存

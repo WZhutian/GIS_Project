@@ -2,7 +2,8 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QHostAddress>
 #include <QDebug>
-
+//#include <struct_list.h>
+//#include <mydatastream.h>
 TcpSocket::TcpSocket(qintptr socketDescriptor, QObject *parent) : //构造函数在主线程执行，lambda在子线程
     QTcpSocket(parent),socketID(socketDescriptor)
 {
@@ -61,7 +62,7 @@ void TcpSocket::readData()
 //    this->write(data);
     if (!watcher.isRunning())//放到异步线程中处理。--这个特么好屌
     {
-        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue(),this->peerAddress().toString(),this->peerPort()));
+        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
     }
 }
 
@@ -74,7 +75,6 @@ QByteArray TcpSocket::handleData(QByteArray data)
     tm.start();
     while(tm.elapsed() < 100)
     {}
-    data =  QByteArray::number(port) + " " + data + " " + QTime::currentTime().toString().toUtf8();
     return data;
 }
 
@@ -83,7 +83,7 @@ void TcpSocket::startNext()
     this->write(watcher.future().result());
     if (!datas.isEmpty())
     {
-        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue(),this->peerAddress().toString(),this->peerPort()));
+        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
     }
 }
 void TcpSocket::Get_Container(Container_List &Container_out){

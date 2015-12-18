@@ -16,7 +16,7 @@ class TcpSocket : public QTcpSocket
 public:
     explicit TcpSocket(qintptr socketDescriptor, QObject *parent = 0);
     ~TcpSocket();
-    QByteArray handleData(QByteArray data,const QString & ip, qint16 port);//用来处理数据的函数
+    QByteArray handleData(QByteArray data);//用来处理数据的函数
     Container_List *Container;//保存当前容器
     void Get_Container(Container_List &Container_out);
 signals:
