@@ -28,22 +28,12 @@ struct St_Polygens{//多边形
     int Index_Part;//在当前PC号对应部分下的索引号
 
 };
-struct St_Raster_images{//栅格图片
+struct St_Raster_images{//栅格图片 图片其实不能用TCP传递
     QList<QPointF> Image_Point;//图片四个角的位置
     QImage *Image;
     int Layer_ID;//图层标记
 };
-/**
- * @brief The St_Change struct
- * 每次增删改都要修改相应图层下
- * 负责人：W
- */
-struct St_Change{//保存TCP传输过程中需要重发的图元信息
-    int PC_ID;//修改地方是被哪一个PC所修改的
-    int Index_Part;//修改的索引号
-    QList<int> Sended_PC_ID;//服务端一直保存的，发送给哪个PC就添加对应PC_ID号，下次就不发送了
-    int Change_Way;//0为删除，1为修改，2为添加
-};
+
 /**
  * @brief The St_Layers struct
  * 用于图层显示以及tcp过程中的首要判断要素
@@ -63,8 +53,10 @@ struct St_Layers{//图层
     int Ob_Type;//图元类型，0为点，1为线，2为面
     int Delete_Times=0;//删除次数
     //TCP通信判断部分：
-    int Change_List_Size;//记录changelist大小
-    QList<St_Change> Change_List;
+    QList<int> PC_ID;//修改地方是被哪一个PC所修改的
+    QList<int> Index_Part;//修改的索引号
+    QList<int> Change_Way;//0为删除，1为修改，2为添加
+    QList<QString> Accept_PC;//服务端一直保存的，发送给哪个PC就添加对应PC_ID号，下次就不发送了
     //被修改/删除的图元在第三层PC_ID对应部分中的索引号，用于tcp中重发机制，
     //客户机每次发送都清空一次，告诉服务端它此次上传修改了那些地方，服务端永久保存
     //只用作从服务端获取更新

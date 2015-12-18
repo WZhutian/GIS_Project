@@ -19,6 +19,12 @@ public:
     QByteArray handleData(QByteArray data);//用来处理数据的函数
     Container_List *Container;//保存当前容器
     void Get_Container(Container_List &Container_out);
+
+    void Judge_LayerSent(){//将传输过来的layer与本地layer比较，将要发送的包直接存入datas中
+
+    }
+    QByteArray  intToByte(int i);
+    int bytesToInt(QByteArray bytes);
 signals:
     //void readData(const int,const QString &,const quint16,const QByteArray &);
     void sockDisConnect(const int ,const QString &,const quint16, QThread *);//NOTE:断开连接的用户信息，此信号必须发出！线程管理类根据信号计数的
