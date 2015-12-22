@@ -201,7 +201,8 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
                 int PC_id_size=0;//获取当前待查找Pcid拥有的元素数量，以供二分查找
                 for(int j=0;j<Layers_List.size();j++){//先找到layer
                     if(Layers_List.at(j).Layer_ID==LayerIDjudge){//获取排在待查找PCid之前的索引数量
-                        for(int c=0;c<PC_ID;c++)
+                        int c=0;
+                        for(c=0;c<PC_ID;c++)
                             index_before+=Layers_List.at(j).Every_size[c];
                         PC_id_size=Layers_List.at(j).Every_size[c];
                         break;
@@ -449,7 +450,8 @@ int Container_List::Current_insert(int Layer_ID,int PC_ID,int Index_Part,int Typ
                 int PC_id_size=0;//获取当前待查找Pcid拥有的元素数量，以供二分查找
                 for(int j=0;j<Layers_List.size();j++){//先找到layer
                     if(Layers_List.at(j).Layer_ID==LayerIDjudge){//获取排在待查找PCid之前的索引数量
-                        for(int c=0;c<PC_ID;c++)
+                        int c=0;
+                        for(;c<PC_ID;c++)
                             index_before+=Layers_List.at(j).Every_size[c];
                         PC_id_size=Layers_List.at(j).Every_size[c];
                         break;

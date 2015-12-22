@@ -213,7 +213,7 @@ void TcpSocket::readData()
             St_Points Points_out;
             Message>>Points_out;
             //添加到本地容器
-            int insert_index=Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
+            int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
             Container->Points_List.insert(insert_index,Points_out);
         }
         QByteArray Ln_size;
@@ -223,7 +223,7 @@ void TcpSocket::readData()
             St_Lines Lines_out;
             Message>>Lines_out;
             //添加到本地容器
-            int insert_index=Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
+            int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
             Container->Lines_List.insert(insert_index,Lines_out);
         }
         QByteArray Pl_size;
@@ -233,8 +233,8 @@ void TcpSocket::readData()
             St_Polygens Polygens_out;
             Message>>Polygens_out;
             //添加到本地容器
-            int insert_index=Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
-            Container->Points_List.insert(insert_index,Polygens_out);
+            int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
+            Container->Polygens_List.insert(insert_index,Polygens_out);
         }
     }
 
