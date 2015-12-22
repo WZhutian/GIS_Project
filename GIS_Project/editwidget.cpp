@@ -7,6 +7,7 @@
 #include <math.h>
 #include <QDebug>
 #include<QImage>
+#include<QScrollBar>
 EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
 {
     curShape = this->PointType;
@@ -24,6 +25,9 @@ EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
 }
 void EditWidget::Get_Container(Container_List &Container_Out){
     Container=&Container_Out;
+}
+void EditWidget::Get_Graphicview(QGraphicsView &Graphic_View_Out){
+    view=&Graphic_View_Out;
 }
 
 void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
@@ -279,7 +283,11 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
 void EditWidget::mousePressMoveScene(QGraphicsSceneMouseEvent *event)
 {
     this->views()[0]->setCursor(Qt::ClosedHandCursor);
-     origPoint1=event->scenePos();
+     //origPoint1=event->scenePos();
+    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
+    {
+        this->views()[0]->setDragMode(QGraphicsView::ScrollHandDrag);
+    }
 }
 
 
@@ -291,6 +299,7 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
         setPen();
         if(curShape==this->PointType)
         {
+            isDrawing=false;
         }
         else if(curShape==this->PolylineType)
         {
@@ -371,17 +380,34 @@ void EditWidget::mouseMoveMove(QGraphicsSceneMouseEvent *event)
 }
 void EditWidget::mouseMoveMoveScene(QGraphicsSceneMouseEvent *event)
 {
-    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
-    {
-        movePoint1=event->scenePos();
-        qreal dx=movePoint1.x()-origPoint1.x();
-        qreal dy=movePoint1.y()-origPoint1.y();
-        QGraphicsView *view = new QGraphicsView(this);
-        QPointF SceneCenter(view->viewport()->width()/2,view->viewport()->height()/2);
-        QPointF target(SceneCenter.x()-dx,SceneCenter.y()-dy);
-        view->centerOn(target);
-        origPoint1=movePoint1;
-    }
+   // if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
+  // {
+
+//        movePoint1=event->scenePos();
+//        qreal dx=movePoint1.x()-origPoint1.x();
+//        qreal dy=movePoint1.y()-origPoint1.y();
+
+
+
+//        qreal x=view->contentsRect().x()-dx;
+//        qreal y=view->contentsRect().y()-dy;
+//        QScrollBar *pVScrollBar=new QScrollBar();
+//        pVScrollBar=view->verticalScrollBar();
+//        if(pVScrollBar!=NULL)//竖直方向调整
+//        {
+//            qreal nYValue =pVScrollBar->value();
+//            pVScrollBar->setValue(nYValue+y);
+
+//        }
+//        QScrollBar *pHScrollBar =view->horizontalScrollBar();
+//        if(pHScrollBar!=NULL)
+//        {
+//            qreal nXValue=pHScrollBar->value();
+//            pHScrollBar->setValue(nXValue+x);
+//        }
+//        view->show();
+        //origPoint1=movePoint1;
+ //  }
 }
 
 void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
@@ -453,6 +479,11 @@ void EditWidget::mouseReleaseMove(QGraphicsSceneMouseEvent *)
 void EditWidget::mouseReleaseMoveScene(QGraphicsSceneMouseEvent *event)
 {
     this->views()[0]->setCursor(Qt::OpenHandCursor);
+    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
+    {
+        this->views()[0]->setDragMode(QGraphicsView::NoDrag);
+    }
+
 }
 
 void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *)

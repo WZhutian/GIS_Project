@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     area=new EditWidget(this);
 
     QGraphicsView *view = new QGraphicsView(area,this);
+    area->Get_Graphicview(*view);
     area->setSceneRect(497000,3518000,3500,3000);
     view->setMouseTracking(true);
     setCentralWidget(view);

@@ -25,7 +25,8 @@ public:
     QGraphicsItem* curEditItem;
     QGraphicsItem* curdrawitem;
     void Get_Container(Container_List &Container_Out);
-
+    void Get_Graphicview(QGraphicsView &Graphic_View_Out);
+    QGraphicsView *view;
     enum ShapeType   //枚举变量,要绘制的图形的类型
     {
         NoneType,
