@@ -56,6 +56,8 @@ private slots:
 
     void on_action_Tcp_Server_triggered();
 
+    void on_action_movescene_triggered();
+
 private:
     Ui::MainWindow *ui;
     //socket部分，客户端client

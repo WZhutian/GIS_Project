@@ -16,8 +16,10 @@ public:
     bool isDrawing;      //false表示结束画图，true表示正在画图
     bool isEditing;
     int editPointIndex;
-    QPointF movePoint;
-    QPointF origPoint;
+    QPointF movePoint;//移动对象时移动的点
+    QPointF origPoint;//移动对象时的原始点
+    QPointF origPoint1;//移动场景的原始点
+    QPointF movePoint1;//移动场景的移动点
     QPen *pen;
 
     QGraphicsItem* curEditItem;
@@ -41,7 +43,9 @@ public:
         DrawType,
         MoveType,
         EditType,
-        RotateType
+        MoveSceneType,
+        RotateType,
+        clearType
     };
 
     void setPenStyle(Qt::PenStyle style); //设置画笔风格
@@ -58,6 +62,7 @@ public:
     QVector<QPointF> points2; //存从数据库读出来的点
     void showpoints();
     void showpicture();
+
     ~EditWidget();
 
 protected:
@@ -75,17 +80,23 @@ private:
     ShapeType curShape;
     viewState curState;
 
+    void mousePressClear(QGraphicsSceneMouseEvent *);
     void mousePressDraw(QGraphicsSceneMouseEvent *);
     void mousePressMove(QGraphicsSceneMouseEvent *);
     void mousePressEdit(QGraphicsSceneMouseEvent *);
+    void mousePressMoveScene(QGraphicsSceneMouseEvent *);
 
     void mouseMoveDraw(QGraphicsSceneMouseEvent *);
     void mouseMoveMove(QGraphicsSceneMouseEvent *);
     void mouseMoveEdit(QGraphicsSceneMouseEvent *);
+    void mouseMoveClear(QGraphicsSceneMouseEvent *);
+    void mouseMoveMoveScene(QGraphicsSceneMouseEvent *);
 
     void mouseReleaseDraw(QGraphicsSceneMouseEvent *);
     void mouseReleaseMove(QGraphicsSceneMouseEvent *);
     void mouseReleaseEdit(QGraphicsSceneMouseEvent *);
+    void mouseReleaseClear(QGraphicsSceneMouseEvent *);
+    void mouseReleaseMoveScene(QGraphicsSceneMouseEvent *);
 
     void mouseDoubleClickEdit(QGraphicsSceneMouseEvent *);
 };

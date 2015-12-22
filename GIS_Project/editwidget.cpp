@@ -9,7 +9,7 @@
 #include<QImage>
 EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
 {
-    curShape = this->PolylineType;
+    curShape = this->PointType;
     curState=this->DrawType;
     isDrawing=false;
     isEditing=false;
@@ -33,19 +33,26 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
     {
                     if(event->button()==Qt::LeftButton && this->isDrawing)
                     {
+                         for(int i=0;i<points.count();i++)
+                         {
+                             this->removeItem(this->items()[0]);
+                         }
                         points.append(event->scenePos());
                         for(int i=0;i<points.count();i++)
                         {
                             QGraphicsEllipseItem *newPointCircle=
-                                    new QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6);
+                                    new QGraphicsEllipseItem(points[i].x()-5,points[i].y()-5,10,10);
                             newPointCircle->setBrush(Qt::red);
                             newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
                             newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
                             shapes.append(newPointCircle);
-                            showShape(shapes);
-                            this->removeItem(this->items()[1]);
                             editPointIndex=i;
                         }
+                          showShape(shapes);
+                          shapes.clear();
+                          isDrawing=false;
+
+                         // qDebug()<<this->items().size();
                     }
                     else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
                     {
@@ -53,7 +60,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
                         points.append(event->scenePos());
 
                         QGraphicsEllipseItem *newPointCircle=
-                                new QGraphicsEllipseItem(points[0].x()-3,points[0].y()-3,6,6);
+                                new QGraphicsEllipseItem(points[0].x()-5,points[0].y()-5,10,10);
                         newPointCircle->setBrush(Qt::red);
                         newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
                         newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -85,7 +92,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             showShape(shapes);
             shapes.clear();
             this->removeItem(this->items()[1]);
-            qDebug()<<this->items().size();
+           // qDebug()<<this->items().size();
         }
         else if(event->button()==Qt::LeftButton && !this->isDrawing)     //如果之前没有开始画图，则单击开始画图
         {
@@ -191,6 +198,7 @@ void EditWidget::mousePressMove(QGraphicsSceneMouseEvent *event)
 
 void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
 {
+
     if(event->button()==Qt::LeftButton && this->isEditing)
     {
         this->views()[0]->setCursor(Qt::SizeAllCursor);
@@ -266,7 +274,14 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
         curEditItem=NULL;
         editPointIndex=-1;
     }
+
 }
+void EditWidget::mousePressMoveScene(QGraphicsSceneMouseEvent *event)
+{
+    this->views()[0]->setCursor(Qt::ClosedHandCursor);
+     origPoint1=event->scenePos();
+}
+
 
 void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
 {
@@ -342,7 +357,7 @@ void EditWidget::mouseMoveMove(QGraphicsSceneMouseEvent *event)
 {
     if(( event->buttons()&Qt::LeftButton)&& isDrawing==false && this->selectedItems().count()>0)
     {
-
+        //  qDebug()<<this->selectedItems().count();
         movePoint=event->scenePos();
         qreal dx=movePoint.x()-origPoint.x();
         qreal dy=movePoint.y()-origPoint.y();
@@ -353,6 +368,20 @@ void EditWidget::mouseMoveMove(QGraphicsSceneMouseEvent *event)
         origPoint=movePoint;
     }
 
+}
+void EditWidget::mouseMoveMoveScene(QGraphicsSceneMouseEvent *event)
+{
+    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
+    {
+        movePoint1=event->scenePos();
+        qreal dx=movePoint1.x()-origPoint1.x();
+        qreal dy=movePoint1.y()-origPoint1.y();
+        QGraphicsView *view = new QGraphicsView(this);
+        QPointF SceneCenter(view->viewport()->width()/2,view->viewport()->height()/2);
+        QPointF target(SceneCenter.x()-dx,SceneCenter.y()-dy);
+        view->centerOn(target);
+        origPoint1=movePoint1;
+    }
 }
 
 void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
@@ -421,6 +450,10 @@ void EditWidget::mouseReleaseMove(QGraphicsSceneMouseEvent *)
     this->clearSelection();
 
 }
+void EditWidget::mouseReleaseMoveScene(QGraphicsSceneMouseEvent *event)
+{
+    this->views()[0]->setCursor(Qt::OpenHandCursor);
+}
 
 void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *)
 {
@@ -449,6 +482,10 @@ void EditWidget::mouseDoubleClickEdit(QGraphicsSceneMouseEvent *)
 {
 
 }
+void EditWidget::mouseMoveClear(QGraphicsSceneMouseEvent *)
+{
+
+}
 
 void EditWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
@@ -463,6 +500,14 @@ void EditWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     else if(curState==EditType)
     {
         mousePressEdit(event);
+    }
+    else if(curState==clearType)
+    {
+        mousePressClear(event);
+    }
+    else if(curState==MoveSceneType)
+    {
+        mousePressMoveScene(event);
     }
 }
 
@@ -481,6 +526,14 @@ void EditWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     {
         mouseMoveEdit(event);
     }
+    else if(curState==clearType)
+    {
+        mouseMoveClear(event);
+    }
+    else if(curState==MoveSceneType)
+    {
+        mouseMoveMoveScene(event);
+    }
 }
 
 
@@ -497,6 +550,10 @@ void EditWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     else if(curState==EditType)
     {
         mouseReleaseEdit(event);
+    }
+    else if(curState==MoveSceneType)
+    {
+        mouseReleaseMoveScene(event);
     }
 }
 
@@ -580,6 +637,20 @@ void EditWidget::showpicture()
                 this->addItem(item);
 
 
+}
+void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
+{
+    this->views()[0]->setCursor(Qt::PointingHandCursor);
+    if(this->items().count()>0)
+    {
+        QGraphicsItem *selectItem =this->itemAt(event->scenePos(), this->items()[0]->transform());
+        if(selectItem != NULL)
+        {
+            selectItem->setSelected(true);
+            this->removeItem(selectItem);
+            this->clearSelection();
+         }
+    }
 }
 
 EditWidget::~EditWidget()

@@ -423,6 +423,8 @@ void MainWindow::on_action_Draw_triggered()
         area->setState(EditWidget::DrawType);
         ui->action_Move->setChecked(false);
         ui->action_Edit->setChecked(false);
+        ui->action_Refresh->setChecked(false);
+        ui->action_movescene->setChecked(false);
     }
 }
 
@@ -434,6 +436,8 @@ void MainWindow::on_action_Move_triggered()
         area->setState(EditWidget::MoveType);
         ui->action_Draw->setChecked(false);
         ui->action_Edit->setChecked(false);
+        ui->action_Refresh->setChecked(false);
+        ui->action_movescene->setChecked(false);
     }
 }
 
@@ -445,6 +449,8 @@ void MainWindow::on_action_Edit_triggered()
         area->setState(EditWidget::EditType);
         ui->action_Move->setChecked(false);
         ui->action_Draw->setChecked(false);
+        ui->action_Refresh->setChecked(false);
+        ui->action_movescene->setChecked(false);
     }
 }
 
@@ -452,14 +458,30 @@ void MainWindow::on_action_Edit_triggered()
 
 void MainWindow::on_action_Refresh_triggered()
 {
-    area->clear();
-    qDebug()<<area->items().size();
-    for(int i=0;i<area->containerItem.count();i++)
+    if(ui->action_Refresh->isChecked()==true)
     {
-        area->addItem(area->containerItem[i]);
+    area->views()[0]->setCursor(Qt::PointingHandCursor);
+    area->setState(EditWidget::clearType);
+    ui->action_Move->setChecked(false);
+    ui->action_Draw->setChecked(false);
+    ui->action_Edit->setChecked(false);
+    ui->action_movescene->setChecked(false);
     }
 
 }
+void MainWindow::on_action_movescene_triggered()
+{
+    if(ui->action_movescene->isChecked()==true)
+    {
+        area->views()[0]->setCursor(Qt::OpenHandCursor);
+        area->setState(EditWidget::MoveSceneType);
+        ui->action_Draw->setChecked(false);
+        ui->action_Edit->setChecked(false);
+        ui->action_Move->setChecked(false);
+        ui->action_Refresh->setChecked(false);
+    }
+}
+
 
 void MainWindow::on_action_ZoomIn_triggered()
 {
@@ -569,3 +591,4 @@ void MainWindow::on_action_Tcp_Server_triggered()
     this->ui->action_Tcp_Server->setEnabled(false);
 
 }
+
