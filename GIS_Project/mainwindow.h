@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QStandardItemModel>
 #include <gdal_readfile.h>
+#include<QMouseEvent>
 namespace Ui {
 class MainWindow;
 }
@@ -57,7 +58,9 @@ private slots:
     void on_action_Tcp_Server_triggered();
 
     void on_action_movescene_triggered();
-
+protected:
+//    void mousePressEvent(QMouseEvent *);
+//    void mouseMoveEvent(QMouseEvent *);
 private:
     Ui::MainWindow *ui;
     //socket部分，客户端client
