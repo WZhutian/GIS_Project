@@ -25,12 +25,11 @@ public:
     QString portd;//服务器端口号
     int h_time;//定时器时间
     void Get_Container(Container_List &Container_Out);
+    void Get_TcpServer(TcpServer &TcpSever_Out);
+    TcpServer *ser;
     QByteArray  intToByte(int i);
     int bytesToInt(QByteArray bytes);
 
-    //查找
-    int Current_search(int Layer_ID,int PC_ID,int Index_Part,int Type);
-    int Add_search(int Layer_ID,int PC_ID,int Type);
     //显示树形图
     void Show_TreeView();
 private slots:

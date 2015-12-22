@@ -10,10 +10,10 @@ int main(int argc, char *argv[])
     Container_List Container;
     Container.PC_ID=0;
     TcpServer ser;
-    ser.listen(QHostAddress::Any,6666);
     ser.Get_Container(Container);
     MainWindow w;
     w.Get_Container(Container);
+    w.Get_TcpServer(ser);
     w.show();
 
     return a.exec();

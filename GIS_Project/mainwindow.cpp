@@ -7,7 +7,7 @@
 #include <QColorDialog>
 #include <QMessageBox>
 #include "mydatastream.h"
-#include "tcpserver.h"
+#include <QInputDialog>
 QByteArray  MainWindow::intToByte(int i)
 {
     QByteArray abyte0;
@@ -24,227 +24,6 @@ int MainWindow::bytesToInt(QByteArray bytes) {
     addr |= ((bytes[2] << 16) & 0x00FF0000);
     addr |= ((bytes[3] << 24) & 0xFF000000);
     return addr;
-}
-//折半查找对应的要素,参数为：3层标记，图元类型
-int MainWindow::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Type)
-{
-    int Index_Return=-1;//返回为-1则表示未找到
-    if(Type==0){
-        int len=Container->Points_List.size();
-        bool finished=false;//判断是否停止
-        //先找到对应的Layer
-        for(int i=0;i<len;i++)
-        {
-            if(finished==true)break;
-            int LayerIDjudge=Container->Points_List.at(i).Layer_ID;//取出一个判断
-            if(LayerIDjudge==Layer_ID){
-                int index_before=0;//在对应PC_ID之前的图元数量
-                for(int j=0;j<Container->Layers_List.size();j++){//先找到layer
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID;c++)
-                            index_before+=Container->Layers_List.at(j).Every_size[c];
-                        break;
-                    }
-                }
-                i+=index_before;
-                while(1){
-                    if( Container->Points_List.at(i).Index_Part<Index_Part)i++;
-                    else if(Container->Points_List.at(i).Index_Part==Index_Part){
-                        finished=true;
-                        Index_Return=i;
-                        break;
-                    }else{
-                        finished=true;
-                        break;
-                    }
-                }
-            }else{//查找layerlist，获取跳过的数量
-                int Jump_number=0;
-                for(int j=0;j<Container->Layers_List.size();j++){
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        Jump_number=Container->Layers_List.at(j).Size;
-                        break;
-                    }
-                }
-                i+=Jump_number;
-            }
-        }
-    }else if(Type==1){
-        int len=Container->Lines_List.size();
-        bool finished=false;//判断是否停止
-        //先找到对应的Layer
-        for(int i=0;i<len;i++)
-        {
-            if(finished==true)break;
-            int LayerIDjudge=Container->Lines_List.at(i).Layer_ID;//取出一个判断
-            if(LayerIDjudge==Layer_ID){
-                int index_before=0;//在对应PC_ID之前的图元数量
-                for(int j=0;j<Container->Layers_List.size();j++){//先找到layer
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID;c++)
-                            index_before+=Container->Layers_List.at(j).Every_size[c];
-                        break;
-                    }
-                }
-                i+=index_before;
-                while(1){
-                    if( Container->Lines_List.at(i).Index_Part<Index_Part)i++;
-                    else if(Container->Lines_List.at(i).Index_Part==Index_Part){
-                        finished=true;
-                        Index_Return=i;
-                        break;
-                    }else{
-                        finished=true;
-                        break;
-                    }
-                }
-            }else{//查找layerlist，获取跳过的数量
-                int Jump_number=0;
-                for(int j=0;j<Container->Layers_List.size();j++){
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        Jump_number=Container->Layers_List.at(j).Size;
-                        break;
-                    }
-                }
-                i+=Jump_number;
-            }
-        }
-    }else{
-        int len=Container->Polygens_List.size();
-        bool finished=false;//判断是否停止
-        //先找到对应的Layer
-        for(int i=0;i<len;i++)
-        {
-            if(finished==true)break;
-            int LayerIDjudge=Container->Polygens_List.at(i).Layer_ID;//取出一个判断
-            if(LayerIDjudge==Layer_ID){
-                int index_before=0;//在对应PC_ID之前的图元数量
-                for(int j=0;j<Container->Layers_List.size();j++){//先找到layer
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID;c++)
-                            index_before+=Container->Layers_List.at(j).Every_size[c];
-                        break;
-                    }
-                }
-                i+=index_before;
-                while(1){
-                    if( Container->Polygens_List.at(i).Index_Part<Index_Part)i++;
-                    else if(Container->Polygens_List.at(i).Index_Part==Index_Part){
-                        finished=true;
-                        Index_Return=i;
-                        break;
-                    }else{
-                        finished=true;
-                        break;
-                    }
-                }
-            }else{//查找layerlist，获取跳过的数量
-                int Jump_number=0;
-                for(int j=0;j<Container->Layers_List.size();j++){
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        Jump_number=Container->Layers_List.at(j).Size;
-                        break;
-                    }
-                }
-                i+=Jump_number;
-            }
-        }
-    }
-    return Index_Return;
-}
-//返回需要添加元素的真实索引值
-int MainWindow::Add_search(int Layer_ID,int PC_ID,int Type)
-{
-    int Index_Return=-1;//返回为-1则表示未找到
-    if(Type==0){
-        int len=Container->Points_List.size();
-        bool finished=false;//判断是否停止
-        //先找到对应的Layer
-        for(int i=0;i<len;i++)
-        {
-            if(finished==true)break;
-            int LayerIDjudge=Container->Points_List.at(i).Layer_ID;//取出一个判断
-            if(LayerIDjudge==Layer_ID){
-                int index_before=0;//在对应PC_ID之前的图元数量
-                for(int j=0;j<Container->Layers_List.size();j++){//先找到layer
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID+1;c++)
-                            index_before+=Container->Layers_List.at(j).Every_size[c];
-                        break;
-                    }
-                }
-                i+=index_before; finished=true;
-            }else{//查找layerlist，获取跳过的数量
-                int Jump_number=0;
-                for(int j=0;j<Container->Layers_List.size();j++){
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        Jump_number=Container->Layers_List.at(j).Size;
-                        break;
-                    }
-                }
-                i+=Jump_number;
-            }
-        }
-    }else if(Type==1){
-        int len=Container->Lines_List.size();
-        bool finished=false;//判断是否停止
-        //先找到对应的Layer
-        for(int i=0;i<len;i++)
-        {
-            if(finished==true)break;
-            int LayerIDjudge=Container->Lines_List.at(i).Layer_ID;//取出一个判断
-            if(LayerIDjudge==Layer_ID){
-                int index_before=0;//在对应PC_ID之前的图元数量
-                for(int j=0;j<Container->Layers_List.size();j++){//先找到layer
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID+1;c++)
-                            index_before+=Container->Layers_List.at(j).Every_size[c];
-                        break;
-                    }
-                }
-                i+=index_before; finished=true;
-            }else{//查找layerlist，获取跳过的数量
-                int Jump_number=0;
-                for(int j=0;j<Container->Layers_List.size();j++){
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        Jump_number=Container->Layers_List.at(j).Size;
-                        break;
-                    }
-                }
-                i+=Jump_number;
-            }
-        }
-    }else{
-        int len=Container->Polygens_List.size();
-        bool finished=false;//判断是否停止
-        //先找到对应的Layer
-        for(int i=0;i<len;i++)
-        {
-            if(finished==true)break;
-            int LayerIDjudge=Container->Polygens_List.at(i).Layer_ID;//取出一个判断
-            if(LayerIDjudge==Layer_ID){
-                int index_before=0;//在对应PC_ID之前的图元数量
-                for(int j=0;j<Container->Layers_List.size();j++){//先找到layer
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID+1;c++)
-                            index_before+=Container->Layers_List.at(j).Every_size[c];
-                        break;
-                    }
-                }
-                i+=index_before; finished=true;
-            }else{//查找layerlist，获取跳过的数量
-                int Jump_number=0;
-                for(int j=0;j<Container->Layers_List.size();j++){
-                    if(Container->Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        Jump_number=Container->Layers_List.at(j).Size;
-                        break;
-                    }
-                }
-                i+=Jump_number;
-            }
-        }
-    }
-    return Index_Return;
 }
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -273,15 +52,14 @@ MainWindow::MainWindow(QWidget *parent) :
         QDataStream Message(this->tcpClient->readAll());
         Message>>Byte_size;
         int size=bytesToInt(Byte_size);
-        Container_List Container_out;
+        //将客户端的修改内容添加到服务器的容器中，并对相应图元进行删除操作
         for(int i=0;i<size;i++){
             St_Layers Layers_out;
             Message>>Layers_out;
-            Container_out.Layers_List.append(Layers_out);
             //对发来的layers做分析，先分析layer中操作，对容器进行修改，存在的都删除；
             for(int t=0;t<Layers_out.PC_ID.size();t++){
                 if(Layers_out.Change_Way.at(t)!=2){
-                    int index=Current_search(Layers_out.Layer_ID,Layers_out.PC_ID.at(t),Layers_out.Index_Part.at(t),Layers_out.Ob_Type);
+                    int index=Container->Current_search(Layers_out.Layer_ID,Layers_out.PC_ID.at(t),Layers_out.Index_Part.at(t),Layers_out.Ob_Type);
                     if(Layers_out.Ob_Type==0){
                         qDebug()<<"remmoved Point:";
                         qDebug()<<Container->Points_List.at(index).Point;
@@ -294,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 }
             }
         }
-
+        //Step3:将数据包添加到本地容器中去
         //按顺序添加后面的包
         QByteArray Pt_size;
         Message>>Pt_size;
@@ -302,7 +80,9 @@ MainWindow::MainWindow(QWidget *parent) :
         for(int j=0;j<size_Pt;j++){
             St_Points Points_out;
             Message>>Points_out;
-            Container_out.Points_List.append(Points_out);
+            //添加到本地容器
+            int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
+            Container->Points_List.insert(insert_index,Points_out);
         }
         QByteArray Ln_size;
         Message>>Ln_size;
@@ -310,39 +90,28 @@ MainWindow::MainWindow(QWidget *parent) :
         for(int j=0;j<size_Ln;j++){
             St_Lines Lines_out;
             Message>>Lines_out;
-            Container_out.Lines_List.append(Lines_out);
+            //添加到本地容器
+            int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
+            Container->Lines_List.insert(insert_index,Lines_out);
         }
-        //        QByteArray Pl_size;
-        //        Message>>Pl_size;
-        //        int size_Pl=bytesToInt(Pl_size);
-        //        for(int j=0;j<size_Pl;j++){
-        //            St_Polygens Polygens_out;
-        //            Message>>Polygens_out;
-        //            Container_out.Polygens_List.append(Polygens_out);
-        //        }
-        //把本地的layer替换为服务器传递过来的layer,并清空通信判断部分
-        //        for(int i=0;i<size;i++){
-        //            Container_out.Layers_List.at(i).PC_ID.clear();
-        //            Container_out.Layers_List.at(i).Index_Part.clear();
-        //            Container_out.Layers_List.at(i).Change_Way.clear();
-        //            Container_out.Layers_List.at(i).Accept_PC.clear();
-        //            Container.Layers_List.at(i)=Container_out.Layers_List.at(i);
-        //        }
+        QByteArray Pl_size;
+        Message>>Pl_size;
+        int size_Pl=bytesToInt(Pl_size);
+        for(int j=0;j<size_Pl;j++){
+            St_Polygens Polygens_out;
+            Message>>Polygens_out;
+            //添加到本地容器
+            int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
+            Container->Polygens_List.insert(insert_index,Polygens_out);
+        }
     });
     connect(tcpClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(ReadError(QAbstractSocket::SocketError)));//错误信号
     connect(&tm,&QTimer::timeout,[&](){
-        int i = qrand() % 6;
-        qDebug()<<tr("%1 Timer Sent: %2").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(list.at(i));
-        tcpClient->write(list.at(i).toUtf8());
+        this->on_action_Tcp_Sent_triggered();
     });//循环
-    connect(tcpClient,&QTcpSocket::disconnected,[](){qDebug()<< "123333" ;});
-    list << "我是谁?" << "渡世白玉" << "hello" << "哈哈哈哈哈" << "你是坏蛋!" <<  "测试一下下了" << "不知道写什么" ;
-    QTime time;
-    time= QTime::currentTime();
-    qsrand(time.msec()+time.second()*1000);
-    ipAdd="127.0.0.1";
+    connect(tcpClient,&QTcpSocket::disconnected,[](){qDebug()<< "断开连接" ;});
     portd="6666";
-    h_time=10;
+    h_time=60;
 }
 
 void MainWindow::Get_Container(Container_List &Container_Out){
@@ -350,6 +119,9 @@ void MainWindow::Get_Container(Container_List &Container_Out){
     area->Get_Container(*Container);
 }
 
+void MainWindow::Get_TcpServer(TcpServer &TcpSever_Out){
+    ser=&TcpSever_Out;
+}
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -460,12 +232,12 @@ void MainWindow::on_action_Refresh_triggered()
 {
     if(ui->action_Refresh->isChecked()==true)
     {
-    area->views()[0]->setCursor(Qt::PointingHandCursor);
-    area->setState(EditWidget::clearType);
-    ui->action_Move->setChecked(false);
-    ui->action_Draw->setChecked(false);
-    ui->action_Edit->setChecked(false);
-    ui->action_movescene->setChecked(false);
+        area->views()[0]->setCursor(Qt::PointingHandCursor);
+        area->setState(EditWidget::clearType);
+        ui->action_Move->setChecked(false);
+        ui->action_Draw->setChecked(false);
+        ui->action_Edit->setChecked(false);
+        ui->action_movescene->setChecked(false);
     }
 
 }
@@ -514,13 +286,27 @@ void MainWindow::on_action_Tcp_Connect_triggered()
     qDebug() << "点击连接：" ;
     if ("连接" == this->ui->action_Tcp_Connect->text())
     {
-        tcpClient->connectToHost(ipAdd,portd.toInt());
-        if (tcpClient->waitForConnected(1000))
-        {
-            ui->action_Tcp_Connect->setText("断开");
-            qDebug()<<"连接服务器成功";
-            ui->action_Tcp_Sent->setEnabled(true);
-            this->ui->action_Tcp_Time->setEnabled(true);
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                             tr("请输入对方IP地址："), QLineEdit::Normal,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            ipAdd=text;//填入IP地址
+            tcpClient->connectToHost(ipAdd,portd.toInt());
+            if (tcpClient->waitForConnected(1000))
+            {
+                ui->action_Tcp_Connect->setText("断开");
+                qDebug()<<"连接服务器成功";
+                ui->action_Tcp_Sent->setEnabled(true);
+                this->ui->action_Tcp_Time->setEnabled(true);
+                QByteArray block;//保存要发送的二进制数据
+                QDataStream out (&block,QIODevice::WriteOnly);//输出流
+                int PCid_size=0;
+                out<<intToByte(PCid_size);
+                int layer_size=0;
+                out<<intToByte(layer_size);
+                tcpClient->write(block);
+            }
         }
     }
     else
@@ -535,18 +321,77 @@ void MainWindow::on_action_Tcp_Connect_triggered()
             this->ui->action_Tcp_Time->setEnabled(false);
             this->ui->action_Tcp_Time->setText("启动定时");
         }
+        ipAdd="";//将IP地址清除
     }
 }
 
 void MainWindow::on_action_Tcp_Sent_triggered()
 {
     qDebug() << "点击发送：" ;
-    QString data =" this->ui->txtData->text();";
-    if (data.isEmpty())
+    QByteArray block;//保存要发送的二进制数据
+    QDataStream out (&block,QIODevice::WriteOnly);
+    int PC_id_sent=Container->PC_ID;
+    out<<intToByte(PC_id_sent);
+    int layer_size=Container->Layers_List.size();
+    out<<intToByte(layer_size);
+    int Point_Mod_size=0,Line_Mod_size=0,Polygen_Mod_size=0;//记录修改操作中的3种要素的数量
+    for(int i=0;i<layer_size;i++){
+        //统计各修改元素的数量
+        if(Container->Layers_List.at(i).Ob_Type==0){
+            Point_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
+        }else if(Container->Layers_List.at(i).Ob_Type==0){
+            Line_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
+        }else{
+            Polygen_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
+        }
+        out<<Container->Layers_List.at(i);
+    }
+    //从图层中查找到点图层，收集修改信息，将修改的要素从对应点容器中提取出来放入输出流中
+    out<<Point_Mod_size;
+    for(int i=0;i<layer_size;i++){
+        if(Container->Layers_List.at(i).Ob_Type==0){
+            for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
+                int pc_id = Container->PC_ID;//获取自身PCID
+                int index = Container->Layers_List.at(i).Index_Part.at(j);
+
+                out<<Container->Points_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,0));
+            }
+        }
+    }
+    out<<Line_Mod_size;
+    for(int i=0;i<layer_size;i++){
+        if(Container->Layers_List.at(i).Ob_Type==1){
+            for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
+                int pc_id = Container->PC_ID;//获取自身PCID
+                int index = Container->Layers_List.at(i).Index_Part.at(j);
+
+                out<<Container->Lines_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,1));
+
+            }
+        }
+    }
+    out<<Polygen_Mod_size;
+    for(int i=0;i<layer_size;i++){
+        if(Container->Layers_List.at(i).Ob_Type==2){
+            for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
+                int pc_id = Container->PC_ID;//获取自身PCID
+                int index = Container->Layers_List.at(i).Index_Part.at(j);
+                out<<Container->Polygens_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,2));
+            }
+        }
+    }
+    //清空本地通信判断
+    for(int i=0;i<layer_size;i++){
+        Container->Layers_List[i].PC_ID.clear();
+        Container->Layers_List[i].Index_Part.clear();
+        Container->Layers_List[i].Change_Way.clear();
+    }
+    if (block.isEmpty())
     {
+        qDebug()<<"待发送数据为空！";
         return ;
     }
-    tcpClient->write(data.toUtf8());
+    tcpClient->write(block);
 }
 
 void MainWindow::on_action_Tcp_Time_triggered()
@@ -588,6 +433,17 @@ void MainWindow::Show_TreeView(){
 
 void MainWindow::on_action_Tcp_Server_triggered()
 {
+    if ("启动服务" == this->ui->action_Tcp_Server->text())
+    {
+        ser->listen(QHostAddress::Any,6666);
+        ui->action_Tcp_Server->setText("停止服务");
+        ui->action_Tcp_Connect->setEnabled(false);
+    }
+    else
+    {
+        ui->action_Tcp_Server->setText("启动服务");
+    }
+
     this->ui->action_Tcp_Server->setEnabled(false);
 
 }

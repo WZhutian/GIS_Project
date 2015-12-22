@@ -65,6 +65,8 @@ int TcpSocket::bytesToInt(QByteArray bytes) {
 }
 void TcpSocket::readData()
 {
+
+    QByteArray block;//保存要发送的二进制数据
     QByteArray Byte_size,Byte_ID;
     QDataStream Message(this->readAll());//读取所有发来的信息
     Message>>Byte_ID;
@@ -113,7 +115,7 @@ void TcpSocket::readData()
             //统计各修改元素的数量
             if(Container->Layers_List.at(i).Ob_Type==0){
                 Point_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
-            }else if(Container->Layers_List.at(i).Ob_Type==0){
+            }else if(Container->Layers_List.at(i).Ob_Type==1){
                 Line_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
             }else{
                 Polygen_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
@@ -142,7 +144,7 @@ void TcpSocket::readData()
         }
         out<<Line_Mod_size;
         for(int i=0;i<layer_size;i++){
-            if(Container->Layers_List.at(i).Ob_Type==0){
+            if(Container->Layers_List.at(i).Ob_Type==1){
                 for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
                     int pc_id = Container->Layers_List.at(i).PC_ID.at(j);
                     int index = Container->Layers_List.at(i).Index_Part.at(j);
@@ -161,7 +163,7 @@ void TcpSocket::readData()
         }
         out<<Polygen_Mod_size;
         for(int i=0;i<layer_size;i++){
-            if(Container->Layers_List.at(i).Ob_Type==0){
+            if(Container->Layers_List.at(i).Ob_Type==2){
                 for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
                     int pc_id = Container->Layers_List.at(i).PC_ID.at(j);
                     int index = Container->Layers_List.at(i).Index_Part.at(j);
@@ -197,7 +199,7 @@ void TcpSocket::readData()
                         Container->Polygens_List.removeAt(index);
                     }
                 }
-                //
+                //把客户机上修改的内容保存到服务器的容器中
                 Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].PC_ID.append(Layers_out.PC_ID.at(t));
                 Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].Index_Part.append(Layers_out.Index_Part.at(t));
                 Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].Change_Way.append(Layers_out.Change_Way.at(t));
@@ -237,7 +239,7 @@ void TcpSocket::readData()
             Container->Polygens_List.insert(insert_index,Polygens_out);
         }
     }
-
+    block.clear();//倒掉
     //    auto data  = handleData(this->readAll(),this->peerAddress().toString(),this->peerPort());
     //    auto test =this->readAll();
     //    qDebug() << data;
@@ -248,10 +250,6 @@ void TcpSocket::readData()
     //        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
     //    }
 }
-void TcpSocket::Judge_LayerSent(){
-
-}
-
 QByteArray TcpSocket::handleData(QByteArray data)
 {
     return data;
