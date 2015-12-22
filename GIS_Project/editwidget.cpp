@@ -276,6 +276,11 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
     }
 
 }
+void EditWidget::mousePressMoveScene(QGraphicsSceneMouseEvent *event)
+{
+    this->views()[0]->setCursor(Qt::ClosedHandCursor);
+     origPoint1=event->scenePos();
+}
 
 
 void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
@@ -364,6 +369,20 @@ void EditWidget::mouseMoveMove(QGraphicsSceneMouseEvent *event)
     }
 
 }
+void EditWidget::mouseMoveMoveScene(QGraphicsSceneMouseEvent *event)
+{
+    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
+    {
+        movePoint1=event->scenePos();
+        qreal dx=movePoint1.x()-origPoint1.x();
+        qreal dy=movePoint1.y()-origPoint1.y();
+        QGraphicsView *view = new QGraphicsView(this);
+        QPointF SceneCenter(view->viewport()->width()/2,view->viewport()->height()/2);
+        QPointF target(SceneCenter.x()-dx,SceneCenter.y()-dy);
+        view->centerOn(target);
+        origPoint1=movePoint1;
+    }
+}
 
 void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
 {
@@ -431,6 +450,10 @@ void EditWidget::mouseReleaseMove(QGraphicsSceneMouseEvent *)
     this->clearSelection();
 
 }
+void EditWidget::mouseReleaseMoveScene(QGraphicsSceneMouseEvent *event)
+{
+    this->views()[0]->setCursor(Qt::OpenHandCursor);
+}
 
 void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *)
 {
@@ -459,6 +482,10 @@ void EditWidget::mouseDoubleClickEdit(QGraphicsSceneMouseEvent *)
 {
 
 }
+void EditWidget::mouseMoveClear(QGraphicsSceneMouseEvent *)
+{
+
+}
 
 void EditWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
@@ -473,6 +500,14 @@ void EditWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     else if(curState==EditType)
     {
         mousePressEdit(event);
+    }
+    else if(curState==clearType)
+    {
+        mousePressClear(event);
+    }
+    else if(curState==MoveSceneType)
+    {
+        mousePressMoveScene(event);
     }
 }
 
@@ -491,6 +526,14 @@ void EditWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     {
         mouseMoveEdit(event);
     }
+    else if(curState==clearType)
+    {
+        mouseMoveClear(event);
+    }
+    else if(curState==MoveSceneType)
+    {
+        mouseMoveMoveScene(event);
+    }
 }
 
 
@@ -507,6 +550,10 @@ void EditWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     else if(curState==EditType)
     {
         mouseReleaseEdit(event);
+    }
+    else if(curState==MoveSceneType)
+    {
+        mouseReleaseMoveScene(event);
     }
 }
 
@@ -590,6 +637,20 @@ void EditWidget::showpicture()
                 this->addItem(item);
 
 
+}
+void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
+{
+    this->views()[0]->setCursor(Qt::PointingHandCursor);
+    if(this->items().count()>0)
+    {
+        QGraphicsItem *selectItem =this->itemAt(event->scenePos(), this->items()[0]->transform());
+        if(selectItem != NULL)
+        {
+            selectItem->setSelected(true);
+            this->removeItem(selectItem);
+            this->clearSelection();
+         }
+    }
 }
 
 EditWidget::~EditWidget()
