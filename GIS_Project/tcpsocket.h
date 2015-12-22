@@ -20,10 +20,11 @@ public:
     Container_List *Container;//保存当前容器
     void Get_Container(Container_List &Container_out);
 
-    void Judge_LayerSent(){//将传输过来的layer与本地layer比较，将要发送的包直接存入datas中
+    void Judge_LayerSent();//将传输过来的layer与本地layer比较，将要发送的包直接存入中
 
-    }
+
     QByteArray  intToByte(int i);
+    QByteArray block;//保存要发送的二进制数据
     int bytesToInt(QByteArray bytes);
 signals:
     //void readData(const int,const QString &,const quint16,const QByteArray &);

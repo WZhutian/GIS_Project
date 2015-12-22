@@ -20,9 +20,7 @@ void GDAL_ReadFile::Open_Shp(){
     }
     poLayer = poDS->GetLayer(poDS->GetLayerCount()-1);//打开最后一层
     poLayer->ResetReading();//重置访问，防止出问题
-    poFeature = poLayer->GetNextFeature();//打开要素
     poFDefn = poLayer->GetLayerDefn();
-    poGeometry = poFeature->GetGeometryRef();
 }
 
 void GDAL_ReadFile::Get_Data(){
@@ -33,7 +31,7 @@ void GDAL_ReadFile::Get_Data(){
 //    St_Layers temp;
 //    temp.Layer_ID
 //    Container->Layers_List.append();
-    St_Layers temp_ly;
+
     while( (poFeature = poLayer->GetNextFeature()) != NULL )//读取几何信息
     {
         poGeometry = poFeature->GetGeometryRef();
@@ -41,16 +39,13 @@ void GDAL_ReadFile::Get_Data(){
                 && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint )
         {
             OGRPoint *poPoint = (OGRPoint *) poGeometry;
+
             St_Points temp;
             temp.Point.setX(poPoint->getX());
             temp.Point.setY(poPoint->getY());
             Container->Points_List.append(temp);
             //
-            temp_ly.Layer_ID=Container->Layers_List.size();
-            temp_ly.Layer_Name="Point Layer";
-            temp_ly.Size++;
-            temp_ly.Every_size[Container->PC_ID]++;
-            temp_ly.Ob_Type=0;
+
             //
         }
         else
@@ -58,6 +53,5 @@ void GDAL_ReadFile::Get_Data(){
             printf( "no point geometry\n" );
         }
     }
-    Container->Layers_List.append(temp_ly);
-    qDebug()<<Container->Layers_List.size();
+    qDebug()<<Container->Points_List.size();
 }
