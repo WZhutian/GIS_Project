@@ -52,7 +52,7 @@ struct St_Layers{//图层
     int Every_size[10] ={0};//按顺序保存各个PC所对应的图元数量，假设不超过10个PC
     int Size=0;//保存图层中图元的数量
     //新TCP加入时添加部分
-    int Pc_numbers=0;//保存当前工作集群中的PC数量
+    int Pc_numbers=0;//保存当前工作集群中的PC数量,由服务器保存
     //TCP通信判断部分：
     QList<int> PC_ID;//修改地方是被哪一个PC所修改的
     QList<int> Index_Part;//修改的索引号

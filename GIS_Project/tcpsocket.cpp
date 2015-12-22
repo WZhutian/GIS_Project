@@ -10,11 +10,11 @@ TcpSocket::TcpSocket(qintptr socketDescriptor, QObject *parent) : //构造函数
     this->setSocketDescriptor(socketDescriptor);
     connect(this,&TcpSocket::readyRead,this,&TcpSocket::readData);
     dis = connect(this,&TcpSocket::disconnected,
-        [&](){
-            qDebug() << "disconnect" ;
-            emit sockDisConnect(socketID,this->peerAddress().toString(),this->peerPort(),QThread::currentThread());//发送断开连接的用户信息
-            this->deleteLater();
-        });
+                  [&](){
+        qDebug() << "disconnect" ;
+        emit sockDisConnect(socketID,this->peerAddress().toString(),this->peerPort(),QThread::currentThread());//发送断开连接的用户信息
+        this->deleteLater();
+    });
     connect(&watcher,&QFutureWatcher<QByteArray>::finished,this,&TcpSocket::startNext);
     connect(&watcher,&QFutureWatcher<QByteArray>::canceled,this,&TcpSocket::startNext);
     qDebug() << "new connect" ;
@@ -65,24 +65,191 @@ int TcpSocket::bytesToInt(QByteArray bytes) {
 }
 void TcpSocket::readData()
 {
-    this->readAll();
-    QByteArray block;
-    QDataStream out (&block,QIODevice::WriteOnly);
-    int layer_size=Container->Layers_List.size();
-    out<<intToByte(layer_size);
-    for(int i=0;i<layer_size;i++){
-        out<<Container->Layers_List.at(i);
+    QByteArray Byte_size,Byte_ID;
+    QDataStream Message(this->readAll());//读取所有发来的信息
+    Message>>Byte_ID;
+    int PC_ID_New = bytesToInt(Byte_ID);//取出连接pc的ID号
+
+    Message>>Byte_size;
+    int size = 0;
+    size = bytesToInt(Byte_size);//取出图层数量
+    if(size==0){//假如为空，表示为一个新的PC加入
+        for(int i = 0;i<Container->Layers_List.size();i++){//添加Pc_numbers
+            Container->Layers_List[i].Pc_numbers++;
+        }
+        QDataStream out (&block,QIODevice::WriteOnly);//输出流
+        int layer_size=Container->Layers_List.size();
+        out<<intToByte(layer_size);
+        for(int i=0;i<layer_size;i++){
+            out<<Container->Layers_List.at(i);
+        }
+        int Point_size=Container->Points_List.size();
+        out<<intToByte(Point_size);
+        for(int i=0;i<Point_size;i++){
+            out<<Container->Points_List.at(i);
+        }
+        int Line_size=Container->Lines_List.size();
+        out<<intToByte(Line_size);
+        for(int i=0;i<Line_size;i++){
+            out<<Container->Lines_List.at(i);
+        }
+        int Polygen_size=Container->Polygens_List.size();
+        out<<intToByte(Polygen_size);
+        for(int i=0;i<Polygen_size;i++){
+            out<<Container->Polygens_List.at(i);
+        }
+        this->write(block);
+    }else{
+
+        //Step1:将本地的操作修改进行分析后打包
+        //先把本地容器中的图层全部打包
+        QDataStream out (&block,QIODevice::WriteOnly);
+        //        int PC_id_sent=Container->PC_ID;
+        //        out<<intToByte(PC_id_sent);
+        int layer_size=Container->Layers_List.size();
+        out<<intToByte(layer_size);
+        int Point_Mod_size=0,Line_Mod_size=0,Polygen_Mod_size=0;//记录修改操作中的3种要素的数量
+        for(int i=0;i<layer_size;i++){
+            //统计各修改元素的数量
+            if(Container->Layers_List.at(i).Ob_Type==0){
+                Point_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
+            }else if(Container->Layers_List.at(i).Ob_Type==0){
+                Line_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
+            }else{
+                Polygen_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
+            }
+            out<<Container->Layers_List.at(i);
+        }
+        //从图层中查找到点图层，收集修改信息，将修改的要素从对应点容器中提取出来放入输出流中
+        out<<Point_Mod_size;
+        for(int i=0;i<layer_size;i++){
+            if(Container->Layers_List.at(i).Ob_Type==0){
+                for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
+                    int pc_id = Container->Layers_List.at(i).PC_ID.at(j);//获取操作记录中对应的三层记录值
+                    int index = Container->Layers_List.at(i).Index_Part.at(j);
+
+                    Container->Layers_List[i].Accept_PC[j].append(pc_id);
+                    out<<Container->Points_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,0));
+                    //识别Accpet中是否有对应PCid,分发完毕则执行冗余清除工作
+                    if(Container->Layers_List[i].Accept_PC.at(j).size()==Container->Layers_List.at(i).Pc_numbers){//冗余值发现
+                        Container->Layers_List[i].PC_ID.removeAt(j);
+                        Container->Layers_List[i].Index_Part.removeAt(j);
+                        Container->Layers_List[i].Change_Way.removeAt(j);
+                        Container->Layers_List[i].Accept_PC.removeAt(j);
+                    }
+                }
+            }
+        }
+        out<<Line_Mod_size;
+        for(int i=0;i<layer_size;i++){
+            if(Container->Layers_List.at(i).Ob_Type==0){
+                for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
+                    int pc_id = Container->Layers_List.at(i).PC_ID.at(j);
+                    int index = Container->Layers_List.at(i).Index_Part.at(j);
+
+                    Container->Layers_List[i].Accept_PC[j].append(pc_id);
+                    out<<Container->Lines_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,1));
+                    //识别Accpet中是否有对应PCid,分发完毕则执行冗余清除工作
+                    if(Container->Layers_List[i].Accept_PC.at(j).size()==Container->Layers_List.at(i).Pc_numbers){//冗余值发现
+                        Container->Layers_List[i].PC_ID.removeAt(j);
+                        Container->Layers_List[i].Index_Part.removeAt(j);
+                        Container->Layers_List[i].Change_Way.removeAt(j);
+                        Container->Layers_List[i].Accept_PC.removeAt(j);
+                    }
+                }
+            }
+        }
+        out<<Polygen_Mod_size;
+        for(int i=0;i<layer_size;i++){
+            if(Container->Layers_List.at(i).Ob_Type==0){
+                for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
+                    int pc_id = Container->Layers_List.at(i).PC_ID.at(j);
+                    int index = Container->Layers_List.at(i).Index_Part.at(j);
+
+                    Container->Layers_List[i].Accept_PC[j].append(pc_id);
+                    out<<Container->Polygens_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,2));
+                    //识别Accpet中是否有对应PCid,分发完毕则执行冗余清除工作
+                    if(Container->Layers_List[i].Accept_PC.at(j).size()==Container->Layers_List.at(i).Pc_numbers){//冗余值发现
+                        Container->Layers_List[i].PC_ID.removeAt(j);
+                        Container->Layers_List[i].Index_Part.removeAt(j);
+                        Container->Layers_List[i].Change_Way.removeAt(j);
+                        Container->Layers_List[i].Accept_PC.removeAt(j);
+                    }
+                }
+            }
+        }
+        this->write(block);
+        //Step2:将客户端的修改内容添加到服务器的容器中，并对相应图元进行删除操作
+        for(int i=0;i<size;i++){
+            St_Layers Layers_out;
+            Message>>Layers_out;
+            //对发来的layers做分析，先分析layer中操作，对容器进行修改，存在的都删除；
+            for(int t=0;t<Layers_out.PC_ID.size();t++){
+                if(Layers_out.Change_Way.at(t)!=2){
+                    int index=Container->Current_search(Layers_out.Layer_ID,Layers_out.PC_ID.at(t),Layers_out.Index_Part.at(t),Layers_out.Ob_Type);
+                    if(Layers_out.Ob_Type==0){
+                        qDebug()<<"remmoved Point:";
+                        qDebug()<<Container->Points_List.at(index).Point;
+                        Container->Points_List.removeAt(index);
+                    }else if(Layers_out.Ob_Type==1){
+                        Container->Lines_List.removeAt(index);
+                    }else{
+                        Container->Polygens_List.removeAt(index);
+                    }
+                }
+                //
+                Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].PC_ID.append(Layers_out.PC_ID.at(t));
+                Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].Index_Part.append(Layers_out.Index_Part.at(t));
+                Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].Change_Way.append(Layers_out.Change_Way.at(t));
+                Container->Layers_List[Container->Search_Layer_Index(Layers_out.Layer_ID)].Accept_PC.append(QString::number(PC_ID_New, 10));
+            }
+        }
+        //Step3:将数据包添加到本地容器中去
+        //按顺序添加后面的包
+        QByteArray Pt_size;
+        Message>>Pt_size;
+        int size_Pt=bytesToInt(Pt_size);
+        for(int j=0;j<size_Pt;j++){
+            St_Points Points_out;
+            Message>>Points_out;
+            //添加到本地容器
+            int insert_index=Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
+            Container->Points_List.insert(insert_index,Points_out);
+        }
+        QByteArray Ln_size;
+        Message>>Ln_size;
+        int size_Ln=bytesToInt(Ln_size);
+        for(int j=0;j<size_Ln;j++){
+            St_Lines Lines_out;
+            Message>>Lines_out;
+            //添加到本地容器
+            int insert_index=Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
+            Container->Lines_List.insert(insert_index,Lines_out);
+        }
+        QByteArray Pl_size;
+        Message>>Pl_size;
+        int size_Pl=bytesToInt(Pl_size);
+        for(int j=0;j<size_Pl;j++){
+            St_Polygens Polygens_out;
+            Message>>Polygens_out;
+            //添加到本地容器
+            int insert_index=Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
+            Container->Points_List.insert(insert_index,Polygens_out);
+        }
     }
-    this->write(block);
-//    auto data  = handleData(this->readAll(),this->peerAddress().toString(),this->peerPort());
-//    auto test =this->readAll();
-//    qDebug() << data;
-//    this->write(test);
-//    this->write(data);
-//    if (!watcher.isRunning())//放到异步线程中处理。
-//    {
-//        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
-//    }
+
+    //    auto data  = handleData(this->readAll(),this->peerAddress().toString(),this->peerPort());
+    //    auto test =this->readAll();
+    //    qDebug() << data;
+    //    this->write(test);
+    //    this->write(data);
+    //    if (!watcher.isRunning())//放到异步线程中处理。
+    //    {
+    //        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
+    //    }
+}
+void TcpSocket::Judge_LayerSent(){
+
 }
 
 QByteArray TcpSocket::handleData(QByteArray data)

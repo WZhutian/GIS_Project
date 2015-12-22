@@ -27,21 +27,25 @@ inline QDataStream& operator>>(QDataStream& in,St_Lines& Lines)
                            Lines.Index_Part;
     return in;
 }
-//inline QDataStream& operator<<(QDataStream& out, const St_Polygens& Polygens)
-//{
-//    return out;
-//}
-//inline QDataStream& operator>>(QDataStream& in,St_Polygens& Polygens)
-//{
-//    return in;
-//}
+inline QDataStream& operator<<(QDataStream& out, const St_Polygens& Polygens)
+{
+    out<<Polygens.Polygen_Round<<Polygens.Attribute_Polygen<<Polygens.Layer_ID<<Polygens.PC_ID<<
+         Polygens.Index_Part;
+    return out;
+}
+inline QDataStream& operator>>(QDataStream& in,St_Polygens& Polygens)
+{
+    in>>Polygens.Polygen_Round>>Polygens.Attribute_Polygen>>Polygens.Layer_ID>>Polygens.PC_ID>>
+            Polygens.Index_Part;
+    return in;
+}
 inline QDataStream& operator<<(QDataStream& out, const St_Layers& Layers)
 {
     out<<Layers.Layer_ID<<Layers.Layer_Name<<Layers.Pc_numbers;
     for(int i=0;i<10;i++){
         out<<Layers.Every_size[i];
     }
-    out<<Layers.Size<<Layers.Ob_Type<<Layers.Delete_Times;
+    out<<Layers.Size<<Layers.Ob_Type;
     out<<Layers.PC_ID<<Layers.Index_Part<<Layers.Change_Way<<Layers.Accept_PC;
 
     return out;
@@ -52,7 +56,7 @@ inline QDataStream& operator>>(QDataStream& in,St_Layers& Layers)
     for(int i=0;i<10;i++){
         in>>Layers.Every_size[i];
     }
-    in>>Layers.Size>>Layers.Ob_Type>>Layers.Delete_Times;
+    in>>Layers.Size>>Layers.Ob_Type;
     in>>Layers.PC_ID>>Layers.Index_Part>>Layers.Change_Way>>Layers.Accept_PC;
 
     return in;
