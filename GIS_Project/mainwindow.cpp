@@ -42,7 +42,6 @@ MainWindow::MainWindow(QWidget *parent) :
     goodsModel->setHeaderData(2, Qt::Horizontal, tr("图层类型"));
     ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(goodsModel,&QStandardItemModel::itemChanged, this ,&MainWindow::treeItemChanged );
-    Show_TreeView();
     //绘图部分，scene初始化
     area=new EditWidget(this);
     QGraphicsView *view = new QGraphicsView(area,this);
@@ -131,6 +130,7 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::Get_Container(Container_List &Container_Out){
     Container=&Container_Out;
     area->Get_Container(*Container);
+    Show_TreeView();
 }
 
 void MainWindow::Get_TcpServer(TcpServer &TcpSever_Out){
