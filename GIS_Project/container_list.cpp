@@ -5,8 +5,20 @@ Container_List::Container_List()
 }
 //折半查找对应的要素,参数为：3层标记，图元类型
 ////////////////////////增删改//////////////////////////////////
+void Container_List::Add_Point_Item(QPointF Point_Item_Out)
+{
+    QGraphicsEllipseItem *newPointCircle=
+            new QGraphicsEllipseItem(Point_Item_Out.x()-5,Point_Item_Out.y()-5,10,10);
+    //newPointCircle->setBrush(Qt::red);
+    newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
+    newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
+    Items_List.append(newPointCircle);
+}
+
 void Container_List::Add_Point(QPointF Point_Out){
     int index =  Add_search(Layer_ID,PC_ID,0);
+    //添加Items
+    this->Add_Point_Item(Point_Out);
     //添加数据部分
     St_Points Addin;
     Addin.Point=Point_Out;
@@ -57,8 +69,25 @@ void Container_List::Delete_Point(int Index_Part_Out){
  * @brief Add_Line
  * @param Line_Out
  */
-void Container_List::Add_Line(QList<QPointF> Line_Out){
+void Container_List::Add_Line_Item(QVector<QPointF> Line_Item_Out)
+{
+    QPainterPath *path=new QPainterPath(Line_Item_Out[0]);
+    for(int i=1;i<Line_Item_Out.count();++i)
+    {
+        path->lineTo(Line_Item_Out[i]);
+    }
+    QGraphicsPathItem *cur=new QGraphicsPathItem();
+    cur->setPath(*path);
+    //cur->setPen(*pen);
+    cur->setFlag(QGraphicsItem::ItemIsMovable,true);
+    cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
+    Items_List.append(cur);
+}
+
+void Container_List::Add_Line(QVector<QPointF> Line_Out){
     int index =  Add_search(Layer_ID,PC_ID,1);
+    //添加Items
+    this->Add_Line_Item(Line_Out);
     //添加数据部分
     St_Lines Addin;
     for(int i=0;i<Line_Out.size();i++){
@@ -113,8 +142,22 @@ void Container_List::Delete_Line(int Index_Part_Out){
  * @param Index_Polygen
  * @param Line_Out_New
  */
-void Container_List::Add_Polygen(QList<QPointF> Polygen_Out){
+void Container_List::Add_Polygen_Item(QVector<QPointF> Poly_Item_Out)
+{
+    QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
+    QPolygonF *curPolygon=new QPolygonF(Poly_Item_Out);
+    cur->setPolygon(*curPolygon);
+    cur->setFlag(QGraphicsItem::ItemIsMovable,true);
+    cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
+//    cur->setPen(*pen);
+//    cur->setBrush(brushColor);
+    Items_List.append(cur);
+}
+
+void Container_List::Add_Polygen(QVector<QPointF> Polygen_Out){
     int index =  Add_search(Layer_ID,PC_ID,1);
+    //添加Items
+    this->Add_Polygen_Item(Polygen_Out);
     //添加数据部分
     St_Polygens Addin;
     for(int i=0;i<Polygen_Out.size();i++){
@@ -166,7 +209,11 @@ void Container_List::Delete_Polygen(int Index_Part_Out){
 //
 void Container_List::Add_Layer(QString Layer_Name,int Ob_Type){
     St_Layers temp_ly;
-    temp_ly.Layer_ID=Layers_List.at(Layers_List.size()-1).Layer_ID+1;
+    if(Layers_List.size()!=0){
+         temp_ly.Layer_ID=Layers_List.at(Layers_List.size()-1).Layer_ID+1;
+    }else{
+        temp_ly.Layer_ID=0;
+    }
     temp_ly.Layer_Name=Layer_Name;
     temp_ly.Every_size[PC_ID]++;
     temp_ly.Ob_Type=Ob_Type;

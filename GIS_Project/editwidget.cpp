@@ -55,6 +55,10 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
                           showShape(shapes);
                           shapes.clear();
                           isDrawing=false;
+                        for(int i=0;i<points.count();i++)
+                        {
+                            Container->Add_Point(points[i]);
+                        }
 
                          // qDebug()<<this->items().size();
                     }
@@ -130,7 +134,8 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             containerItem.append(cur);
             this->removeItem(this->items()[1]);
             isDrawing=false;
-
+            Container->Add_Line(points);
+            //qDebug()<<Container->Items_List.size();
         }
     }
     else if(curShape==this->PolygonType)
@@ -178,6 +183,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             shapes.clear();
             this->removeItem(this->items()[1]);
             isDrawing=false;
+            Container->Add_Polygen(points);
         }
     }
 }
