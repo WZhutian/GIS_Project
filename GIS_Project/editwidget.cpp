@@ -10,8 +10,8 @@
 #include<QScrollBar>
 EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
 {
-    curShape = this->PointType;
-    curState=this->DrawType;
+    curShape = this->NoneType;
+    curState=this->MoveSceneType;
     isDrawing=false;
     isEditing=false;
 
