@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QStandardItemModel>
 #include <gdal_readfile.h>
+#include "tcpserver.h"
 #include<QMouseEvent>
 namespace Ui {
 class MainWindow;
@@ -32,11 +33,11 @@ public:
     int bytesToInt(QByteArray bytes);
 
     //显示树形图
+    QStandardItemModel *goodsModel;
     void Show_TreeView();
 private slots:
     //绘图部分
     void on_penStyleComboBox_currentIndexChanged(const QString penStyle);
-    void on_shapeComboBox_currentIndexChanged(const QString shape);
     void on_penColorToolButton_clicked();
     void on_brushColorToolButton_clicked();
     void on_penWidthSpinBox_valueChanged(int penWidth);
@@ -47,7 +48,8 @@ private slots:
     void on_action_ZoomOut_triggered();
     void on_action_ReadShp_triggered();
     void on_action_Refresh_triggered();
-
+    //图层widget选框被点击
+    void treeItemChanged ( QStandardItem * item );
     //socket部分,客户端client
     void ReadError(QAbstractSocket::SocketError);
     void on_action_Tcp_Connect_triggered();
@@ -57,6 +59,16 @@ private slots:
     void on_action_Tcp_Server_triggered();
 
     void on_action_movescene_triggered();
+    void on_action_Start_Edit_triggered();
+
+    void on_action_End_Edit_triggered();
+
+    void on_action_Create_PointLayer_triggered();
+
+    void on_action_Create_LineLayer_triggered();
+
+    void on_action_Create_PolygenLayer_triggered();
+
 protected:
 //    void mousePressEvent(QMouseEvent *);
 //    void mouseMoveEvent(QMouseEvent *);
