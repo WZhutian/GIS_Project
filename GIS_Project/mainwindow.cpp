@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include "mydatastream.h"
 #include <QInputDialog>
+#include <QBrush>
 QByteArray  MainWindow::intToByte(int i)
 {
     QByteArray abyte0;
@@ -30,8 +31,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //显示表头
+    goodsModel = new QStandardItemModel(0, 3,this);
+    ui->treeView->setModel(goodsModel);
+    ui->treeView->setColumnWidth(0,43);
+    ui->treeView->setColumnWidth(1,130);
+    ui->treeView->setColumnWidth(2,80);
+    goodsModel->setHeaderData(0, Qt::Horizontal,tr("显示"));
+    goodsModel->setHeaderData(1, Qt::Horizontal, tr("图层名"));
+    goodsModel->setHeaderData(2, Qt::Horizontal, tr("图层类型"));
+    ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    connect(goodsModel,&QStandardItemModel::itemChanged, this ,&MainWindow::treeItemChanged );
+    Show_TreeView();
+    //绘图部分，scene初始化
     area=new EditWidget(this);
-
     QGraphicsView *view = new QGraphicsView(area,this);
     area->Get_Graphicview(*view);
     area->setSceneRect(497000,3518000,3500,3000);
@@ -140,29 +153,11 @@ void MainWindow::on_penStyleComboBox_currentIndexChanged(const QString penStyle)
         area->setPenStyle(Qt::DotLine);
     }
 }
-void MainWindow::on_shapeComboBox_currentIndexChanged(const QString shape)
-{
-    if(shape == QStringLiteral("点"))
-    {
-        area->setShape(EditWidget::PointType);
-    }
-    else if(shape == QStringLiteral("线"))
-    {
-        area->setShape(EditWidget::PolylineType);
-    }
-    else if(shape == QStringLiteral("面"))
-    {
-        area->setShape(EditWidget::PolygonType);
-    }
-}
 
 void MainWindow::on_penWidthSpinBox_valueChanged(int penWidth)
 {
     area->setPenWidth(penWidth);
 }
-
-
-
 
 void MainWindow::on_penColorToolButton_clicked()
 {
@@ -268,9 +263,6 @@ void MainWindow::on_action_ZoomOut_triggered()
 
 
 //tcp部分------------------------------------------------------------
-
-
-
 void MainWindow::ReadError(QAbstractSocket::SocketError)//出错
 {
     tcpClient->disconnectFromHost();
@@ -281,7 +273,23 @@ void MainWindow::ReadError(QAbstractSocket::SocketError)//出错
     this->ui->action_Tcp_Time->setEnabled(false);
     this->ui->action_Tcp_Time->setText("启动定时");
 }
+//////////////////////////TCP服务器///////////////////////
+void MainWindow::on_action_Tcp_Server_triggered()
+{
+    if ("启动服务" == this->ui->action_Tcp_Server->text())
+    {
+        ser->listen(QHostAddress::Any,6666);
+        ui->action_Tcp_Server->setText("停止服务");
+        ui->action_Tcp_Connect->setEnabled(false);
+    }
+    else
+    {
+        ui->action_Tcp_Server->setText("启动服务");
+    }
 
+    this->ui->action_Tcp_Server->setEnabled(false);
+
+}
 void MainWindow::on_action_Tcp_Connect_triggered()
 {
     qDebug() << "点击连接：" ;
@@ -325,7 +333,6 @@ void MainWindow::on_action_Tcp_Connect_triggered()
         ipAdd="";//将IP地址清除
     }
 }
-
 void MainWindow::on_action_Tcp_Sent_triggered()
 {
     qDebug() << "点击发送：" ;
@@ -394,7 +401,6 @@ void MainWindow::on_action_Tcp_Sent_triggered()
     }
     tcpClient->write(block);
 }
-
 void MainWindow::on_action_Tcp_Time_triggered()
 {
     if ("启动定时" == this->ui->action_Tcp_Time->text())
@@ -410,13 +416,21 @@ void MainWindow::on_action_Tcp_Time_triggered()
         this->ui->action_Tcp_Time->setText("启动定时");
     }
 }
-
+///////////////////////////////读shpfile////////////////
 void MainWindow::on_action_ReadShp_triggered()//读shp文件
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("Image Files(*.jpg *.png *.shp)"));
     if(path.right(4)==".shp"){
-        GDAL_ReadFile test(path.toLatin1().data(),*Container);
-        test.Get_Data();
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("读取shpfile"),
+                                             tr("请输入图层名："), QLineEdit::Normal,
+                                             "New Shpfile Layer", &ok);
+        if (ok && !text.isEmpty()){
+            GDAL_ReadFile test(path.toLatin1().data(),*Container);
+            test.Get_Data(text);
+            qDebug()<<Container->Layers_List.at(0).Size;
+            Show_TreeView();
+        }
     }else{
         St_Raster_images temp;
         temp.Image=new QImage(path);
@@ -427,25 +441,163 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
         Container->Layers_List.append(temp_ly);
     }
 }
+////////////////////////////////图层部分//////////////////////
 void MainWindow::Show_TreeView(){
     //清空
+    goodsModel->removeRows(0,goodsModel->rowCount());
     //显示所有
-}
+    for (int i = 0; i <  Container->Layers_List.size(); ++i)
+    {
 
-void MainWindow::on_action_Tcp_Server_triggered()
+        QList<QStandardItem *> items;
+
+        QStandardItem *item_1 = new QStandardItem();
+        item_1->setCheckable(true);
+        items.push_back(item_1);
+
+        QStandardItem *item_2 = new QStandardItem(Container->Layers_List.at(i).Layer_Name);
+        items.push_back(item_2);
+
+        QString type;
+        if(Container->Layers_List.at(i).Ob_Type==0){
+            type="点";
+        }else if(Container->Layers_List.at(i).Ob_Type==1){
+            type="线";
+        }else{
+            type="面";
+        }
+        QStandardItem *item_3 = new QStandardItem(type);
+        items.push_back(item_3);
+
+        goodsModel->appendRow(items);
+    }
+}
+//void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+//{
+//    QMenu *pMenu = new QMenu(ui.treeView_);
+//    QAction* buildItem = pMenu->addAction(tr("build"));
+//    pMenu->exec(QCursor::pos());
+//}
+void MainWindow :: treeItemChanged ( QStandardItem * item )
 {
-    if ("启动服务" == this->ui->action_Tcp_Server->text())
-    {
-        ser->listen(QHostAddress::Any,6666);
-        ui->action_Tcp_Server->setText("停止服务");
-        ui->action_Tcp_Connect->setEnabled(false);
+    int layer_id = item->row();
+    qDebug()<<layer_id;
+    //修改图层名,保护图层类型不变
+    Container->Layers_List[layer_id].Layer_Name=goodsModel->item(layer_id,1)->text();
+    if(Container->Layers_List[layer_id].Ob_Type==0){
+        goodsModel->item(layer_id,2)->setText("点");
+    }else if(Container->Layers_List[layer_id].Ob_Type==1){
+        goodsModel->item(layer_id,2)->setText("线");
+    }else{
+        goodsModel->item(layer_id,2)->setText("面");
     }
-    else
-    {
-        ui->action_Tcp_Server->setText("启动服务");
+    if(item->checkState()==Qt::Checked){
+        qDebug()<<item->checkState();
+        //设置显示TODO
+    }else{
+        //设置隐藏Flag TODO
     }
-
-    this->ui->action_Tcp_Server->setEnabled(false);
-
 }
 
+//////////////////////////编辑要素//////////////////////////
+void MainWindow::on_action_Start_Edit_triggered()
+{
+    QStringList lst;
+    for(int i=0;i<Container->Layers_List.size();i++){
+        lst<<Container->Layers_List.at(i).Layer_Name;
+    }
+    if(Container->Layers_List.size()==0){
+        lst<<" <空> ";
+    }
+    bool ok = FALSE;
+    QString res = QInputDialog::getItem(this,
+                                        tr( "选择图层" ),
+                                        tr( "图层列表：" ), lst, 1, TRUE, &ok);
+    if ( ok )// 用户选择一项并且按下OK
+    {
+        Container->Layer_ID = Container->Layers_List.at(lst.indexOf(res)).Layer_ID;//修改当前编辑的图层号
+
+        QColor brushColor=Qt::yellow;   //填充颜色
+        QBrush brush(brushColor);
+        goodsModel->item(lst.indexOf(res))->setBackground(brush);
+        goodsModel->item(lst.indexOf(res),1)->setBackground(brush);
+        goodsModel->item(lst.indexOf(res),2)->setBackground(brush);
+        ui->action_Draw->setEnabled(true);
+        ui->action_Edit->setEnabled(true);
+        ui->action_Move->setEnabled(true);
+        ui->action_Refresh->setEnabled(true);
+        ui->action_Start_Edit->setEnabled(false);
+        //设置可被选中Flag TODO c
+        //设置画笔
+        int ob_type=Container->Layers_List.at(lst.indexOf(res)).Ob_Type;
+        if(ob_type == 0)
+        {
+            area->setShape(EditWidget::PointType);
+        }
+        else if(ob_type == 1)
+        {
+            area->setShape(EditWidget::PolylineType);
+        }
+        else if(ob_type == 2)
+        {
+            area->setShape(EditWidget::PolygonType);
+        }
+    }
+}
+
+void MainWindow::on_action_End_Edit_triggered()
+{
+
+    QColor brushColor=Qt::white;   //填充颜色
+    QBrush brush(brushColor);
+    qDebug()<<goodsModel->rowCount();
+    for(int i=0;i<goodsModel->rowCount();i++){
+        goodsModel->item(i)->setBackground(brush);
+        goodsModel->item(i,1)->setBackground(brush);
+        goodsModel->item(i,2)->setBackground(brush);
+    }
+    Container->Layer_ID=-1;
+    ui->action_Draw->setEnabled(false);
+    ui->action_Edit->setEnabled(false);
+    ui->action_Move->setEnabled(false);
+    ui->action_Refresh->setEnabled(false);
+    ui->action_Start_Edit->setEnabled(true);
+    //设置不可选 TODO
+}
+
+////////////////创建点线面图层/////////////////////
+void MainWindow::on_action_Create_PointLayer_triggered()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("新建点图层"),
+                                         tr("请输入图层名："), QLineEdit::Normal,
+                                         "New Point Layer", &ok);
+    if (ok && !text.isEmpty()){
+        Container->Add_Layer(text,0);
+        Show_TreeView();
+    }
+}
+
+void MainWindow::on_action_Create_LineLayer_triggered()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("新建线图层"),
+                                         tr("请输入图层名："), QLineEdit::Normal,
+                                         "New Line Layer", &ok);
+    if (ok && !text.isEmpty()){
+        Container->Add_Layer(text,1);
+        Show_TreeView();
+    }
+}
+
+void MainWindow::on_action_Create_PolygenLayer_triggered()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("新建面图层"),
+                                         tr("请输入图层名："), QLineEdit::Normal,
+                                         "New Polygen Layer", &ok);
+    if (ok && !text.isEmpty()){
+        Container->Add_Layer(text,2);
+        Show_TreeView();
+    }
+}

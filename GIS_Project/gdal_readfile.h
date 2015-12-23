@@ -12,7 +12,7 @@ public:
     GDAL_ReadFile(char* File_name,Container_List &Container_out);//构造函数，传入文件名，以及容器
     ~GDAL_ReadFile();
     void Open_Shp();
-    void Get_Data();//将shp中的数据传入引用参数容器中
+    void Get_Data(QString Layer_Name);//将shp中的数据传入引用参数容器中
 private:
     Container_List *Container;
     char* File_name;//保存要读取的文件名

@@ -49,5 +49,9 @@
         <file>unselectAll.png</file>
         <file>zoomIn.png</file>
         <file>zoomOut.png</file>
+        <file>identity.ico</file>
+        <file>kalarm.ico</file>
+        <file>server.ico</file>
+        <file>tab_duplicate.ico</file>
     </qresource>
 </RCC>
