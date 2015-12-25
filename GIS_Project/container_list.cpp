@@ -1,5 +1,6 @@
 #include "container_list.h"
 #include<QColor>
+#include <QDebug>
 Container_List::Container_List()
 {
     Layer_ID=-1;//初始化为-1，表示无正在编辑图层
@@ -21,15 +22,19 @@ void Container_List::Add_Point_Item(QPointF Point_Item_Out,int index)
 
 
 void Container_List::Add_Point(QPointF Point_Out){
+    qDebug()<<Layers_List.at(0).Every_size[0];
     int index =  Add_search(Layer_ID,PC_ID,0);
     int Part_Index=0;
-    if(index!=0){
+    if(index>0){
         if(Points_List.at(index-1).Layer_ID==Layer_ID&&
                 Points_List.at(index-1).PC_ID==PC_ID){
             if(Points_List.at(index-1).Index_Part!=0){
                 Part_Index=Points_List.at(index-1).Index_Part+1;
-            }
+            }else
+                Part_Index=0;
         }
+    }else{
+        Part_Index=0;
     }
     //添加Items
     this->Add_Point_Item(Point_Out,Part_Index);
@@ -317,7 +322,6 @@ void Container_List::Add_Layer(QString Layer_Name,int Ob_Type){
         temp_ly.Layer_ID=0;
     }
     temp_ly.Layer_Name=Layer_Name;
-    temp_ly.Every_size[PC_ID]++;
     temp_ly.Ob_Type=Ob_Type;
 
     Layers_List.append(temp_ly);
@@ -497,7 +501,7 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
 //返回需要添加元素的真实索引值
 int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
 {
-    int Index_Return=-1;//返回为-1则表示未找到
+    int Index_Return=0;//返回为0则表示数组为空
     if(Type==0){
         int len=Points_List.size();
         bool finished=false;//判断是否停止
@@ -510,12 +514,14 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                 int index_before=0;//在对应PC_ID之前的图元数量
                 for(int j=0;j<Layers_List.size();j++){//先找到layer
                     if(Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID+1;c++)
+                        for(int c=0;c<PC_ID+1&&c<10;c++)
                             index_before+=Layers_List.at(j).Every_size[c];
                         break;
                     }
                 }
-                i+=index_before; finished=true;
+                i+=index_before;
+                Index_Return+=i;
+                finished=true;
             }else{//查找layerlist，获取跳过的数量
                 int Jump_number=0;
                 for(int j=0;j<Layers_List.size();j++){
@@ -524,7 +530,7 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                         break;
                     }
                 }
-                i+=Jump_number;
+                i+=Jump_number-1;
             }
         }
     }else if(Type==1){
@@ -539,12 +545,14 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                 int index_before=0;//在对应PC_ID之前的图元数量
                 for(int j=0;j<Layers_List.size();j++){//先找到layer
                     if(Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID+1;c++)
+                        for(int c=0;c<PC_ID+1&&c<10;c++)
                             index_before+=Layers_List.at(j).Every_size[c];
                         break;
                     }
                 }
-                i+=index_before; finished=true;
+                i+=index_before;
+                Index_Return+=i;
+                finished=true;
             }else{//查找layerlist，获取跳过的数量
                 int Jump_number=0;
                 for(int j=0;j<Layers_List.size();j++){
@@ -553,7 +561,7 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                         break;
                     }
                 }
-                i+=Jump_number;
+                i+=Jump_number-1;
             }
         }
     }else{
@@ -568,12 +576,14 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                 int index_before=0;//在对应PC_ID之前的图元数量
                 for(int j=0;j<Layers_List.size();j++){//先找到layer
                     if(Layers_List.at(j).Layer_ID==LayerIDjudge){
-                        for(int c=0;c<PC_ID+1;c++)
+                        for(int c=0;c<PC_ID+1&&c<10;c++)
                             index_before+=Layers_List.at(j).Every_size[c];
                         break;
                     }
                 }
-                i+=index_before; finished=true;
+                i+=index_before;
+                Index_Return+=i;
+                finished=true;
             }else{//查找layerlist，获取跳过的数量
                 int Jump_number=0;
                 for(int j=0;j<Layers_List.size();j++){
@@ -582,7 +592,7 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                         break;
                     }
                 }
-                i+=Jump_number;
+                i+=Jump_number-1;
             }
         }
     }
