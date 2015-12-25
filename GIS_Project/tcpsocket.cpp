@@ -92,6 +92,7 @@ void TcpSocket::readData()
         }
         int Line_size=Container->Lines_List.size();
         out<<intToByte(Line_size);
+        qDebug()<<Line_size;
         for(int i=0;i<Line_size;i++){
             out<<Container->Lines_List.at(i);
         }
@@ -100,6 +101,8 @@ void TcpSocket::readData()
         for(int i=0;i<Polygen_size;i++){
             out<<Container->Polygens_List.at(i);
         }
+        qDebug()<<block.size();
+        qDebug()<<Point_size;
         this->write(block);
     }else{
 

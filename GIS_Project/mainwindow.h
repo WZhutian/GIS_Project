@@ -31,10 +31,14 @@ public:
     TcpServer *ser;
     QByteArray  intToByte(int i);
     int bytesToInt(QByteArray bytes);
-
+    QModelIndex  init_modeIndex;
     //显示树形图
     QStandardItemModel *goodsModel;
     void Show_TreeView();
+    int Change_Style_ID;//改变layer中的图元样式，索引值
+    QColor Temp_Color_Pen;
+    QColor Temp_Color_Brush;
+    bool willtoRead;
 private slots:
     //绘图部分
     void on_penStyleComboBox_currentIndexChanged(const QString penStyle);
@@ -50,6 +54,10 @@ private slots:
     void on_action_Refresh_triggered();
     //图层widget选框被点击
     void treeItemChanged ( QStandardItem * item );
+    void slotCustomContextMenu(const QPoint &);
+
+    void Show_Attr();
+    void Change_Style();
     //socket部分,客户端client
     void ReadError(QAbstractSocket::SocketError);
     void on_action_Tcp_Connect_triggered();
@@ -68,6 +76,10 @@ private slots:
     void on_action_Create_LineLayer_triggered();
 
     void on_action_Create_PolygenLayer_triggered();
+
+    void on_Save_Style_clicked();
+
+    void on_action_Show_LayerList_triggered();
 
 protected:
 //    void mousePressEvent(QMouseEvent *);
