@@ -543,14 +543,15 @@ void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *event)
                 QGraphicsEllipseItem(points[i].x()-5,points[i].y()-5,10,10);
         pointCircle->setBrush(Qt::red);
         shapes.append(pointCircle);
+        showShape(shapes);
+      shapes.clear();
     }
     editPointIndex=-1;
     for(int i=0;i<points.count();i++)
     {
         this->removeItem(this->items()[0]);
     }
-    showShape(shapes);
-  shapes.clear();
+
     }
     if(points.count()<2)
     {
@@ -706,10 +707,10 @@ void EditWidget::showpoints()
         newPointCircle->setBrush(Qt::red);
 
         shapes.append(newPointCircle);
-
+        showShape(shapes);
+        shapes.clear();
     }
-    showShape(shapes);
-    shapes.clear();
+
 
 }
 void EditWidget::showpicture()
