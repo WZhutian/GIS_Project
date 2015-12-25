@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network sql
 CONFIG   -= app_bundle
 CONFIG   += C++11
 
@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     editwidget.cpp \
     tcpserver.cpp \
     tcpsocket.cpp \
-    threadhandle.cpp
+    threadhandle.cpp \
+    database.cpp
 
 HEADERS  += mainwindow.h \
     GDAL_include/cpl_atomic_ops.h \
@@ -97,7 +98,8 @@ HEADERS  += mainwindow.h \
     editwidget.h \
     tcpserver.h \
     tcpsocket.h \
-    threadhandle.h
+    threadhandle.h \
+    database.h
 
 FORMS    += mainwindow.ui
 

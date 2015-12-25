@@ -65,8 +65,15 @@
     <addaction name="separator"/>
     <addaction name="menu_4"/>
    </widget>
+   <widget class="QMenu" name="menu_6">
+    <property name="title">
+     <string>显示</string>
+    </property>
+    <addaction name="action_Show_LayerList"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_6"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="mainToolBar">
@@ -102,15 +109,61 @@
    <addaction name="action_Tcp_Time"/>
    <addaction name="separator"/>
   </widget>
+  <widget class="QDockWidget" name="dockWidget_Layers">
+   <property name="minimumSize">
+    <size>
+     <width>122</width>
+     <height>466</height>
+    </size>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="windowTitle">
+    <string>图层列表</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
+     <item>
+      <widget class="QTreeView" name="treeView">
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="indentation">
+        <number>10</number>
+       </property>
+       <property name="expandsOnDoubleClick">
+        <bool>false</bool>
+       </property>
+       <attribute name="headerCascadingSectionResizes">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="headerDefaultSectionSize">
+        <number>30</number>
+       </attribute>
+       <attribute name="headerMinimumSectionSize">
+        <number>25</number>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="maximumSize">
     <size>
      <width>100</width>
      <height>350</height>
     </size>
-   </property>
-   <property name="floating">
-    <bool>false</bool>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -304,6 +357,13 @@
       </layout>
      </item>
      <item>
+      <widget class="QPushButton" name="Save_Style">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer_5">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -323,55 +383,7 @@
     <zorder>verticalSpacer_4</zorder>
     <zorder>verticalSpacer_5</zorder>
     <zorder>label_6</zorder>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidget_Layers">
-   <property name="minimumSize">
-    <size>
-     <width>109</width>
-     <height>134</height>
-    </size>
-   </property>
-   <property name="cursor">
-    <cursorShape>ArrowCursor</cursorShape>
-   </property>
-   <property name="windowTitle">
-    <string>图层列表</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QVBoxLayout" name="verticalLayout_7">
-     <item>
-      <widget class="QTreeView" name="treeView">
-       <property name="baseSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="whatsThis">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="indentation">
-        <number>10</number>
-       </property>
-       <property name="expandsOnDoubleClick">
-        <bool>false</bool>
-       </property>
-       <attribute name="headerCascadingSectionResizes">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="headerDefaultSectionSize">
-        <number>30</number>
-       </attribute>
-       <attribute name="headerMinimumSectionSize">
-        <number>25</number>
-       </attribute>
-      </widget>
-     </item>
-    </layout>
+    <zorder>Save_Style</zorder>
    </widget>
   </widget>
   <action name="action_Move">
@@ -598,6 +610,11 @@
   <action name="action_End_Edit">
    <property name="text">
     <string>结束编辑</string>
+   </property>
+  </action>
+  <action name="action_Show_LayerList">
+   <property name="text">
+    <string>图层列表</string>
    </property>
   </action>
  </widget>

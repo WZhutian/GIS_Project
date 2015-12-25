@@ -9,6 +9,7 @@
 #include "mydatastream.h"
 #include <QInputDialog>
 #include <QBrush>
+#include <QTableWidget>
 QByteArray  MainWindow::intToByte(int i)
 {
     QByteArray abyte0;
@@ -31,6 +32,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    willtoRead=false;
+    //画板
+    Change_Style_ID=-1;
+    Temp_Color_Brush=Qt::white;
+    Temp_Color_Pen=Qt::black;
+    ui->dockWidget->hide();
+    init_modeIndex = ui->treeView->currentIndex();
     //显示表头
     goodsModel = new QStandardItemModel(0, 3,this);
     ui->treeView->setModel(goodsModel);
@@ -42,7 +50,10 @@ MainWindow::MainWindow(QWidget *parent) :
     goodsModel->setHeaderData(2, Qt::Horizontal, tr("图层类型"));
     ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(goodsModel,&QStandardItemModel::itemChanged, this ,&MainWindow::treeItemChanged );
-    Show_TreeView();
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this,SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(slotCustomContextMenu(const QPoint &)));
     //绘图部分，scene初始化
     area=new EditWidget(this);
     QGraphicsView *view = new QGraphicsView(area,this);
@@ -62,62 +73,106 @@ MainWindow::MainWindow(QWidget *parent) :
     tcpClient->abort();
     connect(tcpClient,&QTcpSocket::readyRead,
             [&](){
-        QByteArray Byte_size;
-        QDataStream Message(this->tcpClient->readAll());
-        Message>>Byte_size;
-        int size=bytesToInt(Byte_size);
-        //将客户端的修改内容添加到服务器的容器中，并对相应图元进行删除操作
-        for(int i=0;i<size;i++){
-            St_Layers Layers_out;
-            Message>>Layers_out;
-            //对发来的layers做分析，先分析layer中操作，对容器进行修改，存在的都删除；
-            for(int t=0;t<Layers_out.PC_ID.size();t++){
-                if(Layers_out.Change_Way.at(t)!=2){
-                    int index=Container->Current_search(Layers_out.Layer_ID,Layers_out.PC_ID.at(t),Layers_out.Index_Part.at(t),Layers_out.Ob_Type);
-                    if(Layers_out.Ob_Type==0){
-                        qDebug()<<"remmoved Point:";
-                        qDebug()<<Container->Points_List.at(index).Point;
-                        Container->Points_List.removeAt(index);
-                    }else if(Layers_out.Ob_Type==1){
-                        Container->Lines_List.removeAt(index);
-                    }else{
-                        Container->Polygens_List.removeAt(index);
+        if(willtoRead==true){
+            QByteArray Byte_size;
+            QDataStream Message(this->tcpClient->readAll());
+            Message>>Byte_size;
+            int size=bytesToInt(Byte_size);
+            if(Container->Layers_List.size()==0){//首次连接的情况
+                for(int i=0;i<size;i++){
+                    St_Layers Layers_out;
+                    Message>>Layers_out;
+                    Container->Layers_List.append(Layers_out);
+                }
+                //Step3:将数据包添加到本地容器中去
+                //按顺序添加后面的包
+                QByteArray Pt_size;
+                Message>>Pt_size;
+                int size_Pt=bytesToInt(Pt_size);
+                qDebug()<<size_Pt;
+                for(int j=0;j<size_Pt;j++){
+                    St_Points Points_out;
+                    Message>>Points_out;
+                    //添加到本地容器
+                    Container->Points_List.append(Points_out);
+                }
+                QByteArray Ln_size;
+                Message>>Ln_size;
+                int size_Ln=bytesToInt(Ln_size);
+                for(int j=0;j<size_Ln;j++){
+                    St_Lines Lines_out;
+                    Message>>Lines_out;
+                    //添加到本地容器
+                     Container->Lines_List.append(Lines_out);
+                }
+                QByteArray Pl_size;
+                Message>>Pl_size;
+                int size_Pl=bytesToInt(Pl_size);
+                for(int j=0;j<size_Pl;j++){
+                    St_Polygens Polygens_out;
+                    Message>>Polygens_out;
+                    //添加到本地容器
+                    Container->Polygens_List.append(Polygens_out);
+                }
+            }else{
+                //将客户端的修改内容添加到服务器的容器中，并对相应图元进行删除操作
+                for(int i=0;i<size;i++){
+                    St_Layers Layers_out;
+                    Message>>Layers_out;
+                    //对发来的layers做分析，先分析layer中操作，对容器进行修改，存在的都删除；
+                    for(int t=0;t<Layers_out.PC_ID.size();t++){
+                        if(Layers_out.Change_Way.at(t)!=2){
+                            int index=Container->Current_search(Layers_out.Layer_ID,Layers_out.PC_ID.at(t),Layers_out.Index_Part.at(t),Layers_out.Ob_Type);
+                            if(Layers_out.Ob_Type==0){
+                                qDebug()<<"remmoved Point:";
+                                qDebug()<<Container->Points_List.at(index).Point;
+                                Container->Points_List.removeAt(index);
+                            }else if(Layers_out.Ob_Type==1){
+                                Container->Lines_List.removeAt(index);
+                            }else{
+                                Container->Polygens_List.removeAt(index);
+                            }
+                        }
                     }
                 }
+                //Step3:将数据包添加到本地容器中去
+                //按顺序添加后面的包
+                QByteArray Pt_size;
+                Message>>Pt_size;
+                int size_Pt=bytesToInt(Pt_size);
+                qDebug()<<size_Pt;
+                for(int j=0;j<size_Pt;j++){
+                    St_Points Points_out;
+                    Message>>Points_out;
+                    //添加到本地容器
+                    int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
+                    Container->Points_List.insert(insert_index,Points_out);
+                }
+                QByteArray Ln_size;
+                Message>>Ln_size;
+                int size_Ln=bytesToInt(Ln_size);
+                for(int j=0;j<size_Ln;j++){
+                    St_Lines Lines_out;
+                    Message>>Lines_out;
+                    //添加到本地容器
+                    qDebug()<<Lines_out.Line_FromTo.size();
+                    int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
+                    Container->Lines_List.insert(insert_index,Lines_out);
+                }
+                QByteArray Pl_size;
+                Message>>Pl_size;
+                int size_Pl=bytesToInt(Pl_size);
+                for(int j=0;j<size_Pl;j++){
+                    St_Polygens Polygens_out;
+                    Message>>Polygens_out;
+                    //添加到本地容器
+                    int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
+                    Container->Polygens_List.insert(insert_index,Polygens_out);
+                }
             }
+            willtoRead=false;
         }
-        //Step3:将数据包添加到本地容器中去
-        //按顺序添加后面的包
-        QByteArray Pt_size;
-        Message>>Pt_size;
-        int size_Pt=bytesToInt(Pt_size);
-        for(int j=0;j<size_Pt;j++){
-            St_Points Points_out;
-            Message>>Points_out;
-            //添加到本地容器
-            int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
-            Container->Points_List.insert(insert_index,Points_out);
-        }
-        QByteArray Ln_size;
-        Message>>Ln_size;
-        int size_Ln=bytesToInt(Ln_size);
-        for(int j=0;j<size_Ln;j++){
-            St_Lines Lines_out;
-            Message>>Lines_out;
-            //添加到本地容器
-            int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
-            Container->Lines_List.insert(insert_index,Lines_out);
-        }
-        QByteArray Pl_size;
-        Message>>Pl_size;
-        int size_Pl=bytesToInt(Pl_size);
-        for(int j=0;j<size_Pl;j++){
-            St_Polygens Polygens_out;
-            Message>>Polygens_out;
-            //添加到本地容器
-            int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
-            Container->Polygens_List.insert(insert_index,Polygens_out);
-        }
+
     });
     connect(tcpClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(ReadError(QAbstractSocket::SocketError)));//错误信号
     connect(&tm,&QTimer::timeout,[&](){
@@ -131,6 +186,7 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::Get_Container(Container_List &Container_Out){
     Container=&Container_Out;
     area->Get_Container(*Container);
+    Show_TreeView();
 }
 
 void MainWindow::Get_TcpServer(TcpServer &TcpSever_Out){
@@ -153,7 +209,6 @@ void MainWindow::on_penStyleComboBox_currentIndexChanged(const QString penStyle)
         area->setPenStyle(Qt::DotLine);
     }
 }
-
 void MainWindow::on_penWidthSpinBox_valueChanged(int penWidth)
 {
     area->setPenWidth(penWidth);
@@ -165,6 +220,7 @@ void MainWindow::on_penColorToolButton_clicked()
     if (newColor.isValid())   //如果得到的是可用的颜色
     {
         area->setPenColor(newColor);
+        Temp_Color_Pen=newColor;
         QPalette palette = ui->textBrowser_Pen->palette(); //显示这个颜色
         palette.setColor(QPalette::Base,newColor);
         ui->textBrowser_Pen->setPalette(palette);
@@ -177,6 +233,7 @@ void MainWindow::on_brushColorToolButton_clicked()
     if (newColor.isValid())   //如果得到的是可用的颜色
     {
         area->setBrushColor(newColor);
+        Temp_Color_Brush=newColor;
         QPalette palette = ui->textBrowser_Brush->palette(); //显示这个颜色
         palette.setColor(QPalette::Base,newColor);
         ui->textBrowser_Brush->setPalette(palette);
@@ -288,6 +345,7 @@ void MainWindow::on_action_Tcp_Server_triggered()
     }
 
     this->ui->action_Tcp_Server->setEnabled(false);
+    ui->menu_4->setEnabled(false);
 
 }
 void MainWindow::on_action_Tcp_Connect_triggered()
@@ -316,6 +374,7 @@ void MainWindow::on_action_Tcp_Connect_triggered()
                 out<<intToByte(layer_size);
                 tcpClient->write(block);
             }
+            willtoRead=true;
         }
     }
     else
@@ -331,7 +390,9 @@ void MainWindow::on_action_Tcp_Connect_triggered()
             this->ui->action_Tcp_Time->setText("启动定时");
         }
         ipAdd="";//将IP地址清除
+        willtoRead=false;
     }
+    ui->menu_4->setEnabled(false);
 }
 void MainWindow::on_action_Tcp_Sent_triggered()
 {
@@ -400,6 +461,7 @@ void MainWindow::on_action_Tcp_Sent_triggered()
         return ;
     }
     tcpClient->write(block);
+    willtoRead=true;
 }
 void MainWindow::on_action_Tcp_Time_triggered()
 {
@@ -432,13 +494,20 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
             Show_TreeView();
         }
     }else{
+        qDebug()<<"inhere";
         St_Raster_images temp;
         temp.Image=new QImage(path);
-        St_Layers temp_ly;
-        temp_ly.Layer_ID=Container->Layers_List.size();
-        temp_ly.Layer_Name="Image Layer";
-        Container->Images_List.append(temp);
-        Container->Layers_List.append(temp_ly);
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("读取图片"),
+                                             tr("依次输入左上角XY坐标以及右下角XY坐标，以逗号分隔开:"), QLineEdit::Normal,
+                                             "New Shpfile Image", &ok);
+        QStringList text_list=text.split(",");
+        if (ok && !text.isEmpty()){
+            temp.Image_Name=text;
+            Container->Images_List.append(temp);
+            Show_TreeView();
+        }
+
     }
 }
 ////////////////////////////////图层部分//////////////////////
@@ -471,32 +540,120 @@ void MainWindow::Show_TreeView(){
 
         goodsModel->appendRow(items);
     }
+    for(int i=0;i<Container->Images_List.size();i++){
+        QList<QStandardItem *> items;
+        QStandardItem *item_1 = new QStandardItem();
+        item_1->setCheckable(true);
+        items.push_back(item_1);
+        QStandardItem *item_2 = new QStandardItem(Container->Images_List.at(i).Image_Name);
+        items.push_back(item_2);
+        QStandardItem *item_3 = new QStandardItem("图片");
+        items.push_back(item_3);
+        goodsModel->appendRow(items);
+    }
 }
-//void MainWindow::contextMenuEvent(QContextMenuEvent *event)
-//{
-//    QMenu *pMenu = new QMenu(ui.treeView_);
-//    QAction* buildItem = pMenu->addAction(tr("build"));
-//    pMenu->exec(QCursor::pos());
-//}
+
 void MainWindow :: treeItemChanged ( QStandardItem * item )
 {
     int layer_id = item->row();
     qDebug()<<layer_id;
     //修改图层名,保护图层类型不变
-    Container->Layers_List[layer_id].Layer_Name=goodsModel->item(layer_id,1)->text();
-    if(Container->Layers_List[layer_id].Ob_Type==0){
-        goodsModel->item(layer_id,2)->setText("点");
-    }else if(Container->Layers_List[layer_id].Ob_Type==1){
-        goodsModel->item(layer_id,2)->setText("线");
+    if(Container->Layers_List.size()<layer_id+1){
+        Container->Images_List[layer_id-Container->Layers_List.size()].Image_Name=goodsModel->item(layer_id,1)->text();
+
+        goodsModel->item(layer_id,2)->setText("图片");
+        if(item->checkState()==Qt::Checked){
+            qDebug()<<item->checkState();
+            //设置显示TODO
+        }else{
+            //设置隐藏Flag TODO
+        }
     }else{
-        goodsModel->item(layer_id,2)->setText("面");
+        Container->Layers_List[layer_id].Layer_Name=goodsModel->item(layer_id,1)->text();
+        if(Container->Layers_List[layer_id].Ob_Type==0){
+            goodsModel->item(layer_id,2)->setText("点");
+        }else if(Container->Layers_List[layer_id].Ob_Type==1){
+            goodsModel->item(layer_id,2)->setText("线");
+        }else if(Container->Layers_List[layer_id].Ob_Type==2){
+            goodsModel->item(layer_id,2)->setText("面");
+        }
+        if(item->checkState()==Qt::Checked){
+            qDebug()<<item->checkState();
+            //设置显示TODO
+        }else{
+            //设置隐藏Flag TODO
+        }
     }
-    if(item->checkState()==Qt::Checked){
-        qDebug()<<item->checkState();
-        //设置显示TODO
+}
+void MainWindow::slotCustomContextMenu(const QPoint &){
+    QModelIndex index = ui->treeView->currentIndex();
+    int layer_index = index.row();
+    if(layer_index!=-1&&layer_index<Container->Layers_List.size()){
+        QMenu *menu = new QMenu;
+        qDebug()<<index;
+        menu->addAction(QString("属性"), this, SLOT(Show_Attr()));
+        menu->addAction(QString("修改样式"), this, SLOT(Change_Style()));
+        Change_Style_ID=layer_index;//设置当前修改的layer索引
+        menu->exec(QCursor::pos());
+        ui->treeView->setCurrentIndex(init_modeIndex);
+    }
+}
+void MainWindow::Show_Attr(){
+    int Attr_size=Container->Layers_List.at(Change_Style_ID).Attribute_Name.size();
+    int Elements_size=Container->Layers_List.at(Change_Style_ID).Size;
+    QTableWidget *tableWidget = new QTableWidget(Elements_size,Attr_size); // 构造了一个QTableWidget的对象
+    tableWidget->setWindowTitle("查看属性");
+    //     tableWidget->resize(350, 200);  //设置表格
+    QStringList header;
+    for(int i=0;i<Attr_size;i++){
+        header<<Container->Layers_List.at(Change_Style_ID).Attribute_Name.at(i);
+    }
+    tableWidget->setHorizontalHeaderLabels(header);//设置表头
+    int jump_index=0;
+    for(int i=0;i<Change_Style_ID;i++){
+        if(Container->Layers_List.at(i).Ob_Type==Container->Layers_List.at(Change_Style_ID).Ob_Type)
+            jump_index+=Container->Layers_List.at(i).Size;
+    }
+    if(Container->Layers_List.at(Change_Style_ID).Ob_Type==0){
+        for(int i=0;i<Elements_size;i++){
+            for(int j=0;j<Container->Points_List.at(i+jump_index).Attribute_Point.size();j++){
+                tableWidget->setItem(i,j,new QTableWidgetItem(Container->Points_List.at(i+jump_index).Attribute_Point.at(j)));
+            }
+        }
+    }else if(Container->Layers_List.at(Change_Style_ID).Ob_Type==1){
+        for(int i=0;i<Elements_size;i++){
+            for(int j=0;j<Container->Lines_List.at(i+jump_index).Attribute_Line.size();j++)
+                tableWidget->setItem(i,j,new QTableWidgetItem(Container->Lines_List.at(i+jump_index).Attribute_Line.at(j)));
+        }
     }else{
-        //设置隐藏Flag TODO
+        for(int i=0;i<Elements_size;i++){
+            for(int j=0;j<Container->Polygens_List.at(i+jump_index).Attribute_Polygen.size();j++)
+                tableWidget->setItem(i,j,new QTableWidgetItem(Container->Polygens_List.at(i+jump_index).Attribute_Polygen.at(j)));
+        }
     }
+    tableWidget->show();
+}
+
+void MainWindow::Change_Style(){
+    ui->dockWidget->show();
+}
+void MainWindow::on_Save_Style_clicked()
+{
+    if(ui->penStyleComboBox->currentText() == QStringLiteral("实线"))
+    {
+        Container->Layers_List[Change_Style_ID].penColor=Qt::SolidLine;
+    }
+    else if(ui->penStyleComboBox->currentText()  == QStringLiteral("虚线"))
+    {
+        Container->Layers_List[Change_Style_ID].penColor=Qt::DotLine;
+    }
+    Container->Layers_List[Change_Style_ID].penWidth = ui->penWidthSpinBox->text().toInt();
+    Container->Layers_List[Change_Style_ID].brushColor = Temp_Color_Brush;
+    Container->Layers_List[Change_Style_ID].penColor = Temp_Color_Pen;
+    Change_Style_ID=-1;
+
+    ui->dockWidget->hide();
+    //TODO 修改Container中的所有items
 }
 
 //////////////////////////编辑要素//////////////////////////
@@ -513,7 +670,7 @@ void MainWindow::on_action_Start_Edit_triggered()
     QString res = QInputDialog::getItem(this,
                                         tr( "选择图层" ),
                                         tr( "图层列表：" ), lst, 1, TRUE, &ok);
-    if ( ok )// 用户选择一项并且按下OK
+    if ( ok&&Container->Layers_List.size()!=0 )// 用户选择一项并且按下OK
     {
         Container->Layer_ID = Container->Layers_List.at(lst.indexOf(res)).Layer_ID;//修改当前编辑的图层号
 
@@ -527,6 +684,7 @@ void MainWindow::on_action_Start_Edit_triggered()
         ui->action_Move->setEnabled(true);
         ui->action_Refresh->setEnabled(true);
         ui->action_Start_Edit->setEnabled(false);
+        ui->menu_4->setEnabled(false);
         //设置可被选中Flag TODO c
         //设置画笔
         int ob_type=Container->Layers_List.at(lst.indexOf(res)).Ob_Type;
@@ -562,6 +720,7 @@ void MainWindow::on_action_End_Edit_triggered()
     ui->action_Move->setEnabled(false);
     ui->action_Refresh->setEnabled(false);
     ui->action_Start_Edit->setEnabled(true);
+    ui->menu_4->setEnabled(true);
     //设置不可选 TODO
 }
 
@@ -600,4 +759,10 @@ void MainWindow::on_action_Create_PolygenLayer_triggered()
         Container->Add_Layer(text,2);
         Show_TreeView();
     }
+}
+
+
+void MainWindow::on_action_Show_LayerList_triggered()
+{
+    ui->dockWidget_Layers->show();
 }

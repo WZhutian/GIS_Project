@@ -20,10 +20,20 @@ void GDAL_ReadFile::Open_Shp(){
     }
     poLayer = poDS->GetLayer(poDS->GetLayerCount()-1);//打开最后一层
     poLayer->ResetReading();//重置访问，防止出问题
+
+    poFeature = poLayer->GetFeature(0);//打开要素
     poFDefn = poLayer->GetLayerDefn();
+    poGeometry = poFeature->GetGeometryRef();
 }
 
 void GDAL_ReadFile::Get_Data(QString Layer_Name){
+    QList<QString> temp_attr;
+    for(int i = 0;i < poFDefn->GetFieldCount();i++){
+        poGeometry = poFeature->GetGeometryRef();
+        OGRFieldDefn *pFieldDefn = poFDefn->GetFieldDefn(i);
+        poGeometry->getGeometryType();
+        temp_attr.append(pFieldDefn->GetNameRef());
+    }
     int type=-1;
     int size=0;
     while( (poFeature = poLayer->GetNextFeature()) != NULL )//读取几何信息
@@ -38,13 +48,15 @@ void GDAL_ReadFile::Get_Data(QString Layer_Name){
             St_Points temp;
             temp.Point.setX(poPoint->getX());
             temp.Point.setY(poPoint->getY());
-            Container->Points_List.append(temp);
+            temp.Layer_ID=Container->Layers_List.size();
+            temp.PC_ID=Container->PC_ID;
+            temp.Index_Part=size-1;
 
-//            for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
-//            {
-//                temp.Attribute_Point.append(poFeature->GetFieldAsString(i));
-//                Container->Points_List.append(temp);
-//            }
+            for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
+            {
+                temp.Attribute_Point.append(poFeature->GetFieldAsString(i));
+            }
+            Container->Points_List.append(temp);
             type=0;
         }
         //读取线坐标
@@ -59,13 +71,15 @@ void GDAL_ReadFile::Get_Data(QString Layer_Name){
                 tempPoint.setX(poLine->getX(i));
                 tempPoint.setY(poLine->getY(i));
                 tempLine.Line_FromTo.append(tempPoint);
-                Container->Lines_List.append(tempLine);
             }
-//            for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
-//            {
-//                tempLine.Attribute_Line.append(poFeature->GetFieldAsString(i));
-//                Container->Lines_List.append(tempLine);
-//            }
+            tempLine.Layer_ID=Container->Layers_List.size();
+            tempLine.PC_ID=Container->PC_ID;
+            tempLine.Index_Part=size-1;
+            for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
+            {
+                tempLine.Attribute_Line.append(poFeature->GetFieldAsString(i));
+            }
+            Container->Lines_List.append(tempLine);
             type=1;
         }
         //读取面坐标(简单多边形，没有内环)
@@ -77,17 +91,18 @@ void GDAL_ReadFile::Get_Data(QString Layer_Name){
             for(int i = 0;i <= ring->getNumPoints(); i++){
                 QPointF tempPoint;
                 //              ring->getPoint(i,&tempPoint);
-                qDebug()<<ring->getX(i);
                 tempPoint.setX(ring->getX(i));
                 tempPoint.setY(ring->getY(i));
                 tempPolygen.Polygen_Round.append(tempPoint);
-                Container->Polygens_List.append(tempPolygen);
             }
-//            for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
-//            {
-//                tempPolygen.Attribute_Polygen.append(poFeature->GetFieldAsString(i));
-//                Container->Polygens_List.append(tempPolygen);
-//            }
+            tempPolygen.Layer_ID=Container->Layers_List.size();
+            tempPolygen.PC_ID=Container->PC_ID;
+            tempPolygen.Index_Part=size-1;
+            for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
+            {
+                tempPolygen.Attribute_Polygen.append(poFeature->GetFieldAsString(i));
+            }
+            Container->Polygens_List.append(tempPolygen);
             type=2;
         }
         else
@@ -99,5 +114,6 @@ void GDAL_ReadFile::Get_Data(QString Layer_Name){
         Container->Add_Layer(Layer_Name,type);
         Container->Layers_List[Container->Layers_List.size()-1].Size=size;
         Container->Layers_List[Container->Layers_List.size()-1].Every_size[Container->PC_ID]=size;
+        Container->Layers_List[Container->Layers_List.size()-1].Attribute_Name=temp_attr;
     }
 }
