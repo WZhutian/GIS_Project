@@ -12,7 +12,7 @@ public:
     int PC_ID;
     int Layer_ID;//当前编辑的图层号
 
-    QList<QGraphicsItem*> Items_List;
+    QList<St_Items> Items_List;
     QList<St_Points> Points_List;
     QList<St_Lines> Lines_List;
     QList<St_Polygens> Polygens_List;
@@ -37,9 +37,18 @@ public:
     int Search_Layer_Index(int Layer_ID_Out);
     int Current_insert(int Layer_ID,int PC_ID,int Index_Part,int Type);
     ////////////////////////添加Items//////////////////////////////////
-    void Add_Point_Item(QPointF Point_Item_Out);
-    void Add_Line_Item(QVector<QPointF> Line_Item_Out);
-    void Add_Polygen_Item(QVector<QPointF> Poly_Item_Out);
+    void Add_Point_Item(QPointF Point_Item_Out,int index);
+    void Add_Line_Item(QVector<QPointF> Line_Item_Out,int index);
+    void Add_Polygen_Item(QVector<QPointF> Poly_Item_Out,int index);
+    //////////////////////修改Items////////////////////////////////////
+    void Modify_Point_Item(QPointF Point_Item_Out_New,int index);
+    void Modify_Line_Item(QPointF Line_Item_Out_new,int index,int index_Line);
+    void Modify_Polygen_Item(QPointF Polygens_Item_Out_new,int index,int Index_Polygen);
+    //////////////////////删除Items/////////////////////////////////////
+    void Delete_Point_Item(int Index);
+    void Delete_Line_Item(int Index);
+    void Delete_Polygen_Item(int Index);
+
 };
 
 #endif // CONTAINER_LIST_H

@@ -4,6 +4,9 @@
 #include <QString>
 #include <QPointF>
 #include <QImage>
+#include<QVector>
+#include<QGraphicsItem>
+#include<QColor>
 struct St_Points{//点
     QPointF Point;//存储点坐标
     QList<QString> Attribute_Point;//存储属性
@@ -12,7 +15,7 @@ struct St_Points{//点
     int Index_Part;//在当前PC号对应部分下的索引号
 };
 struct St_Lines{//线与折线
-    QList<QPointF> Line_FromTo;//按顺序存储折线段的上点
+    QVector<QPointF> Line_FromTo;//按顺序存储折线段的上点
     QList<QString> Attribute_Line;
     int Layer_ID;//图层标记
     int PC_ID;//客户端标记，当前PC不属于该ID的时候，禁止编辑！！
@@ -20,7 +23,7 @@ struct St_Lines{//线与折线
 
 };
 struct St_Polygens{//多边形
-    QList<QPointF> Polygen_Round;//顺时针存储多边形上的点
+    QVector<QPointF> Polygen_Round;//顺时针存储多边形上的点
     QList<QString> Attribute_Polygen;
     int Layer_ID;//图层标记
     int PC_ID;//客户端标记，当前PC不属于该ID的时候，禁止编辑！！
@@ -29,6 +32,7 @@ struct St_Polygens{//多边形
 };
 struct St_Raster_images{//栅格图片 图片其实不能用TCP传递
     QList<QPointF> Image_Point;//图片四个角的位置
+    QString Image_Name;
     QImage *Image;
     int Layer_ID;//图层标记
 };
@@ -42,6 +46,11 @@ struct St_Layers{//图层
     //编辑时判断部分
     bool Visiable=false;//是否显示
     bool isEditing=false;//是否为当前编辑
+    //图元样式
+    QColor penColor=Qt::black;    //画笔颜色
+    QColor brushColor=Qt::white;   //填充颜色
+    int penWidth=1;     //画笔宽度
+    Qt::PenStyle penStyle=Qt::SolidLine;    //画笔风格
     //创建时添加部分
     int Layer_ID;//图层对应的图层号
     QString Layer_Name;//图层名字
@@ -61,6 +70,10 @@ struct St_Layers{//图层
     //被修改/删除的图元在第三层PC_ID对应部分中的索引号，用于tcp中重发机制，
     //客户机每次发送都清空一次，告诉服务端它此次上传修改了那些地方，服务端永久保存
     //只用作从服务端获取更新
+
+};
+struct St_Items{//Items
+    QList<QGraphicsItem*> Cur_Item;
 
 };
 

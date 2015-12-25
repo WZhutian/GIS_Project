@@ -55,11 +55,11 @@ public:
     void setBrushColor(QColor color);   //设置填充颜色
     void setShape(ShapeType shape);  //设置要绘制的图形
     void setState(viewState state);
-    void showShape(QVector<QGraphicsItem*> shapes);
+    void showShape(QList<QGraphicsItem*> shapes);
     void setPen();
     QVector<QPointF> points;    //绘制的图形对应的坐标
-    QVector<QGraphicsItem*> shapes;//交互操作图形容器
-    QVector<QGraphicsItem*> containerItem;//总的图形容器
+    QList<QGraphicsItem*> shapes;//交互操作图形容器
+
     QVector<QPointF> points2; //存从数据库读出来的点
     void showpoints();
     void showpicture();
