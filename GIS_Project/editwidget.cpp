@@ -133,10 +133,6 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
 //            shapes.append(cur);
 //            showShape(shapes);
 //            shapes.clear();
-            for(int i=0;i<points.count();i++)
-            {
-                Container->Lines_List[Container->Layer_ID].Line_FromTo.append(points[i]);
-            }
 
             Container->Add_Line(points);
             showShape(Container->Items_List[Container->Layer_ID].Cur_Item);
@@ -190,10 +186,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
 //            shapes.append(cur);
 //            showShape(shapes);
 //            shapes.clear();
-            for(int i=0;i<points.count();i++)
-            {
-                Container->Polygens_List[Container->Layer_ID].Polygen_Round.append(points[i]);
-            }
+
              Container->Add_Polygen(points);
             this->removeItem(this->items()[1]);
             isDrawing=false;
@@ -465,22 +458,24 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
 
         points[editPointIndex]=event->scenePos();
 
-        QGraphicsPathItem*curEditPathItem=dynamic_cast<QGraphicsPathItem*>(curEditItem);
-        if(curEditPathItem!=NULL&&curEditPathItem->path().elementCount()>1)
-        {
-            QPainterPath *path=new QPainterPath(points[0]);
-            for(int i=1;i<points.count();++i)
-            {
-                path->lineTo(points[i]);
-            }
-            curEditPathItem->setPath(*path);
+       QGraphicsPathItem*curEditPathItem=dynamic_cast<QGraphicsPathItem*>(curEditItem);
+       if(curEditPathItem!=NULL&&curEditPathItem->path().elementCount()>1)
+       {
+//            QPainterPath *path=new QPainterPath(points[0]);
+//            for(int i=1;i<points.count();++i)
+//            {
+//                path->lineTo(points[i]);
+//            }
+//            curEditPathItem->setPath(*path);
+        Container->Modify_Line(curEditItem->data(2).toInt(),editPointIndex,event->scenePos());
 
         }
         QGraphicsPolygonItem*curEditPolygonItem=dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
         if(curEditPolygonItem!=NULL)
         {
-            QPolygonF *curPolygon=new QPolygonF(points);
-            curEditPolygonItem->setPolygon(*curPolygon);
+//            QPolygonF *curPolygon=new QPolygonF(points);
+//            curEditPolygonItem->setPolygon(*curPolygon);
+            Container->Modify_Polygen(curEditItem->data(2).toInt(),editPointIndex,event->scenePos());
         }
         //shapes=shapes;
         for(int i=0;i<points.count();++i)
@@ -493,6 +488,8 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
                             QGraphicsEllipseItem(points[i].x()-5,points[i].y()-5,10,10);
                     pointCircle->setBrush(Qt::red);
                     shapes.append(pointCircle);
+                    showShape(shapes);
+                    shapes.clear();
             }
             else
             {
@@ -500,14 +497,15 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
                         QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6);
                 pointCircle->setBrush(Qt::red);
                 shapes.append(pointCircle);
+                showShape(shapes);
+                shapes.clear();
             }
        }
         for(int i=0;i<points.count();i++)
         {
             this->removeItem(this->items()[0]);
         }
-        showShape(shapes);
-        shapes.clear();
+
     }
     }
 }
@@ -561,7 +559,7 @@ void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *event)
         isEditing=false;
         editPointIndex=-1;
         QPointF ChangePoint =event->scenePos();
-        Container->Modify_Point(curEditItem->data(2),ChangePoint);
+        Container->Modify_Point(curEditItem->data(2).toInt(),ChangePoint);
     }
 }
 
@@ -644,12 +642,12 @@ void EditWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     }
 }
 
-void EditWidget::showShape(QList<QGraphicsItem *>shapes)
+void EditWidget::showShape(QList<QGraphicsItem *>&shapes)
 {
 
 
 
-        this->addItem(&shapes[0]);
+        this->addItem(shapes[0]);
 
 }
 
@@ -734,8 +732,9 @@ void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
         if(selectItem != NULL)
         {
             selectItem->setSelected(true);
-            this->removeItem(selectItem);
+            //this->removeItem(selectItem);
             this->clearSelection();
+            Container->Delete_Point(selectItem->data(2).toInt());
          }
     }
 }
