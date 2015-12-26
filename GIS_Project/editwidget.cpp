@@ -444,7 +444,7 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
     if((event->buttons()&Qt::LeftButton)&& editPointIndex!=-1)
     {
         movePoint=event->scenePos();
-        if(points.count()<2&&this->selectedItems().count()>0) //如果在编辑点
+        if(points.count()<2&&this->selectedItems().count()>0&&points.count()>0) //如果在编辑点
         {
             qDebug()<<this->selectedItems().count();
             qreal dx=movePoint.x()-origPoint.x();
@@ -560,7 +560,7 @@ void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *event)
         }
 
     }
-    if(points.count()<2)
+    if(points.count()<2&&points.count()>1)
     {
         this->views()[0]->setCursor(Qt::PointingHandCursor);
         this->clearSelection();
