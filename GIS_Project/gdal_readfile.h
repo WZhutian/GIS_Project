@@ -6,6 +6,7 @@
 #include <container_list.h>
 #include <QDebug>
 #include <QPointF>
+#include "editwidget.h"
 class GDAL_ReadFile
 {
 public:
@@ -13,6 +14,8 @@ public:
     ~GDAL_ReadFile();
     void Open_Shp();
     void Get_Data(QString Layer_Name);//将shp中的数据传入引用参数容器中
+
+;
 private:
     Container_List *Container;
     char* File_name;//保存要读取的文件名
@@ -21,6 +24,7 @@ private:
     OGRFeature *poFeature;//要素对象
     OGRLayer  *poLayer;//图层对象
     OGRFeatureDefn *poFDefn;//要素集信息，包含架构信息
+
 };
 
 #endif // GDAL_READFILE_H

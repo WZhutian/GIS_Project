@@ -22,7 +22,6 @@ void Container_List::Add_Point_Item(QPointF Point_Item_Out,int index)
 
 
 void Container_List::Add_Point(QPointF Point_Out){
-    qDebug()<<Layers_List.at(0).Every_size[0];
     int index =  Add_search(Layer_ID,PC_ID,0);
     int Part_Index=0;
     if(index>0){
