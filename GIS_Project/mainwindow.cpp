@@ -82,7 +82,18 @@ MainWindow::MainWindow(QWidget *parent) :
                 for(int i=0;i<size;i++){
                     St_Layers Layers_out;
                     Message>>Layers_out;
+                    //初始化
+                    Layers_out.Size=0;
+                    for(int j=0;j<10;j++){
+                        Layers_out.Every_size[j]=0;
+                    }
+                    Layers_out.PC_ID.clear();
+                    Layers_out.Index_Part.clear();
+                    Layers_out.Change_Way.clear();
+                    //
                     Container->Layers_List.append(Layers_out);
+                    St_Items temp_item;
+                    Container->Items_List.append(temp_item);
                 }
                 //Step3:将数据包添加到本地容器中去
                 //按顺序添加后面的包
@@ -95,6 +106,14 @@ MainWindow::MainWindow(QWidget *parent) :
                     Message>>Points_out;
                     //添加到本地容器
                     Container->Points_List.append(Points_out);
+
+                    int tempPcID=Container->PC_ID;
+                    int tempLayerID=Container->Layer_ID;
+                    Container->Layer_ID=Points_out.Layer_ID;
+                    Container->PC_ID=Points_out.PC_ID;
+                    Container->Add_Point_Item(Points_out.Point,Points_out.Index_Part);
+                    Container->PC_ID=tempPcID;
+                    Container->Layer_ID=tempLayerID;
                 }
                 QByteArray Ln_size;
                 Message>>Ln_size;
@@ -104,7 +123,15 @@ MainWindow::MainWindow(QWidget *parent) :
                     Message>>Lines_out;
                     //添加到本地容器
                     Container->Lines_List.append(Lines_out);
-                }
+
+                    int tempPcID=Container->PC_ID;
+                    int tempLayerID=Container->Layer_ID;
+                    Container->Layer_ID=Lines_out.Layer_ID;
+                    Container->PC_ID=Lines_out.PC_ID;
+                    Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
+                    Container->PC_ID=tempPcID;
+                    Container->Layer_ID=tempLayerID;
+                 }
                 QByteArray Pl_size;
                 Message>>Pl_size;
                 int size_Pl=bytesToInt(Pl_size);
@@ -113,6 +140,14 @@ MainWindow::MainWindow(QWidget *parent) :
                     Message>>Polygens_out;
                     //添加到本地容器
                     Container->Polygens_List.append(Polygens_out);
+
+                    int tempPcID=Container->PC_ID;
+                    int tempLayerID=Container->Layer_ID;
+                    Container->Layer_ID=Polygens_out.Layer_ID;
+                    Container->PC_ID=Polygens_out.PC_ID;
+                    Container->Add_Polygen_Item(Polygens_out.Polygen_Round,Polygens_out.Index_Part);
+                    Container->PC_ID=tempPcID;
+                    Container->Layer_ID=tempLayerID;
                 }
             }else{
                 //将客户端的修改内容添加到服务器的容器中，并对相应图元进行删除操作
@@ -588,7 +623,7 @@ void MainWindow :: treeItemChanged ( QStandardItem * item )
 void MainWindow::slotCustomContextMenu(const QPoint &){
     QModelIndex index = ui->treeView->currentIndex();
     int layer_index = index.row();
-    if(layer_index!=-1&&layer_index<Container->Layers_List.size()){
+    if(layer_index!=-1&&layer_index<Container->Layers_List.size()&&index.column()!=0){
         QMenu *menu = new QMenu;
         qDebug()<<index;
         menu->addAction(QString("属性"), this, SLOT(Show_Attr()));

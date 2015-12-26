@@ -45,6 +45,7 @@ inline QDataStream& operator<<(QDataStream& out, const St_Layers& Layers)
     for(int i=0;i<10;i++){
         out<<Layers.Every_size[i];
     }
+    out<<Layers.Attribute_Name;
     out<<Layers.Size<<Layers.Ob_Type;
     out<<Layers.PC_ID<<Layers.Index_Part<<Layers.Change_Way<<Layers.Accept_PC;
 
@@ -56,6 +57,7 @@ inline QDataStream& operator>>(QDataStream& in,St_Layers& Layers)
     for(int i=0;i<10;i++){
         in>>Layers.Every_size[i];
     }
+    in>>Layers.Attribute_Name;
     in>>Layers.Size>>Layers.Ob_Type;
     in>>Layers.PC_ID>>Layers.Index_Part>>Layers.Change_Way>>Layers.Accept_PC;
 
