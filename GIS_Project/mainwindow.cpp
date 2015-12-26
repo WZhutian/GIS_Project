@@ -103,7 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     St_Lines Lines_out;
                     Message>>Lines_out;
                     //添加到本地容器
-                     Container->Lines_List.append(Lines_out);
+                    Container->Lines_List.append(Lines_out);
                 }
                 QByteArray Pl_size;
                 Message>>Pl_size;
@@ -492,6 +492,7 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
             test.Get_Data(text);
             qDebug()<<Container->Layers_List.at(0).Size;
             Show_TreeView();
+            area->showShape(Container->Items_List[Container->Items_List.size()-1].Cur_Item,Container->Layers_List.at(Container->Layers_List.size()-1).Size);
         }
     }else{
         qDebug()<<"inhere";
@@ -556,14 +557,12 @@ void MainWindow::Show_TreeView(){
 void MainWindow :: treeItemChanged ( QStandardItem * item )
 {
     int layer_id = item->row();
-    qDebug()<<layer_id;
     //修改图层名,保护图层类型不变
     if(Container->Layers_List.size()<layer_id+1){
         Container->Images_List[layer_id-Container->Layers_List.size()].Image_Name=goodsModel->item(layer_id,1)->text();
 
         goodsModel->item(layer_id,2)->setText("图片");
         if(item->checkState()==Qt::Checked){
-            qDebug()<<item->checkState();
             //设置显示TODO
         }else{
             //设置隐藏Flag TODO
@@ -578,10 +577,11 @@ void MainWindow :: treeItemChanged ( QStandardItem * item )
             goodsModel->item(layer_id,2)->setText("面");
         }
         if(item->checkState()==Qt::Checked){
-            qDebug()<<item->checkState();
-            //设置显示TODO
+            for(int i=0 ;i<Container->Items_List.at(layer_id).Cur_Item.size();i++)
+                Container->Items_List[layer_id].Cur_Item.at(i)->show();
         }else{
-            //设置隐藏Flag TODO
+            for(int i =0;i<Container->Items_List.at(layer_id).Cur_Item.size();i++)
+                Container->Items_List[layer_id].Cur_Item.at(i)->hide();
         }
     }
 }
@@ -641,19 +641,45 @@ void MainWindow::on_Save_Style_clicked()
 {
     if(ui->penStyleComboBox->currentText() == QStringLiteral("实线"))
     {
-        Container->Layers_List[Change_Style_ID].penColor=Qt::SolidLine;
+        Container->Layers_List[Change_Style_ID].penStyle=Qt::SolidLine;
     }
     else if(ui->penStyleComboBox->currentText()  == QStringLiteral("虚线"))
     {
-        Container->Layers_List[Change_Style_ID].penColor=Qt::DotLine;
+        Container->Layers_List[Change_Style_ID].penStyle=Qt::DotLine;
     }
     Container->Layers_List[Change_Style_ID].penWidth = ui->penWidthSpinBox->text().toInt();
     Container->Layers_List[Change_Style_ID].brushColor = Temp_Color_Brush;
     Container->Layers_List[Change_Style_ID].penColor = Temp_Color_Pen;
+
+    //TODO 修改Container中的所有items
+    QPen temp;
+    temp.setWidth(Container->Layers_List[Change_Style_ID].penWidth);
+    temp.setBrush(Temp_Color_Brush);
+    temp.setColor(Temp_Color_Pen);
+    int obtype=Container->Layers_List[Change_Style_ID].Ob_Type;
+    for(int i =0;i< Container->Items_List.at(Change_Style_ID).Cur_Item.size();i++){
+        if(obtype==0){
+            QGraphicsEllipseItem *new_Point_style;
+            new_Point_style=dynamic_cast<QGraphicsEllipseItem *>(Container->Items_List.at(Change_Style_ID).Cur_Item[i]);
+            new_Point_style->setBrush(Temp_Color_Brush);
+            new_Point_style->setPen(temp);
+        }else if(obtype=1){
+
+            QGraphicsPathItem* new_Line_style;
+            new_Line_style=dynamic_cast<QGraphicsPathItem *>(Container->Items_List.at(Change_Style_ID).Cur_Item[i]);
+            new_Line_style->setBrush(Temp_Color_Brush);
+            new_Line_style->setPen(temp);
+        }else{
+            QGraphicsPolygonItem* new_Polygen_style;
+            new_Polygen_style=dynamic_cast<QGraphicsPolygonItem *>(Container->Items_List.at(Change_Style_ID).Cur_Item[i]);
+            new_Polygen_style->setBrush(Temp_Color_Brush);
+            new_Polygen_style->setPen(temp);
+        }
+    }
+
     Change_Style_ID=-1;
 
     ui->dockWidget->hide();
-    //TODO 修改Container中的所有items
 }
 
 //////////////////////////编辑要素//////////////////////////

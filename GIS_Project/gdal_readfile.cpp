@@ -1,5 +1,4 @@
 #include "gdal_readfile.h"
-
 GDAL_ReadFile::GDAL_ReadFile(char* File_name,Container_List &Container_out)
 {
     this->File_name=File_name;//保存文件名
@@ -34,86 +33,95 @@ void GDAL_ReadFile::Get_Data(QString Layer_Name){
         poGeometry->getGeometryType();
         temp_attr.append(pFieldDefn->GetNameRef());
     }
-    int type=-1;
-    int size=0;
+    bool add_layer=false;
     while( (poFeature = poLayer->GetNextFeature()) != NULL )//读取几何信息
     {
-        size++;
         poGeometry = poFeature->GetGeometryRef();
         poFDefn=poLayer->GetLayerDefn();
         //
         if( poGeometry != NULL && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint )
         {
+            if(add_layer==false){
+                Container->Add_Layer(Layer_Name,0);
+                Container->Layers_List[Container->Layers_List.size()-1].Attribute_Name=temp_attr;
+                add_layer=true;
+            }
             OGRPoint *poPoint = (OGRPoint *) poGeometry;
-            St_Points temp;
-            temp.Point.setX(poPoint->getX());
-            temp.Point.setY(poPoint->getY());
-            temp.Layer_ID=Container->Layers_List.size();
-            temp.PC_ID=Container->PC_ID;
-            temp.Index_Part=size-1;
-
+            QList<QString> Attr;
+            QPointF temp;
+            temp.setX(poPoint->getX());
+            temp.setY(poPoint->getY());
+            int restore_temp=Container->Layer_ID;
+            Container->Layer_ID=Container->Layers_List.size()-1;
+            Container->Add_Point(temp);
+            Container->Layer_ID=restore_temp;
             for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
             {
-                temp.Attribute_Point.append(poFeature->GetFieldAsString(i));
+                Attr.append(poFeature->GetFieldAsString(i));
             }
-            Container->Points_List.append(temp);
-            type=0;
-        }
+            Container->Points_List[Container->Points_List.size()-1].Attribute_Point=Attr;
+         }
         //读取线坐标
         else if( poGeometry != NULL && wkbFlatten(poGeometry->getGeometryType()) == wkbLineString )
         {
+            if(add_layer==false){
+                Container->Add_Layer(Layer_Name,0);
+                Container->Layers_List[Container->Layers_List.size()-1].Attribute_Name=temp_attr;
+                add_layer=true;
+            }
             OGRLineString *poLine = (OGRLineString*)poGeometry;
             int a = poLine->getNumPoints();
-            St_Lines tempLine;
+            QVector<QPointF> tempLine;
+            QList<QString> Attr;
+            int restore_temp=Container->Layer_ID;
+            Container->Layer_ID=Container->Layers_List.size()-1;
             for(int i = 0;i <= a; i++){
-
                 QPointF tempPoint;
                 tempPoint.setX(poLine->getX(i));
                 tempPoint.setY(poLine->getY(i));
-                tempLine.Line_FromTo.append(tempPoint);
+                tempLine.append(tempPoint);
             }
-            tempLine.Layer_ID=Container->Layers_List.size();
-            tempLine.PC_ID=Container->PC_ID;
-            tempLine.Index_Part=size-1;
+            Container->Add_Line(tempLine);
+            Container->Layer_ID=restore_temp;
             for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
             {
-                tempLine.Attribute_Line.append(poFeature->GetFieldAsString(i));
+                Attr.append(poFeature->GetFieldAsString(i));
             }
-            Container->Lines_List.append(tempLine);
-            type=1;
+            Container->Lines_List[Container->Lines_List.size()-1].Attribute_Line=Attr;
         }
         //读取面坐标(简单多边形，没有内环)
         else if( poGeometry != NULL && wkbFlatten(poGeometry->getGeometryType()) == wkbPolygon)
         {
+            if(add_layer==false){
+                Container->Add_Layer(Layer_Name,0);
+                Container->Layers_List[Container->Layers_List.size()-1].Attribute_Name=temp_attr;
+                add_layer=true;
+            }
             OGRPolygon *PoPolygen = (OGRPolygon*)poGeometry;
             OGRLinearRing *ring = PoPolygen->getExteriorRing();//获取该多边形的外环
-            St_Polygens tempPolygen;
+            QVector<QPointF> tempPolygen;
+            QList<QString> Attr;
+            int restore_temp=Container->Layer_ID;
+            Container->Layer_ID=Container->Layers_List.size()-1;
             for(int i = 0;i <= ring->getNumPoints(); i++){
                 QPointF tempPoint;
                 //              ring->getPoint(i,&tempPoint);
                 tempPoint.setX(ring->getX(i));
                 tempPoint.setY(ring->getY(i));
-                tempPolygen.Polygen_Round.append(tempPoint);
+                tempPolygen.append(tempPoint);
             }
-            tempPolygen.Layer_ID=Container->Layers_List.size();
-            tempPolygen.PC_ID=Container->PC_ID;
-            tempPolygen.Index_Part=size-1;
+            Container->Add_Polygen(tempPolygen);
+            Container->Layer_ID=restore_temp;
             for(int i = 0;i < poFDefn->GetFieldCount();i++) //列上的
             {
-                tempPolygen.Attribute_Polygen.append(poFeature->GetFieldAsString(i));
+                Attr.append(poFeature->GetFieldAsString(i));
             }
-            Container->Polygens_List.append(tempPolygen);
-            type=2;
+            Container->Polygens_List[Container->Polygens_List.size()-1].Attribute_Polygen=Attr;
         }
         else
         {
             printf( "no point geometry\n" );
         }
     }
-    if(type!=-1){
-        Container->Add_Layer(Layer_Name,type);
-        Container->Layers_List[Container->Layers_List.size()-1].Size=size;
-        Container->Layers_List[Container->Layers_List.size()-1].Every_size[Container->PC_ID]=size;
-        Container->Layers_List[Container->Layers_List.size()-1].Attribute_Name=temp_attr;
-    }
+
 }
