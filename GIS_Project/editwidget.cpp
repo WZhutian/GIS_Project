@@ -247,51 +247,52 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
         this->views()[0]->setCursor(Qt::PointingHandCursor);
         points.clear();
         curEditItem = this->itemAt(event->scenePos(),this->items()[0]->transform()); //选取当前鼠标点击的Items
-        //shapes=shapes;
-        QGraphicsEllipseItem *curEditPointCircleItem=dynamic_cast<QGraphicsEllipseItem*>(curEditItem);
-        if(curEditPointCircleItem!=NULL) //如果在编辑点
-        {     //qDebug()<<this->items().count();
-            QPointF curPoint1(curEditPointCircleItem->rect().topLeft().x()+5, //取出当前编辑的点的坐标
-                              curEditPointCircleItem->rect().topLeft().y()+5);
-            points.append(curPoint1); //将坐标添加到points容器中
-
-            this->clearSelection(); //清除之前选择过的内容
-            origPoint=event->scenePos();  //记录编辑前点的位置
-            curEditItem->setSelected(true); //选中正在编辑的图元
-            editPointIndex=0;  //设置图元的编辑序号
-        }
-        QGraphicsPathItem*curEditPathItem=dynamic_cast<QGraphicsPathItem*>(curEditItem);
-        if(curEditPathItem!=NULL&&curEditPathItem->path().elementCount()>1) //如果在编辑线
+        if(curEditItem->data(0).toInt()==Container->Layer_ID)
         {
-            for(int i=0;i<curEditPathItem->path().elementCount();++i)
-            {
-                QPointF curPoint(curEditPathItem->path().elementAt(i).x,   //取出折线上所有折点的坐标
-                                 curEditPathItem->path().elementAt(i).y);
-                points.append(curPoint);
-                QGraphicsEllipseItem *pointCircle=new
-                        QGraphicsEllipseItem(curPoint.x()-3,curPoint.y()-3,6,6);//将折点画成圆点
-                pointCircle->setBrush(Qt::red);
-                shapes.append(pointCircle);
-                showShape(shapes);//将这些折线原点显示出来
-                shapes.clear();
-            }
-        }
-        QGraphicsPolygonItem*curEditPolygonItem=dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
-        if(curEditPolygonItem!=NULL)   //如果在编辑多边形
-        {
-            for(int i=0;i< curEditPolygonItem->polygon().count();++i)
-            {
-                points.append(curEditPolygonItem->polygon().data()[i]);
-                QGraphicsEllipseItem *pointCircle=new
-                        QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6); //显示多边形折点上的圆点
-                pointCircle->setBrush(Qt::red);
-                shapes.append(pointCircle);
-                showShape(shapes);
-                shapes.clear();
-            }
-        }
-        isEditing=true;
+            QGraphicsEllipseItem *curEditPointCircleItem=dynamic_cast<QGraphicsEllipseItem*>(curEditItem);
+            if(curEditPointCircleItem!=NULL) //如果在编辑点
+            {     //qDebug()<<this->items().count();
+                QPointF curPoint1(curEditPointCircleItem->rect().topLeft().x()+5, //取出当前编辑的点的坐标
+                                  curEditPointCircleItem->rect().topLeft().y()+5);
+                points.append(curPoint1); //将坐标添加到points容器中
 
+                this->clearSelection(); //清除之前选择过的内容
+                origPoint=event->scenePos();  //记录编辑前点的位置
+                curEditItem->setSelected(true); //选中正在编辑的图元
+                editPointIndex=0;  //设置图元的编辑序号
+            }
+            QGraphicsPathItem*curEditPathItem=dynamic_cast<QGraphicsPathItem*>(curEditItem);
+            if(curEditPathItem!=NULL&&curEditPathItem->path().elementCount()>1) //如果在编辑线
+            {
+                for(int i=0;i<curEditPathItem->path().elementCount();++i)
+                {
+                    QPointF curPoint(curEditPathItem->path().elementAt(i).x,   //取出折线上所有折点的坐标
+                                     curEditPathItem->path().elementAt(i).y);
+                    points.append(curPoint);
+                    QGraphicsEllipseItem *pointCircle=new
+                            QGraphicsEllipseItem(curPoint.x()-3,curPoint.y()-3,6,6);//将折点画成圆点
+                    pointCircle->setBrush(Qt::red);
+                    shapes.append(pointCircle);
+                    showShape(shapes);//将这些折线原点显示出来
+                    shapes.clear();
+                }
+            }
+            QGraphicsPolygonItem*curEditPolygonItem=dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
+            if(curEditPolygonItem!=NULL)   //如果在编辑多边形
+            {
+                for(int i=0;i< curEditPolygonItem->polygon().count();++i)
+                {
+                    points.append(curEditPolygonItem->polygon().data()[i]);
+                    QGraphicsEllipseItem *pointCircle=new
+                            QGraphicsEllipseItem(points[i].x()-3,points[i].y()-3,6,6); //显示多边形折点上的圆点
+                    pointCircle->setBrush(Qt::red);
+                    shapes.append(pointCircle);
+                    showShape(shapes);
+                    shapes.clear();
+                }
+            }
+            isEditing=true;
+        }
     }
     else if(event->button()==Qt::RightButton && this->isEditing)
     {
@@ -743,7 +744,7 @@ void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
     if(this->items().count()>0)
     {
         QGraphicsItem *selectItem =this->itemAt(event->scenePos(), this->items()[0]->transform());
-        if(selectItem != NULL)
+        if(selectItem != NULL&&selectItem->data(0).toInt()==Container->Layer_ID)
         {
             selectItem->setSelected(true);
             this->removeItem(selectItem);
