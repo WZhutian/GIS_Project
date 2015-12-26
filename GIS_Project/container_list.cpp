@@ -52,16 +52,16 @@ void Container_List::Add_Point(QPointF Point_Out){
     Layers_List[layer_index].Index_Part.append(index);
     Layers_List[layer_index].Change_Way.append(2);
 }
-void Container_List::Modify_Point_Item(QPointF Point_Item_Out_New,int index)
-{
-    QGraphicsItem *origPointCricle=Items_List[Layer_ID].Cur_Item.at(index);
-    origPointCricle->setPos(Point_Item_Out_New.x(),Point_Item_Out_New.y());
-}
+//void Container_List::Modify_Point_Item(QPointF Point_Item_Out_New,QPointF origPoint,EditWidget *area)
+//{
+
+//    this->Modify_Point(area->itemAt(origPoint,area->items()[0]->transform())->data(2).toInt(),Point_Item_Out_New);
+//}
 
 void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
-    //修改Items部分
-    this->Modify_Point_Item(Point_Out_New,index);
+//    //修改Items部分
+//    this->Modify_Point_Item(Point_Out_New,index);
     //修改数据部分
     Points_List[index].Point=Point_Out_New;
     //添加图层部分
@@ -79,16 +79,16 @@ void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
     Layers_List[layer_index].Index_Part.insert(0,index);
     Layers_List[layer_index].Change_Way.insert(0,1);
 }
-void Container_List::Delete_Point_Item(int Index)
-{
-    QGraphicsItem *curClearItem=Items_List[Layer_ID].Cur_Item[Index];
-    Items_List[Layer_ID].Cur_Item.removeOne(curClearItem);
-}
+//void Container_List::Delete_Point_Item(int Index)
+//{
+//    QGraphicsItem *curClearItem=Items_List[Layer_ID].Cur_Item[Index];
+//    Items_List[Layer_ID].Cur_Item.removeOne(curClearItem);
+//}
 
 void Container_List::Delete_Point(int Index_Part_Out){
     int index=Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
-    //修改Items部分
-    this->Delete_Point_Item(index);
+//    //修改Items部分
+//    this->Delete_Point_Item(index);
     //修改数据部分
     Points_List.removeAt(Index_Part_Out);
     //添加图层部分
@@ -152,26 +152,26 @@ void Container_List::Add_Line(QVector<QPointF> Line_Out){
     Layers_List[layer_index].Index_Part.append(index);
     Layers_List[layer_index].Change_Way.append(2);
 }
-void Container_List::Modify_Line_Item(QPointF Line_Item_Out_new, int index,int index_Line)
-{
-    QGraphicsItem *curEditItem=Items_List[Layer_ID].Cur_Item.at(index);
-    QGraphicsPathItem *curEditPathItem = dynamic_cast<QGraphicsPathItem*>(curEditItem);
-    Lines_List[index].Line_FromTo[index_Line]=Line_Item_Out_new;
-    if(curEditPathItem!=NULL)
-    {
-        QPainterPath *path=new QPainterPath(Lines_List[index].Line_FromTo[0]);
-        for(int i=1;i<Lines_List[index].Line_FromTo.count();++i)
-        {
-            path->lineTo(Lines_List[index].Line_FromTo[i]);
-        }
-        curEditPathItem->setPath(*path);
-    }
-}
+//void Container_List::Modify_Line_Item(QPointF Line_Item_Out_new, int index,int index_Line)
+//{
+//    QGraphicsItem *curEditItem=Items_List[Layer_ID].Cur_Item.at(index);
+//    QGraphicsPathItem *curEditPathItem = dynamic_cast<QGraphicsPathItem*>(curEditItem);
+//    Lines_List[index].Line_FromTo[index_Line]=Line_Item_Out_new;
+//    if(curEditPathItem!=NULL)
+//    {
+//        QPainterPath *path=new QPainterPath(Lines_List[index].Line_FromTo[0]);
+//        for(int i=1;i<Lines_List[index].Line_FromTo.count();++i)
+//        {
+//            path->lineTo(Lines_List[index].Line_FromTo[i]);
+//        }
+//        curEditPathItem->setPath(*path);
+//    }
+//}
 
 void Container_List::Modify_Line(int Index_Part_Out,int Index_Line,QPointF Line_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
-    //修改Items部分
-    this->Modify_Line_Item(Line_Out_New,index,Index_Line);
+//    //修改Items部分
+//    this->Modify_Line_Item(Line_Out_New,index,Index_Line);
     //修改数据部分
     Lines_List[index].Line_FromTo[Index_Line]=Line_Out_New;
     //添加图层部分
@@ -260,21 +260,21 @@ void Container_List::Add_Polygen(QVector<QPointF> Polygen_Out){
     Layers_List[layer_index].Index_Part.append(index);
     Layers_List[layer_index].Change_Way.append(2);
 }
-void Container_List::Modify_Polygen_Item(QPointF Polygens_Item_Out_new, int index, int Index_Polygen)
-{
-    QGraphicsItem *curEditItem =Items_List[Layer_ID].Cur_Item.at(index);
-    QGraphicsPolygonItem *curEditPolygenItem =dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
-    Polygens_List[index].Polygen_Round[Index_Polygen]=Polygens_Item_Out_new;
-    if(curEditPolygenItem!=NULL){
-    QPolygonF *newPolygen =new QPolygonF(Polygens_List[index].Polygen_Round);
-    curEditPolygenItem->setPolygon(*newPolygen);
-    }
-}
+//void Container_List::Modify_Polygen_Item(QPointF Polygens_Item_Out_new, int index, int Index_Polygen)
+//{
+//    QGraphicsItem *curEditItem =Items_List[Layer_ID].Cur_Item.at(index);
+//    QGraphicsPolygonItem *curEditPolygenItem =dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
+//    Polygens_List[index].Polygen_Round[Index_Polygen]=Polygens_Item_Out_new;
+//    if(curEditPolygenItem!=NULL){
+//    QPolygonF *newPolygen =new QPolygonF(Polygens_List[index].Polygen_Round);
+//    curEditPolygenItem->setPolygon(*newPolygen);
+//    }
+//}
 
 void Container_List::Modify_Polygen(int Index_Part_Out,int Index_Polygen,QPointF Polygen_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
-    //修改Items 部分
-    this->Modify_Polygen_Item(Polygen_Out_New,index,Index_Polygen);
+//    //修改Items 部分
+//    this->Modify_Polygen_Item(Polygen_Out_New,index,Index_Polygen);
     //修改数据部分
     Polygens_List[index].Polygen_Round[Index_Polygen]=Polygen_Out_New;
     //添加图层部分
