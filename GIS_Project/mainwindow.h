@@ -23,6 +23,7 @@ public:
     Container_List *Container;
     EditWidget *area;
     ~MainWindow();
+    int checked_bug=0;
     QString ipAdd;//服务器IP地址
     QString portd;//服务器端口号
     int h_time;//定时器时间

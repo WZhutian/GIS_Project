@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     willtoRead=false;
+    ui->action_End_Edit->setEnabled(false);
     //画板
     Change_Style_ID=-1;
     Temp_Color_Brush=Qt::white;
@@ -131,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
-                 }
+                }
                 QByteArray Pl_size;
                 Message>>Pl_size;
                 int size_Pl=bytesToInt(Pl_size);
@@ -168,11 +169,11 @@ MainWindow::MainWindow(QWidget *parent) :
                                 //TODO删除判断
                                 area->removeItem( area->itemAt(Container->Lines_List.at(index).Line_FromTo.at(0),area->items()[0]->transform()));
                                 Container->Lines_List.removeAt(index);
-                             }else{
+                            }else{
                                 //TODO删除判断
                                 area->removeItem( area->itemAt(Container->Polygens_List.at(index).Polygen_Round.at(0),area->items()[0]->transform()));
                                 Container->Polygens_List.removeAt(index);
-                              }
+                            }
                         }
                     }
                 }
@@ -643,7 +644,10 @@ void MainWindow :: treeItemChanged ( QStandardItem * item )
         if(item->checkState()==Qt::Checked){
             for(int i=0 ;i<Container->Items_List.at(layer_id).Cur_Item.size();i++)
                 Container->Items_List[layer_id].Cur_Item.at(i)->show();
-        }else{
+        }else if(checked_bug!=0){
+            checked_bug--;
+        }
+        else{
             for(int i =0;i<Container->Items_List.at(layer_id).Cur_Item.size();i++)
                 Container->Items_List[layer_id].Cur_Item.at(i)->hide();
         }
@@ -749,6 +753,7 @@ void MainWindow::on_Save_Style_clicked()
 //////////////////////////编辑要素//////////////////////////
 void MainWindow::on_action_Start_Edit_triggered()
 {
+
     QStringList lst;
     for(int i=0;i<Container->Layers_List.size();i++){
         lst<<Container->Layers_List.at(i).Layer_Name;
@@ -775,6 +780,7 @@ void MainWindow::on_action_Start_Edit_triggered()
         ui->action_Refresh->setEnabled(true);
         ui->action_Start_Edit->setEnabled(false);
         ui->menu_4->setEnabled(false);
+        ui->action_End_Edit->setEnabled(true);
         //设置可被选中Flag TODO c
         for(int i=0;i<Container->Items_List.at(Container->Layer_ID).Cur_Item.size();i++){
             Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable);
@@ -803,11 +809,12 @@ void MainWindow::on_action_End_Edit_triggered()
     QBrush brush(brushColor);
     qDebug()<<goodsModel->rowCount();
     for(int i=0;i<goodsModel->rowCount();i++){
+        checked_bug+=3;
         goodsModel->item(i)->setBackground(brush);
         goodsModel->item(i,1)->setBackground(brush);
         goodsModel->item(i,2)->setBackground(brush);
     }
-        //设置不可选 TODO
+    //设置不可选 TODO
     for(int i=0;i<Container->Items_List.at(Container->Layer_ID).Cur_Item.size();i++){
         Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable);
     }
@@ -818,7 +825,11 @@ void MainWindow::on_action_End_Edit_triggered()
     ui->action_Refresh->setEnabled(false);
     ui->action_Start_Edit->setEnabled(true);
     ui->menu_4->setEnabled(true);
-
+    //设置鼠标状态
+    area->isDrawing=false;
+    area->isEditing=false;
+    area->setState(EditWidget::NoneState);
+    area->views()[0]->setCursor(Qt::ArrowCursor);
 }
 
 ////////////////创建点线面图层/////////////////////
