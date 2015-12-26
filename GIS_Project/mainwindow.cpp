@@ -161,12 +161,18 @@ MainWindow::MainWindow(QWidget *parent) :
                             if(Layers_out.Ob_Type==0){
                                 qDebug()<<"remmoved Point:";
                                 qDebug()<<Container->Points_List.at(index).Point;
+                                //TODO删除判断
+                                area->removeItem(area->itemAt(Container->Points_List.at(index).Point,area->items()[0]->transform()));
                                 Container->Points_List.removeAt(index);
                             }else if(Layers_out.Ob_Type==1){
+                                //TODO删除判断
+                                area->removeItem( area->itemAt(Container->Lines_List.at(index).Line_FromTo.at(0),area->items()[0]->transform()));
                                 Container->Lines_List.removeAt(index);
-                            }else{
+                             }else{
+                                //TODO删除判断
+                                area->removeItem( area->itemAt(Container->Polygens_List.at(index).Polygen_Round.at(0),area->items()[0]->transform()));
                                 Container->Polygens_List.removeAt(index);
-                            }
+                              }
                         }
                     }
                 }
@@ -182,6 +188,13 @@ MainWindow::MainWindow(QWidget *parent) :
                     //添加到本地容器
                     int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
                     Container->Points_List.insert(insert_index,Points_out);
+                    int tempPcID=Container->PC_ID;
+                    int tempLayerID=Container->Layer_ID;
+                    Container->Layer_ID=Points_out.Layer_ID;
+                    Container->PC_ID=Points_out.PC_ID;
+                    Container->Add_Point_Item(Points_out.Point,Points_out.Index_Part);
+                    Container->PC_ID=tempPcID;
+                    Container->Layer_ID=tempLayerID;
                 }
                 QByteArray Ln_size;
                 Message>>Ln_size;
@@ -193,6 +206,13 @@ MainWindow::MainWindow(QWidget *parent) :
                     qDebug()<<Lines_out.Line_FromTo.size();
                     int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
                     Container->Lines_List.insert(insert_index,Lines_out);
+                    int tempPcID=Container->PC_ID;
+                    int tempLayerID=Container->Layer_ID;
+                    Container->Layer_ID=Lines_out.Layer_ID;
+                    Container->PC_ID=Lines_out.PC_ID;
+                    Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
+                    Container->PC_ID=tempPcID;
+                    Container->Layer_ID=tempLayerID;
                 }
                 QByteArray Pl_size;
                 Message>>Pl_size;
@@ -203,6 +223,13 @@ MainWindow::MainWindow(QWidget *parent) :
                     //添加到本地容器
                     int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
                     Container->Polygens_List.insert(insert_index,Polygens_out);
+                    int tempPcID=Container->PC_ID;
+                    int tempLayerID=Container->Layer_ID;
+                    Container->Layer_ID=Polygens_out.Layer_ID;
+                    Container->PC_ID=Polygens_out.PC_ID;
+                    Container->Add_Polygen_Item(Polygens_out.Polygen_Round,Polygens_out.Index_Part);
+                    Container->PC_ID=tempPcID;
+                    Container->Layer_ID=tempLayerID;
                 }
             }
             willtoRead=false;
@@ -558,7 +585,9 @@ void MainWindow::Show_TreeView(){
 
         QStandardItem *item_1 = new QStandardItem();
         item_1->setCheckable(true);
+        item_1->setCheckState(Qt::Checked);
         items.push_back(item_1);
+
 
         QStandardItem *item_2 = new QStandardItem(Container->Layers_List.at(i).Layer_Name);
         items.push_back(item_2);
@@ -747,6 +776,9 @@ void MainWindow::on_action_Start_Edit_triggered()
         ui->action_Start_Edit->setEnabled(false);
         ui->menu_4->setEnabled(false);
         //设置可被选中Flag TODO c
+        for(int i=0;i<Container->Items_List.at(Container->Layer_ID).Cur_Item.size();i++){
+            Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable);
+        }
         //设置画笔
         int ob_type=Container->Layers_List.at(lst.indexOf(res)).Ob_Type;
         if(ob_type == 0)
@@ -775,6 +807,10 @@ void MainWindow::on_action_End_Edit_triggered()
         goodsModel->item(i,1)->setBackground(brush);
         goodsModel->item(i,2)->setBackground(brush);
     }
+        //设置不可选 TODO
+    for(int i=0;i<Container->Items_List.at(Container->Layer_ID).Cur_Item.size();i++){
+        Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable);
+    }
     Container->Layer_ID=-1;
     ui->action_Draw->setEnabled(false);
     ui->action_Edit->setEnabled(false);
@@ -782,7 +818,7 @@ void MainWindow::on_action_End_Edit_triggered()
     ui->action_Refresh->setEnabled(false);
     ui->action_Start_Edit->setEnabled(true);
     ui->menu_4->setEnabled(true);
-    //设置不可选 TODO
+
 }
 
 ////////////////创建点线面图层/////////////////////
