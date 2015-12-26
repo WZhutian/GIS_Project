@@ -30,7 +30,7 @@ void Container_List::Add_Point(QPointF Point_Out){
             if(Points_List.at(index-1).Index_Part!=0){
                 Part_Index=Points_List.at(index-1).Index_Part+1;
             }else
-                Part_Index=0;
+                Part_Index=1;
         }
     }else{
         Part_Index=0;
@@ -189,16 +189,16 @@ void Container_List::Modify_Line(int Index_Part_Out,int Index_Line,QPointF Line_
     Layers_List[layer_index].Index_Part.insert(0,index);
     Layers_List[layer_index].Change_Way.insert(0,1);
 }
-void Container_List::Delete_Line_Item(int Index)
-{
-    QGraphicsItem *curClearItem=Items_List[Layer_ID].Cur_Item[Index];
-    Items_List[Layer_ID].Cur_Item.removeOne(curClearItem);
-}
+//void Container_List::Delete_Line_Item(int Index)
+//{
+//    QGraphicsItem *curClearItem=Items_List[Layer_ID].Cur_Item[Index];
+//    Items_List[Layer_ID].Cur_Item.removeOne(curClearItem);
+//}
 
 void Container_List::Delete_Line(int Index_Part_Out){
     int index=Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
-    //修改Items部分
-    this->Delete_Line_Item(index);
+//    //修改Items部分
+//    this->Delete_Line_Item(index);
     //修改数据部分
     Lines_List.removeAt(Index_Part_Out);
     //添加图层部分
@@ -292,16 +292,16 @@ void Container_List::Modify_Polygen(int Index_Part_Out,int Index_Polygen,QPointF
     Layers_List[layer_index].Index_Part.insert(0,index);
     Layers_List[layer_index].Change_Way.insert(0,1);
 }
-void Container_List::Delete_Polygen_Item(int Index)
-{
-    QGraphicsItem *curClearItem=Items_List[Layer_ID].Cur_Item[Index];
-    Items_List[Layer_ID].Cur_Item.removeOne(curClearItem);
-}
+//void Container_List::Delete_Polygen_Item(int Index)
+//{
+//    QGraphicsItem *curClearItem=Items_List[Layer_ID].Cur_Item[Index];
+//    Items_List[Layer_ID].Cur_Item.removeOne(curClearItem);
+//}
 
 void Container_List::Delete_Polygen(int Index_Part_Out){
     int index=Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
-    //修改Items部分
-    this->Delete_Polygen_Item(index);
+//    //修改Items部分
+//    this->Delete_Polygen_Item(index);
     //修改数据部分
     Polygens_List.removeAt(Index_Part_Out);
     //添加图层部分

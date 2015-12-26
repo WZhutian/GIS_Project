@@ -55,9 +55,9 @@ public:
 //    void Modify_Line_Item(QPointF Line_Item_Out_new,int index,int index_Line);
 //    void Modify_Polygen_Item(QPointF Polygens_Item_Out_new,int index,int Index_Polygen);
     //////////////////////删除Items/////////////////////////////////////
-    void Delete_Point_Item(int Index);
-    void Delete_Line_Item(int Index);
-    void Delete_Polygen_Item(int Index);
+//    void Delete_Point_Item(int Index);
+//    void Delete_Line_Item(int Index);
+//    void Delete_Polygen_Item(int Index);
 
 };
 
