@@ -5,13 +5,23 @@
 #include <QPointF>
 #include<QVector>
 #include<QGraphicsItem>
+#include "editwidget.h"
+class EditWidget;
 class Container_List
 {
 public:
     Container_List();
+    EditWidget *area;
+    void Get_Area(EditWidget& Area_out){
+        area=&Area_out;
+    }
+
+    ////
     int PC_ID;
     int Layer_ID;//当前编辑的图层号
 
+
+    ///
     QList<St_Items> Items_List;
     QList<St_Points> Points_List;
     QList<St_Lines> Lines_List;

@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QPointF>
 #include "editwidget.h"
+class Container_List;
 class GDAL_ReadFile
 {
 public:

@@ -8,6 +8,7 @@
 #include <QPen>
 #include<QPointF>
 #include<container_list.h>
+class Container_List;
 class EditWidget: public QGraphicsScene
 {
 public:
