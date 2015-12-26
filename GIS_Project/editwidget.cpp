@@ -648,12 +648,18 @@ void EditWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     }
 }
 
-void EditWidget::showShape(QList<QGraphicsItem *>&shapes)
+void EditWidget::showShape(QList<QGraphicsItem *>&shapes,int all)
 {
 
 
 
+    if(all==0){
         this->addItem(shapes[shapes.size()-1]);
+    }else{
+        for(int i=0;i<all;i++)
+            this->addItem(shapes[i]);
+    }
+
 
 }
 
