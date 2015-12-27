@@ -43,7 +43,7 @@ public:
     {
         NoneState,
         DrawType,
-        MoveType,
+       // MoveType,
         EditType,
         MoveSceneType,
         RotateType,
@@ -84,18 +84,18 @@ private:
 
     void mousePressClear(QGraphicsSceneMouseEvent *);
     void mousePressDraw(QGraphicsSceneMouseEvent *);
-    void mousePressMove(QGraphicsSceneMouseEvent *);
+    //void mousePressMove(QGraphicsSceneMouseEvent *);
     void mousePressEdit(QGraphicsSceneMouseEvent *);
     void mousePressMoveScene(QGraphicsSceneMouseEvent *);
 
     void mouseMoveDraw(QGraphicsSceneMouseEvent *);
-    void mouseMoveMove(QGraphicsSceneMouseEvent *);
+   // void mouseMoveMove(QGraphicsSceneMouseEvent *);
     void mouseMoveEdit(QGraphicsSceneMouseEvent *);
     void mouseMoveClear(QGraphicsSceneMouseEvent *);
     void mouseMoveMoveScene(QGraphicsSceneMouseEvent *);
 
     void mouseReleaseDraw(QGraphicsSceneMouseEvent *);
-    void mouseReleaseMove(QGraphicsSceneMouseEvent *);
+    //void mouseReleaseMove(QGraphicsSceneMouseEvent *);
     void mouseReleaseEdit(QGraphicsSceneMouseEvent *);
     void mouseReleaseClear(QGraphicsSceneMouseEvent *);
     void mouseReleaseMoveScene(QGraphicsSceneMouseEvent *);
