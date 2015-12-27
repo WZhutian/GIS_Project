@@ -196,23 +196,23 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void EditWidget::mousePressMove(QGraphicsSceneMouseEvent *event)
-{
-    this->views()[0]->setCursor(Qt::ClosedHandCursor);
-    if(this->items().count()>0)
-    {
+//void EditWidget::mousePressMove(QGraphicsSceneMouseEvent *event)
+//{
+//    this->views()[0]->setCursor(Qt::ClosedHandCursor);
+//    if(this->items().count()>0)
+//    {
 
-        QGraphicsItem* curSelectItem = this->itemAt(event->scenePos(), this->items()[0]->transform());
-        if(curSelectItem != NULL)
-        {
-            this->clearSelection();
-            origPoint=event->scenePos();
-            curSelectItem->setSelected(true);
+//        QGraphicsItem* curSelectItem = this->itemAt(event->scenePos(), this->items()[0]->transform());
+//        if(curSelectItem != NULL)
+//        {
+//            this->clearSelection();
+//            origPoint=event->scenePos();
+//            curSelectItem->setSelected(true);
 
 
-        }
-    }
-}
+//        }
+//    }
+//}
 
 void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
 {
@@ -314,6 +314,7 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
         shapes.clear();
         curEditItem=NULL;
         editPointIndex=-1;
+
     }
 
 }
@@ -395,22 +396,22 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void EditWidget::mouseMoveMove(QGraphicsSceneMouseEvent *event)
-{
-    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false && this->selectedItems().count()>0)
-    {
-        //  qDebug()<<this->selectedItems().count();
-        movePoint=event->scenePos();
-        qreal dx=movePoint.x()-origPoint.x();
-        qreal dy=movePoint.y()-origPoint.y();
-        for(int i=0;i<this->selectedItems().count();++i)
-        {
-            this->selectedItems()[i]->moveBy(dx,dy);
-        }
-        origPoint=movePoint;
-    }
+//void EditWidget::mouseMoveMove(QGraphicsSceneMouseEvent *event)
+//{
+//    if(( event->buttons()&Qt::LeftButton)&& isDrawing==false && this->selectedItems().count()>0)
+//    {
+//        //  qDebug()<<this->selectedItems().count();
+//        movePoint=event->scenePos();
+//        qreal dx=movePoint.x()-origPoint.x();
+//        qreal dy=movePoint.y()-origPoint.y();
+//        for(int i=0;i<this->selectedItems().count();++i)
+//        {
+//            this->selectedItems()[i]->moveBy(dx,dy);
+//        }
+//        origPoint=movePoint;
+//    }
 
-}
+//}
 void EditWidget::mouseMoveMoveScene(QGraphicsSceneMouseEvent *event)
 {
     // if(( event->buttons()&Qt::LeftButton)&& isDrawing==false )
@@ -526,12 +527,12 @@ void EditWidget::mouseReleaseDraw(QGraphicsSceneMouseEvent *)
 
 }
 
-void EditWidget::mouseReleaseMove(QGraphicsSceneMouseEvent *)
-{
-    this->views()[0]->setCursor(Qt::OpenHandCursor);
-    this->clearSelection();
+//void EditWidget::mouseReleaseMove(QGraphicsSceneMouseEvent *)
+//{
+//    this->views()[0]->setCursor(Qt::OpenHandCursor);
+//    this->clearSelection();
 
-}
+//}
 void EditWidget::mouseReleaseMoveScene(QGraphicsSceneMouseEvent *event)
 {
 
@@ -591,10 +592,10 @@ void EditWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     {
         mousePressDraw(event);
     }
-    else if(curState==MoveType)
-    {
-        mousePressMove(event);
-    }
+//    else if(curState==MoveType)
+//    {
+//        mousePressMove(event);
+//    }
     else if(curState==EditType)
     {
         mousePressEdit(event);
@@ -616,10 +617,10 @@ void EditWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     {
         mouseMoveDraw(event);
     }
-    else if(curState==MoveType)
-    {
-        mouseMoveMove(event);
-    }
+//    else if(curState==MoveType)
+//    {
+//        mouseMoveMove(event);
+//    }
     else if(curState==EditType)
     {
         mouseMoveEdit(event);
@@ -641,10 +642,10 @@ void EditWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     {
         mouseReleaseDraw(event);
     }
-    else if(curState==MoveType)
-    {
-        mouseReleaseMove(event);
-    }
+//    else if(curState==MoveType)
+//    {
+//        mouseReleaseMove(event);
+//    }
     else if(curState==EditType)
     {
         mouseReleaseEdit(event);

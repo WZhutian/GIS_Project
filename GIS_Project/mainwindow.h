@@ -49,7 +49,7 @@ private slots:
     void on_penColorToolButton_clicked();
     void on_brushColorToolButton_clicked();
     void on_penWidthSpinBox_valueChanged(int penWidth);
-    void on_action_Move_triggered();
+    //void on_action_Move_triggered();
     void on_action_Edit_triggered();
     void on_action_Draw_triggered();
     void on_action_ZoomIn_triggered();

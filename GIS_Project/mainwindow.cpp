@@ -316,25 +316,25 @@ void MainWindow::on_action_Draw_triggered()
     {
         area->views()[0]->setCursor(Qt::CrossCursor);
         area->setState(EditWidget::DrawType);
-        ui->action_Move->setChecked(false);
+       // ui->action_Move->setChecked(false);
         ui->action_Edit->setChecked(false);
         ui->action_Refresh->setChecked(false);
         ui->action_movescene->setChecked(false);
     }
 }
 
-void MainWindow::on_action_Move_triggered()
-{
-    if( ui->action_Move->isChecked()==true)
-    {
-        area->views()[0]->setCursor(Qt::OpenHandCursor);
-        area->setState(EditWidget::MoveType);
-        ui->action_Draw->setChecked(false);
-        ui->action_Edit->setChecked(false);
-        ui->action_Refresh->setChecked(false);
-        ui->action_movescene->setChecked(false);
-    }
-}
+//void MainWindow::on_action_Move_triggered()
+//{
+//    if( ui->action_Move->isChecked()==true)
+//    {
+//        area->views()[0]->setCursor(Qt::OpenHandCursor);
+//        area->setState(EditWidget::MoveType);
+//        ui->action_Draw->setChecked(false);
+//        ui->action_Edit->setChecked(false);
+//        ui->action_Refresh->setChecked(false);
+//        ui->action_movescene->setChecked(false);
+//    }
+//}
 
 void MainWindow::on_action_Edit_triggered()
 {
@@ -342,10 +342,12 @@ void MainWindow::on_action_Edit_triggered()
     {
         area->views()[0]->setCursor(Qt::PointingHandCursor);
         area->setState(EditWidget::EditType);
-        ui->action_Move->setChecked(false);
+        //ui->action_Move->setChecked(false);
         ui->action_Draw->setChecked(false);
         ui->action_Refresh->setChecked(false);
         ui->action_movescene->setChecked(false);
+//        ui->action_Draw->setEnabled(false);
+//        ui->action_Refresh->setEnabled(false);
     }
 }
 
@@ -357,7 +359,7 @@ void MainWindow::on_action_Refresh_triggered()
     {
         area->views()[0]->setCursor(Qt::PointingHandCursor);
         area->setState(EditWidget::clearType);
-        ui->action_Move->setChecked(false);
+        //ui->action_Move->setChecked(false);
         ui->action_Draw->setChecked(false);
         ui->action_Edit->setChecked(false);
         ui->action_movescene->setChecked(false);
@@ -372,7 +374,7 @@ void MainWindow::on_action_movescene_triggered()
         area->setState(EditWidget::MoveSceneType);
         ui->action_Draw->setChecked(false);
         ui->action_Edit->setChecked(false);
-        ui->action_Move->setChecked(false);
+        //ui->action_Move->setChecked(false);
         ui->action_Refresh->setChecked(false);
     }
 }
@@ -739,11 +741,11 @@ void MainWindow::on_Save_Style_clicked()
             new_Point_style=dynamic_cast<QGraphicsEllipseItem *>(Container->Items_List.at(Change_Style_ID).Cur_Item[i]);
             new_Point_style->setBrush(Temp_Color_Brush);
             new_Point_style->setPen(temp);
-        }else if(obtype=1){
+        }else if(obtype==1){
 
             QGraphicsPathItem* new_Line_style;
             new_Line_style=dynamic_cast<QGraphicsPathItem *>(Container->Items_List.at(Change_Style_ID).Cur_Item[i]);
-            new_Line_style->setBrush(Temp_Color_Brush);
+            //new_Line_style->setBrush(Temp_Color_Brush);
             new_Line_style->setPen(temp);
         }else{
             QGraphicsPolygonItem* new_Polygen_style;
@@ -779,12 +781,13 @@ void MainWindow::on_action_Start_Edit_triggered()
 
         QColor brushColor=Qt::yellow;   //填充颜色
         QBrush brush(brushColor);
+        checked_bug+=3;
         goodsModel->item(lst.indexOf(res))->setBackground(brush);
         goodsModel->item(lst.indexOf(res),1)->setBackground(brush);
         goodsModel->item(lst.indexOf(res),2)->setBackground(brush);
         ui->action_Draw->setEnabled(true);
         ui->action_Edit->setEnabled(true);
-        ui->action_Move->setEnabled(true);
+        //ui->action_Move->setEnabled(true);
         ui->action_Refresh->setEnabled(true);
         ui->action_Start_Edit->setEnabled(false);
         ui->menu_4->setEnabled(false);
@@ -829,10 +832,11 @@ void MainWindow::on_action_End_Edit_triggered()
     Container->Layer_ID=-1;
     ui->action_Draw->setEnabled(false);
     ui->action_Edit->setEnabled(false);
-    ui->action_Move->setEnabled(false);
+    //ui->action_Move->setEnabled(false);
     ui->action_Refresh->setEnabled(false);
     ui->action_Start_Edit->setEnabled(true);
     ui->menu_4->setEnabled(true);
+    ui->action_End_Edit->setEnabled(false);
     //设置鼠标状态
     area->isDrawing=false;
     area->isEditing=false;
@@ -902,8 +906,8 @@ void MainWindow::on_action_ReadDB_triggered()
         int index = lst.indexOf(res);
         QString temp =  lst.at(index);
         qDebug()<<temp.split(".").at(0).toInt();
-        database.Get_Info(temp.split(".").at(0).toInt()+1);
-        Container->Project_ID=index;
+        database.Get_Info(temp.split(".").at(0).toInt());
+        Container->Project_ID=index+1;
         Show_TreeView();
 
     }else if(!ok||size==0){
@@ -925,6 +929,7 @@ void MainWindow::on_action_Save_DataBase_triggered()
         if (ok && !text.isEmpty()){
             database.Add_Project(text);
             database.Add_Info(database.Get_Project_Last());
+            Container->Project_ID=database.Get_Project_Last()-1;
         }
     }else{
         database.Delete_Info(Container->Project_ID);
