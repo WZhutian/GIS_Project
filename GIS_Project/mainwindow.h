@@ -10,6 +10,7 @@
 #include <gdal_readfile.h>
 #include "tcpserver.h"
 #include<QMouseEvent>
+#include <database.h>
 namespace Ui {
 class MainWindow;
 }
@@ -22,6 +23,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     Container_List *Container;
     EditWidget *area;
+
+    Database database;
     ~MainWindow();
     int checked_bug=0;
     QString ipAdd;//服务器IP地址
@@ -81,6 +84,10 @@ private slots:
     void on_Save_Style_clicked();
 
     void on_action_Show_LayerList_triggered();
+
+    void on_action_ReadDB_triggered();
+
+    void on_action_Save_DataBase_triggered();
 
 protected:
 //    void mousePressEvent(QMouseEvent *);

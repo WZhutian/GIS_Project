@@ -220,6 +220,13 @@ void TcpSocket::readData()
             //添加到本地容器
             int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
             Container->Points_List.insert(insert_index,Points_out);
+            int tempPcID=Container->PC_ID;
+            int tempLayerID=Container->Layer_ID;
+            Container->Layer_ID=Points_out.Layer_ID;
+            Container->PC_ID=Points_out.PC_ID;
+            Container->Add_Point_Item(Points_out.Point,Points_out.Index_Part);
+            Container->PC_ID=tempPcID;
+            Container->Layer_ID=tempLayerID;
         }
         QByteArray Ln_size;
         Message>>Ln_size;
@@ -230,6 +237,14 @@ void TcpSocket::readData()
             //添加到本地容器
             int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
             Container->Lines_List.insert(insert_index,Lines_out);
+
+            int tempPcID=Container->PC_ID;
+            int tempLayerID=Container->Layer_ID;
+            Container->Layer_ID=Lines_out.Layer_ID;
+            Container->PC_ID=Lines_out.PC_ID;
+            Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
+            Container->PC_ID=tempPcID;
+            Container->Layer_ID=tempLayerID;
         }
         QByteArray Pl_size;
         Message>>Pl_size;
@@ -240,6 +255,14 @@ void TcpSocket::readData()
             //添加到本地容器
             int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
             Container->Polygens_List.insert(insert_index,Polygens_out);
+
+            int tempPcID=Container->PC_ID;
+            int tempLayerID=Container->Layer_ID;
+            Container->Layer_ID=Polygens_out.Layer_ID;
+            Container->PC_ID=Polygens_out.PC_ID;
+            Container->Add_Polygen_Item(Polygens_out.Polygen_Round,Polygens_out.Index_Part);
+            Container->PC_ID=tempPcID;
+            Container->Layer_ID=tempLayerID;
         }
     }
     block.clear();//倒掉
