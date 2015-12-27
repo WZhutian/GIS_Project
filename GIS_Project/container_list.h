@@ -6,6 +6,7 @@
 #include<QVector>
 #include<QGraphicsItem>
 #include "editwidget.h"
+#include<QPen>
 class EditWidget;
 class Container_List
 {
@@ -17,6 +18,7 @@ public:
     }
 
     ////
+    int Project_ID=-1;
     int PC_ID;
     int Layer_ID;//当前编辑的图层号
 
@@ -58,6 +60,18 @@ public:
 //    void Delete_Point_Item(int Index);
 //    void Delete_Line_Item(int Index);
 //    void Delete_Polygen_Item(int Index);
+    //////////////////////设置画笔////////////////////////////////////////
+    void setPenStyle(Qt::PenStyle style); //设置画笔风格
+    void setPenWidth(int width);   //设置画笔宽度
+    void setPenColor(QColor color);   //设置画笔颜色
+    void setBrushColor(QColor color);   //设置填充颜色
+    void setPen();
+private:
+    QPen *pen;
+    QColor penColor;    //画笔颜色
+    QColor brushColor;   //填充颜色
+    int penWidth;     //画笔宽度
+    Qt::PenStyle penStyle;    //画笔风格
 
 };
 

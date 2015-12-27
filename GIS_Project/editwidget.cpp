@@ -16,7 +16,7 @@ EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
     isEditing=false;
 
     penColor = Qt::black;
-    brushColor = Qt::black;
+    brushColor = Qt::gray;
     penWidth = 1;
     penStyle = Qt::SolidLine;
     pen=new QPen();
@@ -52,7 +52,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             //                            Container->Items_List[Container->Layer_ID].Cur_Item.append(newPointCircle);
             //                            editPointIndex=i;
             //                        }
-            Container->Add_Point(event->scenePos());
+            Container->Add_Point(event->scenePos());   //画点
             showShape(Container->Items_List[Container->Layer_ID].Cur_Item);
             // shapes.clear();
             isDrawing=false;
@@ -74,7 +74,8 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             //                        newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
             //                        newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
             //                          Container->Items_List[Container->Layer_ID].Cur_Item.append(newPointCircle);
-            Container->Add_Point(event->scenePos());
+            Container->Add_Point(event->scenePos()); //之前没开始，现在开始画点
+
             showShape(Container->Items_List[Container->Layer_ID].Cur_Item);
             //shapes.clear();
             isDrawing=true;
@@ -96,7 +97,7 @@ void EditWidget::mousePressDraw(QGraphicsSceneMouseEvent *event)
             cur->setPath(*path);
             cur->setPen(*pen);
             cur->setFlag(QGraphicsItem::ItemIsMovable,true);
-            cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
+          //  cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
             shapes.append(cur);
             showShape(shapes);
             shapes.clear();
@@ -247,7 +248,7 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
         this->views()[0]->setCursor(Qt::PointingHandCursor);
         points.clear();
         curEditItem = this->itemAt(event->scenePos(),this->items()[0]->transform()); //选取当前鼠标点击的Items
-        if(curEditItem->data(0).toInt()==Container->Layer_ID)
+        if(curEditItem->data(1).toInt()==Container->Layer_ID)
         {
             QGraphicsEllipseItem *curEditPointCircleItem=dynamic_cast<QGraphicsEllipseItem*>(curEditItem);
             if(curEditPointCircleItem!=NULL) //如果在编辑点
@@ -260,6 +261,7 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
                 origPoint=event->scenePos();  //记录编辑前点的位置
                 curEditItem->setSelected(true); //选中正在编辑的图元
                 editPointIndex=0;  //设置图元的编辑序号
+                isEditing=true;
             }
             QGraphicsPathItem*curEditPathItem=dynamic_cast<QGraphicsPathItem*>(curEditItem);
             if(curEditPathItem!=NULL&&curEditPathItem->path().elementCount()>1) //如果在编辑线
@@ -275,6 +277,7 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
                     shapes.append(pointCircle);
                     showShape(shapes);//将这些折线原点显示出来
                     shapes.clear();
+                    isEditing=true;
                 }
             }
             QGraphicsPolygonItem*curEditPolygonItem=dynamic_cast<QGraphicsPolygonItem*>(curEditItem);
@@ -289,9 +292,10 @@ void EditWidget::mousePressEdit(QGraphicsSceneMouseEvent *event)
                     shapes.append(pointCircle);
                     showShape(shapes);
                     shapes.clear();
+                    isEditing=true;
                 }
             }
-            isEditing=true;
+
         }
     }
     else if(event->button()==Qt::RightButton && this->isEditing)
@@ -330,11 +334,11 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
     if(isDrawing)
     {
         setPen();
-        if(curShape==this->PointType)
+        if(curShape==this->PointType) //如果在移动画点
         {
             isDrawing=false;
         }
-        else if(curShape==this->PolylineType)
+        else if(curShape==this->PolylineType)  //如果在移动画线
         {
             if(this->items().size()!=0)
             {
@@ -358,13 +362,13 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
             cur->setPath(*path);
             cur->setPen(*pen);
             cur->setFlag(QGraphicsItem::ItemIsMovable,true);
-            cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
+           // cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
             shapes.append(cur);
             showShape(shapes);
             shapes.clear();
 
         }
-        else if(curShape==this->PolygonType)
+        else if(curShape==this->PolygonType) //如果在移动画多边形
         {
             if(this->items().size()!=0)
             {
@@ -384,7 +388,6 @@ void EditWidget::mouseMoveDraw(QGraphicsSceneMouseEvent *event)
             cur->setPolygon(*curPolygon);
             cur->setPen(*pen);
             cur->setBrush(brushColor);
-            //   shapes=shapes;
             shapes.append(cur);
             showShape(shapes);
             shapes.clear();
@@ -485,6 +488,10 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
                 Container->Modify_Polygen(curEditItem->data(2).toInt(),editPointIndex,movePoint);  //将修改多边形的信息存入到Container中
             }
             //shapes=shapes;
+            for(int i=0;i<points.count();i++)
+            {
+                this->removeItem(this->items()[0]);
+            }
             for(int i=0;i<points.count();++i)
             {
 
@@ -492,7 +499,7 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
                 {
 
                     QGraphicsEllipseItem *pointCircle=new
-                            QGraphicsEllipseItem(points[i].x()-5,points[i].y()-5,10,10);
+                            QGraphicsEllipseItem(event->scenePos().x()-5,event->scenePos().y()-5,10,10);
                     pointCircle->setBrush(Qt::red);
                     shapes.append(pointCircle);
                     showShape(shapes);
@@ -508,10 +515,7 @@ void EditWidget::mouseMoveEdit(QGraphicsSceneMouseEvent *event)
                     shapes.clear();
                 }
             }
-            for(int i=0;i<points.count();i++)
-            {
-                this->removeItem(this->items()[0]);
-            }
+
 
         }
     }
@@ -561,7 +565,7 @@ void EditWidget::mouseReleaseEdit(QGraphicsSceneMouseEvent *event)
         }
 
     }
-    if(points.count()<2&&points.count()>1)
+    if(points.count()<2&&points.count()>0)
     {
         this->views()[0]->setCursor(Qt::PointingHandCursor);
         this->clearSelection();
@@ -744,23 +748,24 @@ void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
     if(this->items().count()>0)
     {
         QGraphicsItem *selectItem =this->itemAt(event->scenePos(), this->items()[0]->transform());
-        if(selectItem != NULL&&selectItem->data(0).toInt()==Container->Layer_ID)
+        if(selectItem != NULL&&selectItem->data(1).toInt()==Container->Layer_ID)
         {
-            selectItem->setSelected(true);
+           // selectItem->setSelected(true);
             this->removeItem(selectItem);
             this->clearSelection();
             int type_ob=Container->Layers_List.at(Container->Layer_ID).Ob_Type;
             if(type_ob==0)
             {
-                Container->Delete_Point(curEditItem->data(2).toInt());
+                //qDebug()<<"data2:"<<selectItem->data(2).toInt();
+                Container->Delete_Point(selectItem->data(2).toInt());
             }
                 else if(type_ob==1)
             {
-                Container->Delete_Line(curEditItem->data(2).toInt());
+                Container->Delete_Line(selectItem->data(2).toInt());
             }
                 else
             {
-                Container->Delete_Polygen(curEditItem->data(2).toInt());
+                Container->Delete_Polygen(selectItem->data(2).toInt());
             }
         }
     }
