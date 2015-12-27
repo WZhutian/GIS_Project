@@ -258,6 +258,7 @@ void Container_List::Add_Polygen(QVector<QPointF> Polygen_Out){
     for(int i=0;i<Polygen_Out.size();i++){
         Addin.Polygen_Round.append(Polygen_Out.at(i));
     }
+    qDebug()<<"polygensize:"<<Addin.Polygen_Round.size();
     Addin.Layer_ID=Layer_ID;
     Addin.PC_ID=PC_ID;
     Addin.Index_Part=Part_Index;

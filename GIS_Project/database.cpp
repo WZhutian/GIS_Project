@@ -110,7 +110,7 @@ bool Database::Get_Info(int ID){
         //TODO
         QGraphicsEllipseItem *newPointCircle=
                 new QGraphicsEllipseItem(Point.Point.x()-5,Point.Point.y()-5,10,10);
-       // newPointCircle->setBrush(Qt::red);
+        // newPointCircle->setBrush(Qt::red);
         newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,false);
         newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,false);
         newPointCircle->setData(0,Point.PC_ID);
@@ -152,7 +152,7 @@ bool Database::Get_Info(int ID){
     while (query.next())
     {
         St_Polygens Polygon;
-        QDataStream in(query.value(1).toByteArray());
+        QDataStream in(query.value(0).toByteArray());
         in>>Polygon.Polygen_Round;
         QDataStream in_2(query.value(1).toByteArray());
         in_2>>Polygon.Attribute_Polygen;
@@ -164,19 +164,21 @@ bool Database::Get_Info(int ID){
         QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
         QVector<QPointF>Poly_Item_Out;
         for(int i=0;i<Polygon.Polygen_Round.size();i++){
-            Poly_Item_Out[i]=Polygon.Polygen_Round.at(i);
+            Poly_Item_Out.append(Polygon.Polygen_Round.at(i));
         }
+        qDebug()<<Polygon.Polygen_Round.size();
+        qDebug()<<Poly_Item_Out.size();
         QPolygonF *curPolygon=new QPolygonF(Poly_Item_Out);
         cur->setPolygon(*curPolygon);
         cur->setFlag(QGraphicsItem::ItemIsMovable,false);
         cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
-    //    cur->setPen(*pen);
-    //    cur->setBrush(brushColor);
+        //    cur->setPen(*pen);
+        //    cur->setBrush(brushColor);
         cur->setData(0,Polygon.PC_ID);
         cur->setData(1,Polygon.Layer_ID);
         cur->setData(2,Polygon.Index_Part);
         Container->Items_List[Polygon.Layer_ID].Cur_Item.append(cur);
-         area->addItem(cur);
+        area->addItem(cur);
     }
     if(succeed_1||succeed_2||succeed_3||succeed_4){
         return true;
@@ -282,12 +284,20 @@ bool Database::Add_Info(int ID){
 
 void Database::Delete_Info(int ID){
     QSqlQuery query;
-    query.prepare("delete * TABLE from Layer_List where ID=?");
+    bool success;
+    query.prepare("delete  from Layer_List where ID=?");
     query.bindValue(0,ID);
-    query.exec("delete *  TABLE from Point_List where ID=?");
+    success=query.exec();
+    query.prepare("delete from Point_List where ID=?");
     query.bindValue(0,ID);
-    query.exec("delete *  TABLE from Line_List where ID=?");
+    query.exec();
+    query.prepare("delete from Line_List where ID=?");
     query.bindValue(0,ID);
-    query.exec("delete *  TABLE from Polygon_List where ID=?");
+    query.exec();
+    query.prepare("delete from Polygon_List where ID=?");
     query.bindValue(0,ID);
+    query.exec();
+    if(success){
+        qDebug()<<"success";
+    }
 }
