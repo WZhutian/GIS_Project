@@ -249,6 +249,8 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::Get_Container(Container_List &Container_Out){
     Container=&Container_Out;
     area->Get_Container(*Container);
+    database.Get_Container(*Container);
+    database.Get_Area(*area);
     Show_TreeView();
 }
 
@@ -266,15 +268,18 @@ void MainWindow::on_penStyleComboBox_currentIndexChanged(const QString penStyle)
     if(penStyle == QStringLiteral("实线"))
     {
         area->setPenStyle(Qt::SolidLine);   //利用PaintArea类中的枚举变量
+        Container->setPenStyle(Qt::SolidLine);
     }
     else if(penStyle == QStringLiteral("虚线"))
     {
         area->setPenStyle(Qt::DotLine);
+        Container->setPenStyle(Qt::DotLine);
     }
 }
 void MainWindow::on_penWidthSpinBox_valueChanged(int penWidth)
 {
     area->setPenWidth(penWidth);
+    Container->setPenWidth(penWidth);
 }
 
 void MainWindow::on_penColorToolButton_clicked()
@@ -283,6 +288,7 @@ void MainWindow::on_penColorToolButton_clicked()
     if (newColor.isValid())   //如果得到的是可用的颜色
     {
         area->setPenColor(newColor);
+        Container->setPenColor(newColor);
         Temp_Color_Pen=newColor;
         QPalette palette = ui->textBrowser_Pen->palette(); //显示这个颜色
         palette.setColor(QPalette::Base,newColor);
@@ -296,6 +302,7 @@ void MainWindow::on_brushColorToolButton_clicked()
     if (newColor.isValid())   //如果得到的是可用的颜色
     {
         area->setBrushColor(newColor);
+        Container->setBrushColor(newColor);
         Temp_Color_Brush=newColor;
         QPalette palette = ui->textBrowser_Brush->palette(); //显示这个颜色
         palette.setColor(QPalette::Base,newColor);
@@ -557,7 +564,8 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
             Show_TreeView();
             area->showShape(Container->Items_List[Container->Items_List.size()-1].Cur_Item,Container->Layers_List.at(Container->Layers_List.size()-1).Size);
         }
-    }else{
+    }else if(path.right(4)==".jpg"||path.right(4)==".png"){
+
         qDebug()<<"inhere";
         St_Raster_images temp;
         temp.Image=new QImage(path);
@@ -783,7 +791,7 @@ void MainWindow::on_action_Start_Edit_triggered()
         ui->action_End_Edit->setEnabled(true);
         //设置可被选中Flag TODO c
         for(int i=0;i<Container->Items_List.at(Container->Layer_ID).Cur_Item.size();i++){
-            Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable);
+            Container->Items_List[Container->Layer_ID].Cur_Item[i]->setFlag(QGraphicsItem::ItemIsSelectable,true);
         }
         //设置画笔
         int ob_type=Container->Layers_List.at(lst.indexOf(res)).Ob_Type;
@@ -816,7 +824,7 @@ void MainWindow::on_action_End_Edit_triggered()
     }
     //设置不可选 TODO
     for(int i=0;i<Container->Items_List.at(Container->Layer_ID).Cur_Item.size();i++){
-        Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable);
+        Container->Items_List.at(Container->Layer_ID).Cur_Item.at(i)->setFlag(QGraphicsItem::ItemIsSelectable,false);
     }
     Container->Layer_ID=-1;
     ui->action_Draw->setEnabled(false);
@@ -873,4 +881,53 @@ void MainWindow::on_action_Create_PolygenLayer_triggered()
 void MainWindow::on_action_Show_LayerList_triggered()
 {
     ui->dockWidget_Layers->show();
+}
+//数据库交互部分
+void MainWindow::on_action_ReadDB_triggered()
+{
+    database.Connect();
+    QStringList lst;
+    int size=database.Get_Project_Size();
+    qDebug()<<size;
+    if(size==0){
+        lst<<" <空> ";
+    }else{
+        lst=database.Get_Projcet();
+    }
+    bool ok = FALSE;
+    QString res = QInputDialog::getItem(this,
+                                        tr( "选择项目" ),
+                                        tr( "项目列表：" ), lst, 1, TRUE, &ok);
+    if (ok && size!=0&&Container->Project_ID==-1&&Container->Layers_List.size()==0){
+        int index = lst.indexOf(res);
+        QString temp =  lst.at(index);
+        qDebug()<<temp.split(".").at(0).toInt();
+        database.Get_Info(temp.split(".").at(0).toInt()+1);
+        Container->Project_ID=index;
+        Show_TreeView();
+
+    }else if(!ok||size==0){
+        QMessageBox::information(this,"提示","数据库中无可选项目");
+    }else if(Container->Project_ID!=-1||Container->Layers_List.size()!=0){
+         QMessageBox::information(this,"提示","当前已经在编辑项目，无法重新读取");
+    }
+
+}
+
+void MainWindow::on_action_Save_DataBase_triggered()
+{
+    database.Connect();
+    if(Container->Project_ID==-1){
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("新建矢量化项目"),
+                                             tr("请输入项目名："), QLineEdit::Normal,
+                                             "New Project", &ok);
+        if (ok && !text.isEmpty()){
+            database.Add_Project(text);
+            database.Add_Info(database.Get_Project_Last());
+        }
+    }else{
+        database.Delete_Info(Container->Project_ID);
+        database.Add_Info(Container->Project_ID);
+    }
 }

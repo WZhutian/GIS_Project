@@ -1,9 +1,15 @@
 #include "container_list.h"
 #include<QColor>
 #include <QDebug>
+#include<QBrush>
 Container_List::Container_List()
 {
     Layer_ID=-1;//初始化为-1，表示无正在编辑图层
+    penColor = Qt::black;
+    brushColor = Qt::gray;
+    penWidth = 1;
+    penStyle = Qt::SolidLine;
+    pen=new QPen();
 }
 //折半查找对应的要素,参数为：3层标记，图元类型
 ////////////////////////增删改//////////////////////////////////
@@ -11,12 +17,13 @@ void Container_List::Add_Point_Item(QPointF Point_Item_Out,int index)
 {
     QGraphicsEllipseItem *newPointCircle=
             new QGraphicsEllipseItem(Point_Item_Out.x()-5,Point_Item_Out.y()-5,10,10);
-   // newPointCircle->setBrush(Qt::red);
+    newPointCircle->setBrush(brushColor);
     newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,true);
     newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,true);
     newPointCircle->setData(0,PC_ID);
     newPointCircle->setData(1,Layer_ID);
     newPointCircle->setData(2,index);
+
     Items_List[Layer_ID].Cur_Item.append(newPointCircle);
 }
 
@@ -60,6 +67,7 @@ void Container_List::Add_Point(QPointF Point_Out){
 
 void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    qDebug()<<"index"<<index;
 //    //修改Items部分
 //    this->Modify_Point_Item(Point_Out_New,index);
     //修改数据部分
@@ -67,7 +75,7 @@ void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
     //添加图层部分
     int layer_index = Search_Layer_Index(Layer_ID);
     //搜索全部修改部分，查找是否有相同记录,从前往后开始查找
-    for(int i=0;Layers_List.at(layer_index).PC_ID.size();i--){
+    for(int i=0;Layers_List.at(layer_index).PC_ID.size();i++){
         if(Layers_List.at(layer_index).Index_Part.at(i)==index){//已经有的就不修改
             return;
         }else if(Layers_List.at(layer_index).Change_Way.at(i)==2){
@@ -90,7 +98,7 @@ void Container_List::Delete_Point(int Index_Part_Out){
 //    //修改Items部分
 //    this->Delete_Point_Item(index);
     //修改数据部分
-    Points_List.removeAt(Index_Part_Out);
+    Points_List.removeAt(index);
     //添加图层部分
     int layer_index = Search_Layer_Index(Layer_ID);
     Layers_List[layer_index].Every_size[PC_ID]--;
@@ -105,6 +113,7 @@ void Container_List::Delete_Point(int Index_Part_Out){
  */
 void Container_List::Add_Line_Item(QVector<QPointF> Line_Item_Out,int index)
 {
+    setPen();
     QPainterPath *path=new QPainterPath(Line_Item_Out[0]);
     for(int i=1;i<Line_Item_Out.count();++i)
     {
@@ -112,7 +121,7 @@ void Container_List::Add_Line_Item(QVector<QPointF> Line_Item_Out,int index)
     }
     QGraphicsPathItem *cur=new QGraphicsPathItem();
     cur->setPath(*path);
-    //cur->setPen(*pen);
+    cur->setPen(*pen);
     cur->setFlag(QGraphicsItem::ItemIsMovable,true);
     cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
     cur->setData(0,PC_ID);
@@ -177,7 +186,7 @@ void Container_List::Modify_Line(int Index_Part_Out,int Index_Line,QPointF Line_
     //添加图层部分
     int layer_index = Search_Layer_Index(Layer_ID);
     //搜索全部修改部分，查找是否有相同记录,从前往后开始查找
-    for(int i=0;Layers_List.at(layer_index).PC_ID.size();i--){
+    for(int i=0;Layers_List.at(layer_index).PC_ID.size();i++){
         if(Layers_List.at(layer_index).Index_Part.at(i)==index){//已经有的就不修改
             return;
         }else if(Layers_List.at(layer_index).Change_Way.at(i)==2){
@@ -217,13 +226,14 @@ void Container_List::Delete_Line(int Index_Part_Out){
  */
 void Container_List::Add_Polygen_Item(QVector<QPointF> Poly_Item_Out,int index)
 {
+    setPen();
     QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
     QPolygonF *curPolygon=new QPolygonF(Poly_Item_Out);
     cur->setPolygon(*curPolygon);
     cur->setFlag(QGraphicsItem::ItemIsMovable,true);
     cur->setFlag(QGraphicsItem::ItemIsSelectable,true);
-//    cur->setPen(*pen);
-//    cur->setBrush(brushColor);
+    cur->setPen(*pen);
+    cur->setBrush(brushColor);
     cur->setData(0,PC_ID);
     cur->setData(1,Layer_ID);
     cur->setData(2,index);
@@ -280,7 +290,7 @@ void Container_List::Modify_Polygen(int Index_Part_Out,int Index_Polygen,QPointF
     //添加图层部分
     int layer_index = Search_Layer_Index(Layer_ID);
     //搜索全部修改部分，查找是否有相同记录,从前往后开始查找
-    for(int i=0;Layers_List.at(layer_index).PC_ID.size();i--){
+    for(int i=0;Layers_List.at(layer_index).PC_ID.size();i++){
         if(Layers_List.at(layer_index).Index_Part.at(i)==index){//已经有的就不修改
             return;
         }else if(Layers_List.at(layer_index).Change_Way.at(i)==2){
@@ -343,7 +353,7 @@ int Container_List::Search_Layer_Index(int Layer_ID_Out){
 }
 int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Type)//TODO最后一步替换为二分查找
 {
-    int Index_Return=-1;//返回为-1则表示未找到
+    int Index_Return=0;//返回为-1则表示未找到
     if(Type==0){
         int len=Points_List.size();
         bool finished=false;//判断是否停止
@@ -783,4 +793,27 @@ int Container_List::Current_insert(int Layer_ID,int PC_ID,int Index_Part,int Typ
         }
     }
     return Index_Return;
+}
+///////////////////////////////设置画笔//////////////////////////////////
+void Container_List::setPenStyle(Qt::PenStyle style)
+{
+    penStyle=style;
+}
+void Container_List::setPenColor(QColor color)
+{
+    penColor=color;
+}
+void Container_List::setPenWidth(int width)
+{
+    penWidth=width;
+}
+void Container_List::setPen()
+{
+    pen->setColor(penColor);
+    pen->setStyle(penStyle);
+    pen->setWidth(penWidth);
+}
+void Container_List::setBrushColor(QColor color)
+{
+    brushColor=color;
 }
