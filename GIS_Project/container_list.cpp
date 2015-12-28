@@ -341,7 +341,7 @@ void Container_List::Add_Layer(QString Layer_Name,int Ob_Type){
 
 }
 void Container_List::Add_Layer_Attr(int Layer_ID_Out,QString Attribute_Name){
-    Layers_List[Search_Layer_Index(Layer_ID_Out)].Attribute_Name.append(Attribute_Name);
+    Layers_List[Layer_ID_Out].Attribute_Name.append(Attribute_Name);
 }
 /////////////////////////查找///////////////////
 int Container_List::Search_Layer_Index(int Layer_ID_Out){
