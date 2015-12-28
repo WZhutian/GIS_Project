@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(slotCustomContextMenu(const QPoint &)));
     //绘图部分，scene初始化
     area=new EditWidget(this);
-    QGraphicsView *view = new QGraphicsView(area,this);
+    view = new QGraphicsView(area,this);
     area->Get_Graphicview(*view);
     area->setSceneRect(497000,3518000,3500,3000);
     view->setMouseTracking(true);
@@ -66,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setScene(area);
     view->show();
+
     //socket部分，客户端client
     tcpClient = new QTcpSocket(this);
     ui->action_Tcp_Sent->setEnabled(false);
@@ -84,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     St_Layers Layers_out;
                     Message>>Layers_out;
                     //初始化
-                    Container->PC_ID=Layers_out.Pc_numbers+1;
+                    Container->PC_ID=Layers_out.Pc_numbers;
                     Layers_out.Size=0;
                     for(int j=0;j<10;j++){
                         Layers_out.Every_size[j]=0;
@@ -582,7 +583,7 @@ void MainWindow::on_action_Tcp_Sent_triggered()
         out<<Container->Layers_List.at(i);
     }
     //从图层中查找到点图层，收集修改信息，将修改的要素从对应点容器中提取出来放入输出流中
-    out<<Point_Mod_size;
+    out<<intToByte( Point_Mod_size);
     for(int i=0;i<layer_size;i++){
         if(Container->Layers_List.at(i).Ob_Type==0){
             for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
@@ -593,7 +594,7 @@ void MainWindow::on_action_Tcp_Sent_triggered()
             }
         }
     }
-    out<<Line_Mod_size;
+    out<<intToByte(Line_Mod_size);
     for(int i=0;i<layer_size;i++){
         if(Container->Layers_List.at(i).Ob_Type==1){
             for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
@@ -605,7 +606,7 @@ void MainWindow::on_action_Tcp_Sent_triggered()
             }
         }
     }
-    out<<Polygen_Mod_size;
+    out<<intToByte(Polygen_Mod_size);
     for(int i=0;i<layer_size;i++){
         if(Container->Layers_List.at(i).Ob_Type==2){
             for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
@@ -663,6 +664,7 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
     }else if(path.right(4)==".jpg"||path.right(4)==".png"){
 
         qDebug()<<"inhere";
+
         bool ok;
         QString text = QInputDialog::getText(this, tr("读取图片"),
                                              tr("依次输入左上角XY坐标以及右下角XY坐标，以逗号分隔开:"), QLineEdit::Normal,
@@ -744,10 +746,11 @@ void MainWindow :: treeItemChanged ( QStandardItem * item )
         goodsModel->item(layer_id,2)->setText("图片");
         if(item->checkState()==Qt::Checked){
             //设置显示TODO
-            Container->Images_List[layer_id-Container->Layers_List.size()].show();
+            Container->Images_List[layer_id-Container->Layers_List.size()].image_Item->show()
+                    ;
         }else{
             //设置隐藏Flag TODO
-            Container->Images_List[layer_id-Container->Layers_List.size()].hide();
+            Container->Images_List[layer_id-Container->Layers_List.size()].image_Item->hide();
         }
     }else{
         Container->Layers_List[layer_id].Layer_Name=goodsModel->item(layer_id,1)->text();
@@ -792,35 +795,60 @@ void MainWindow::Add_Attr_Name(){
                                          "New Name", &ok);
     if (ok && !text.isEmpty()){
         Container->Add_Layer_Attr(Change_Style_ID,text);
+                int obtype=Container->Layers_List.at(Change_Style_ID).Ob_Type;
+        int jump=0;
+                for(int i=0;i<Container->Layers_List.size()-1;i++){
+                    if(Container->Layers_List.at(i).Ob_Type==obtype){
+                        jump+=Container->Layers_List.at(i).Size;
+                    }
+                }
+                if(obtype==0){
+                    for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
+                        Container->Points_List[jump+i].Attribute_Point.append("");
+
+                    }
+                }else if(obtype==1){
+
+                    for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
+                        Container->Lines_List[jump+i].Attribute_Line.append("");
+
+                    }
+                }else{
+                    for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
+                        Container->Polygens_List[jump+i].Attribute_Polygen.append("");
+
+                    }
+                }
     }
 }
 void MainWindow::attrItemChanged(QTableWidgetItem * item){
-    int index = item->row();
-    int attr_index = item->column();
-    qDebug()<<index<<":"<<attr_index;
-    int obtype=Container->Layers_List.at(index).Ob_Type;
-    int jump=0;
-    for(int i=0;i<Container->Layers_List.size();i++){
-        if(Container->Layers_List.at(i)==obtype){
-            jump+=Container->Layers_List.at(i).Size;
+    if (newtable_bug==1)return;
+        int index = item->row();
+        int attr_index = item->column();
+        qDebug()<<index<<":"<<attr_index;
+        int obtype=Container->Layers_List.at(index).Ob_Type;
+        int jump=0;
+        for(int i=0;i<Container->Layers_List.size()-1;i++){
+            if(Container->Layers_List.at(i).Ob_Type==obtype){
+                jump+=Container->Layers_List.at(i).Size;
+            }
         }
-    }
-    if(obtype==0){
-        Container->Points_List[jump+index].Attribute_Point[attr_index]=item->data(attr_index).toString();
-    }else if(obtype==1){
+        if(obtype==0){
+            Container->Points_List[jump+index].Attribute_Point[attr_index]=item->data(attr_index).toString();
+        }else if(obtype==1){
 
-        Container->Lines_List[jump+index].Attribute_Line[attr_index]=item->data(attr_index).toString();
-    }else{
+            Container->Lines_List[jump+index].Attribute_Line[attr_index]=item->data(attr_index).toString();
+        }else{
 
-        Container->Polygens_List[jump+index].Attribute_Polygen[attr_index]=item->data(attr_index).toString();
-    }
-
+            Container->Polygens_List[jump+index].Attribute_Polygen[attr_index]=item->data(attr_index).toString();
+        }
 
 }
 
 void MainWindow::Show_Attr(){
     int Attr_size=Container->Layers_List.at(Change_Style_ID).Attribute_Name.size();
     int Elements_size=Container->Layers_List.at(Change_Style_ID).Size;
+    newtable_bug=1;
     QTableWidget *tableWidget = new QTableWidget(Elements_size,Attr_size); // 构造了一个QTableWidget的对象
     tableWidget->setWindowTitle("查看属性");
     connect(tableWidget,
@@ -853,6 +881,7 @@ void MainWindow::Show_Attr(){
                 tableWidget->setItem(i,j,new QTableWidgetItem(Container->Polygens_List.at(i+jump_index).Attribute_Polygen.at(j)));
         }
     }
+    newtable_bug=0;
     tableWidget->show();
 }
 
@@ -1079,4 +1108,22 @@ void MainWindow::on_action_Save_DataBase_triggered()
         database.Delete_Info(Container->Project_ID);
         database.Add_Info(Container->Project_ID);
     }
+}
+
+void MainWindow::wheelEvent(QWheelEvent* e)
+{
+   view->setTransformationAnchor(QGraphicsView::NoAnchor);
+   view->setResizeAnchor(QGraphicsView::NoAnchor);
+
+   QPointF oldPoint=view->mapToScene(e->pos());
+   if(e->delta()>0)
+   {
+       view->scale(1.2,1.2);
+   }
+   else {
+       view->scale(1/1.2,1/1.2);
+   }
+   QPointF newPoint=view->mapToScene(e->pos());
+   QPointF delta=newPoint-oldPoint;
+   view->translate(delta.x(),delta.y());
 }
