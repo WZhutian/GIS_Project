@@ -65,7 +65,9 @@ int TcpSocket::bytesToInt(QByteArray bytes) {
 }
 void TcpSocket::readData()
 {
-
+    qDebug()<<"point:"<<Container->Points_List.size();
+    qDebug()<<"items:"<<Container->Items_List.at(0).Cur_Item.size();
+     mutex.lock();
     QByteArray block;//保存要发送的二进制数据
     QByteArray Byte_size,Byte_ID;
     QDataStream Message(this->readAll());//读取所有发来的信息
@@ -126,7 +128,7 @@ void TcpSocket::readData()
             out<<Container->Layers_List.at(i);
         }
         //从图层中查找到点图层，收集修改信息，将修改的要素从对应点容器中提取出来放入输出流中
-        out<<Point_Mod_size;
+        out<<intToByte(Point_Mod_size);
         for(int i=0;i<layer_size;i++){
             if(Container->Layers_List.at(i).Ob_Type==0){
                 for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
@@ -145,7 +147,7 @@ void TcpSocket::readData()
                 }
             }
         }
-        out<<Line_Mod_size;
+        out<<intToByte(Line_Mod_size);
         for(int i=0;i<layer_size;i++){
             if(Container->Layers_List.at(i).Ob_Type==1){
                 for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
@@ -164,7 +166,7 @@ void TcpSocket::readData()
                 }
             }
         }
-        out<<Polygen_Mod_size;
+        out<<intToByte(Polygen_Mod_size);
         for(int i=0;i<layer_size;i++){
             if(Container->Layers_List.at(i).Ob_Type==2){
                 for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
@@ -227,6 +229,16 @@ void TcpSocket::readData()
             Container->Add_Point_Item(Points_out.Point,Points_out.Index_Part);
             Container->PC_ID=tempPcID;
             Container->Layer_ID=tempLayerID;
+
+            QGraphicsEllipseItem newPointCircle(Points_out.Point.x()-5,Points_out.Point.y()-5,10,10);
+            // newPointCircle->setBrush(Qt::red);
+            newPointCircle.setFlag(QGraphicsItem::ItemIsMovable,false);
+            newPointCircle.setFlag(QGraphicsItem::ItemIsSelectable,false);
+            newPointCircle.setData(0,Points_out.PC_ID);
+            newPointCircle.setData(1,Points_out.Layer_ID);
+            newPointCircle.setData(2,Points_out.Index_Part);
+            Container->Items_List[Points_out.Layer_ID].Cur_Item.append(&newPointCircle);
+            area->addItem(&newPointCircle);
         }
         QByteArray Ln_size;
         Message>>Ln_size;
@@ -245,6 +257,7 @@ void TcpSocket::readData()
             Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
             Container->PC_ID=tempPcID;
             Container->Layer_ID=tempLayerID;
+
         }
         QByteArray Pl_size;
         Message>>Pl_size;
@@ -275,6 +288,7 @@ void TcpSocket::readData()
     //    {
     //        watcher.setFuture(QtConcurrent::run(this,&TcpSocket::handleData,datas.dequeue()));
     //    }
+    mutex.unlock();
 }
 QByteArray TcpSocket::handleData(QByteArray data)
 {

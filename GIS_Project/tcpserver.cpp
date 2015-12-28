@@ -29,9 +29,11 @@ void TcpServer::incomingConnection(qintptr socketDescriptor) //多线程必须�
         tcp.disconnectFromHost();
         return;
     }
+
     auto th = ThreadHandle::getClass().getThread();
     auto tcpTemp = new TcpSocket(socketDescriptor);
     tcpTemp->Get_Container(*Container);
+    tcpTemp->Get_Area(*area);
     QString ip =  tcpTemp->peerAddress().toString();
     qint16 port = tcpTemp->peerPort();
 

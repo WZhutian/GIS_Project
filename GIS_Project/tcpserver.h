@@ -4,7 +4,7 @@
 #include <QTcpServer>
 #include <QHash>
 #include "tcpsocket.h"
-
+#include "editwidget.h"
 
 //继承QTCPSERVER以实现多线程TCPscoket的服务器。
 //如果socket的信息处理直接处理的话，很多新建的信号和槽是用不到的
@@ -16,6 +16,10 @@ public:
     ~TcpServer();
     Container_List *Container;//保存当前容器
     void Get_Container(Container_List &Container_out);
+    EditWidget *area;
+    void Get_Area(EditWidget &area_out){
+        area=&area_out;
+    }
 
     void setMaxPendingConnections(int numConnections);//重写设置最大连接数函数
 signals:
