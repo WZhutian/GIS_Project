@@ -22,6 +22,7 @@ EditWidget::EditWidget(QWidget *parent):QGraphicsScene(parent)
     pen=new QPen();
     editPointIndex=-1;
 
+
 }
 void EditWidget::Get_Container(Container_List &Container_Out){
     Container=&Container_Out;
@@ -771,6 +772,7 @@ void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
         }
     }
 }
+
 
 EditWidget::~EditWidget()
 {
