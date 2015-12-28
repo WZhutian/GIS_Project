@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QBrush>
 #include <QTableWidget>
+#include<QScrollBar>
 QByteArray  MainWindow::intToByte(int i)
 {
     QByteArray abyte0;
@@ -1112,18 +1113,15 @@ void MainWindow::on_action_Save_DataBase_triggered()
 
 void MainWindow::wheelEvent(QWheelEvent* e)
 {
-   view->setTransformationAnchor(QGraphicsView::NoAnchor);
-   view->setResizeAnchor(QGraphicsView::NoAnchor);
 
-   QPointF oldPoint=view->mapToScene(e->pos());
    if(e->delta()>0)
    {
        view->scale(1.2,1.2);
    }
-   else {
+   else if(e->delta()<0) {
        view->scale(1/1.2,1/1.2);
    }
-   QPointF newPoint=view->mapToScene(e->pos());
-   QPointF delta=newPoint-oldPoint;
-   view->translate(delta.x(),delta.y());
+
+
+
 }

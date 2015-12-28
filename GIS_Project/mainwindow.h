@@ -47,6 +47,7 @@ public:
     bool willtoRead;
     void wheelEvent(QWheelEvent *);
 
+
 private slots:
     //绘图部分
     void on_penStyleComboBox_currentIndexChanged(const QString penStyle);
@@ -104,6 +105,7 @@ private:
     QTcpSocket * tcpClient;
     QTimer tm;
     QStringList list;
+
 };
 
 #endif // MAINWINDOW_H
