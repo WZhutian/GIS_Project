@@ -569,16 +569,26 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
     }else if(path.right(4)==".jpg"||path.right(4)==".png"){
 
         qDebug()<<"inhere";
-        St_Raster_images temp;
-        temp.Image=new QImage(path);
         bool ok;
         QString text = QInputDialog::getText(this, tr("读取图片"),
                                              tr("依次输入左上角XY坐标以及右下角XY坐标，以逗号分隔开:"), QLineEdit::Normal,
-                                             "New Shpfile Image", &ok);
+                                             "497000,3518000,497000,3518000", &ok);
+
         QStringList text_list=text.split(",");
+        St_Raster_images temp;
+        temp.Image=new QImage(path);
+
+      temp.Image->scaledToWidth(text_list.at(2).toInt()-text_list.at(0).toInt());
+      temp.Image->scaledToHeight(text_list.at(3).toInt()-text_list.at(1).toInt());
         if (ok && !text.isEmpty()){
             temp.Image_Name=text;
+            QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(*temp.Image));
+            //item->setScale(1);
+            item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+            item->setPos(text_list.at(0).toFloat(),text_list.at(1).toFloat());
+            temp.image_Item=item;
             Container->Images_List.append(temp);
+            area->addItem(Container->Images_List.at(Container->Images_List.size()-1).image_Item);
             Show_TreeView();
         }
 
@@ -619,6 +629,7 @@ void MainWindow::Show_TreeView(){
     for(int i=0;i<Container->Images_List.size();i++){
         QList<QStandardItem *> items;
         QStandardItem *item_1 = new QStandardItem();
+        item_1->setCheckState(Qt::Checked);
         item_1->setCheckable(true);
         items.push_back(item_1);
         QStandardItem *item_2 = new QStandardItem(Container->Images_List.at(i).Image_Name);
@@ -639,8 +650,10 @@ void MainWindow :: treeItemChanged ( QStandardItem * item )
         goodsModel->item(layer_id,2)->setText("图片");
         if(item->checkState()==Qt::Checked){
             //设置显示TODO
+            Container->Images_List[layer_id-Container->Layers_List.size()].image_Item->show();
         }else{
             //设置隐藏Flag TODO
+            Container->Images_List[layer_id-Container->Layers_List.size()].image_Item->hide();
         }
     }else{
         Container->Layers_List[layer_id].Layer_Name=goodsModel->item(layer_id,1)->text();
