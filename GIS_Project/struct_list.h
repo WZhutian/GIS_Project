@@ -7,6 +7,15 @@
 #include<QVector>
 #include<QGraphicsItem>
 #include<QColor>
+
+struct St_Temp{//处理TCP多线程同步BUG，用以收集更新的变量
+    int Layer_ID;//图层标记
+    int PC_ID;//客户端标记,当前PC不属于该ID的时候，禁止编辑！！
+    int Index_Part;//在当前PC号对应部分下的索引号
+    int Type;
+};
+
+
 struct St_Points{//点
     QPointF Point;//存储点坐标
     QList<QString> Attribute_Point;//存储属性

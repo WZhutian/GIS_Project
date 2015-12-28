@@ -107,6 +107,10 @@ bool Database::Get_Info(int ID){
         Point.PC_ID=query.value(4).toInt();
         Point.Index_Part=query.value(5).toInt();
         Container->Points_List.append(Point);
+        //
+        Container->Layers_List[Point.Layer_ID].Every_size[Point.PC_ID]++;
+        Container->Layers_List[Point.Layer_ID].Size++;
+
         //TODO
         QGraphicsEllipseItem *newPointCircle=
                 new QGraphicsEllipseItem(Point.Point.x()-5,Point.Point.y()-5,10,10);
@@ -131,6 +135,11 @@ bool Database::Get_Info(int ID){
         Line.PC_ID=query.value(3).toInt();
         Line.Index_Part=query.value(4).toInt();
         Container->Lines_List.append(Line);
+        //
+
+        Container->Layers_List[Line.Layer_ID].Every_size[Line.PC_ID]++;
+        Container->Layers_List[Line.Layer_ID].Size++;
+
         //TODO
         QPainterPath *path=new QPainterPath(Line.Line_FromTo[0]);
         for(int i=1;i<Line.Line_FromTo.count();++i)
@@ -160,6 +169,10 @@ bool Database::Get_Info(int ID){
         Polygon.PC_ID=query.value(3).toInt();
         Polygon.Index_Part=query.value(4).toInt();
         Container->Polygens_List.append(Polygon);
+        //
+
+        Container->Layers_List[Polygon.Layer_ID].Every_size[Polygon.PC_ID]++;
+        Container->Layers_List[Polygon.Layer_ID].Size++;
         //TODO
         QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
         QVector<QPointF>Poly_Item_Out;

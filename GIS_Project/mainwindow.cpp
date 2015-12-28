@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QBrush>
 #include <QTableWidget>
+#include<QScrollBar>
 QByteArray  MainWindow::intToByte(int i)
 {
     QByteArray abyte0;
@@ -334,7 +335,70 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     connect(tcpClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(ReadError(QAbstractSocket::SocketError)));//错误信号
     connect(&tm,&QTimer::timeout,[&](){
-        this->on_action_Tcp_Sent_triggered();
+        qDebug()<<"run"<<Container->Tcp_Receive.size();
+        qDebug()<<"items:"<<Container->Items_List.at(0).Cur_Item.size();
+        if(!Container->Tcp_Receive.isEmpty()){
+            tm.stop();
+            for(int i=0;i<Container->Tcp_Receive.size();i++){
+                int index = Container->Current_search(Container->Tcp_Receive.at(i).Layer_ID,Container->Tcp_Receive.at(i).PC_ID,Container->Tcp_Receive.at(i).Index_Part,Container->Tcp_Receive.at(i).Type);
+                int obtype=Container->Tcp_Receive.at(i).Type;
+                if(obtype==0){
+                    St_Points Points_out;
+                    Points_out=Container->Points_List.at(index);
+
+                    QGraphicsEllipseItem *newPointCircle=
+                            new QGraphicsEllipseItem(Points_out.Point.x()-5,Points_out.Point.y()-5,10,10);
+                    // newPointCircle->setBrush(Qt::red);
+                    newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    newPointCircle->setData(0,Points_out.PC_ID);
+                    newPointCircle->setData(1,Points_out.Layer_ID);
+                    newPointCircle->setData(2,Points_out.Index_Part);
+                    Container->Items_List[Points_out.Layer_ID].Cur_Item.append(newPointCircle);
+                    area->addItem(newPointCircle);
+                }else if(obtype==1){
+                    St_Lines Lines_out;
+                    Lines_out=Container->Lines_List.at(index);
+                    QPainterPath *path=new QPainterPath(Lines_out.Line_FromTo[0]);
+                    for(int i=1;i<Lines_out.Line_FromTo.count();++i)
+                    {
+                        path->lineTo(Lines_out.Line_FromTo[i]);
+                    }
+                    QGraphicsPathItem *cur=new QGraphicsPathItem();
+                    cur->setPath(*path);
+                    //cur->setPen(*pen);
+                    cur->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    cur->setData(0,Lines_out.PC_ID);
+                    cur->setData(1,Lines_out.Layer_ID);
+                    cur->setData(2,Lines_out.Index_Part);
+                    Container->Items_List[Lines_out.Layer_ID].Cur_Item.append(cur);
+                    area->addItem(cur);
+                }else{
+                    St_Polygens Polygens_out;
+                    Polygens_out=Container->Polygens_List.at(index);
+                    QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
+                    QVector<QPointF>Poly_Item_Out;
+                    for(int i=0;i<Polygens_out.Polygen_Round.size();i++){
+                        Poly_Item_Out.append(Polygens_out.Polygen_Round.at(i));
+                    }
+                    QPolygonF *curPolygon=new QPolygonF(Poly_Item_Out);
+                    cur->setPolygon(*curPolygon);
+                    cur->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    //    cur->setPen(*pen);
+                    //    cur->setBrush(brushColor);
+                    cur->setData(0,Polygens_out.PC_ID);
+                    cur->setData(1,Polygens_out.Layer_ID);
+                    cur->setData(2,Polygens_out.Index_Part);
+                    Container->Items_List[Polygens_out.Layer_ID].Cur_Item.append(cur);
+                    area->addItem(cur);
+                }
+            }
+            Container->Tcp_Receive.clear();
+            qDebug()<<"items:"<<Container->Items_List.at(0).Cur_Item.size();
+            tm.start(1000);
+        }
     });//循环
     connect(tcpClient,&QTcpSocket::disconnected,[](){qDebug()<< "断开连接" ;});
     portd="6666";
@@ -493,7 +557,7 @@ void MainWindow::ReadError(QAbstractSocket::SocketError)//出错
     ui->action_Tcp_Connect->setText("连接");
     qDebug()<<tr("连接出错：%1").arg(tcpClient->errorString());
     ui->action_Tcp_Sent->setEnabled(false);
-    tm.stop();
+    //    tm.stop();
     this->ui->action_Tcp_Time->setEnabled(false);
     this->ui->action_Tcp_Time->setText("启动定时");
 }
@@ -503,6 +567,7 @@ void MainWindow::on_action_Tcp_Server_triggered()
     if ("启动服务" == this->ui->action_Tcp_Server->text())
     {
         ser->listen(QHostAddress::Any,6666);
+        tm.start(1000);
         ui->action_Tcp_Server->setText("停止服务");
         ui->action_Tcp_Connect->setEnabled(false);
     }
@@ -552,7 +617,7 @@ void MainWindow::on_action_Tcp_Connect_triggered()
             ui->action_Tcp_Connect->setText("连接");
             qDebug()<<"断开服务器";
             ui->action_Tcp_Sent->setEnabled(false);
-            tm.stop();
+            //            tm.stop();
             this->ui->action_Tcp_Time->setEnabled(false);
             this->ui->action_Tcp_Time->setText("启动定时");
         }
@@ -563,6 +628,7 @@ void MainWindow::on_action_Tcp_Connect_triggered()
 }
 void MainWindow::on_action_Tcp_Sent_triggered()
 {
+
     qDebug() << "点击发送：" ;
     QByteArray block;//保存要发送的二进制数据
     QDataStream out (&block,QIODevice::WriteOnly);
@@ -629,6 +695,8 @@ void MainWindow::on_action_Tcp_Sent_triggered()
     }
     tcpClient->write(block);
     willtoRead=true;
+
+
 }
 void MainWindow::on_action_Tcp_Time_triggered()
 {
@@ -636,12 +704,12 @@ void MainWindow::on_action_Tcp_Time_triggered()
     {
         int h;
         h = h_time*1000;
-        tm.start(h);
+        //        tm.start(h);
         this->ui->action_Tcp_Time->setText("停止定时");
     }
     else
     {
-        tm.stop();
+        //        tm.stop();
         this->ui->action_Tcp_Time->setText("启动定时");
     }
 }
@@ -795,38 +863,7 @@ void MainWindow::Add_Attr_Name(){
                                          "New Name", &ok);
     if (ok && !text.isEmpty()){
         Container->Add_Layer_Attr(Change_Style_ID,text);
-                int obtype=Container->Layers_List.at(Change_Style_ID).Ob_Type;
-        int jump=0;
-                for(int i=0;i<Container->Layers_List.size()-1;i++){
-                    if(Container->Layers_List.at(i).Ob_Type==obtype){
-                        jump+=Container->Layers_List.at(i).Size;
-                    }
-                }
-                if(obtype==0){
-                    for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
-                        Container->Points_List[jump+i].Attribute_Point.append("");
-
-                    }
-                }else if(obtype==1){
-
-                    for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
-                        Container->Lines_List[jump+i].Attribute_Line.append("");
-
-                    }
-                }else{
-                    for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
-                        Container->Polygens_List[jump+i].Attribute_Polygen.append("");
-
-                    }
-                }
-    }
-}
-void MainWindow::attrItemChanged(QTableWidgetItem * item){
-    if (newtable_bug==1)return;
-        int index = item->row();
-        int attr_index = item->column();
-        qDebug()<<index<<":"<<attr_index;
-        int obtype=Container->Layers_List.at(index).Ob_Type;
+        int obtype=Container->Layers_List.at(Change_Style_ID).Ob_Type;
         int jump=0;
         for(int i=0;i<Container->Layers_List.size()-1;i++){
             if(Container->Layers_List.at(i).Ob_Type==obtype){
@@ -834,14 +871,45 @@ void MainWindow::attrItemChanged(QTableWidgetItem * item){
             }
         }
         if(obtype==0){
-            Container->Points_List[jump+index].Attribute_Point[attr_index]=item->data(attr_index).toString();
+            for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
+                Container->Points_List[jump+i].Attribute_Point.append("");
+
+            }
         }else if(obtype==1){
 
-            Container->Lines_List[jump+index].Attribute_Line[attr_index]=item->data(attr_index).toString();
-        }else{
+            for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
+                Container->Lines_List[jump+i].Attribute_Line.append("");
 
-            Container->Polygens_List[jump+index].Attribute_Polygen[attr_index]=item->data(attr_index).toString();
+            }
+        }else{
+            for (int i=0;i<Container->Layers_List.at(Change_Style_ID).Size;i++){
+                Container->Polygens_List[jump+i].Attribute_Polygen.append("");
+
+            }
         }
+    }
+}
+void MainWindow::attrItemChanged(QTableWidgetItem * item){
+    if (newtable_bug==1)return;
+    int index = item->row();
+    int attr_index = item->column();
+    qDebug()<<index<<":"<<attr_index;
+    int obtype=Container->Layers_List.at(index).Ob_Type;
+    int jump=0;
+    for(int i=0;i<Container->Layers_List.size()-1;i++){
+        if(Container->Layers_List.at(i).Ob_Type==obtype){
+            jump+=Container->Layers_List.at(i).Size;
+        }
+    }
+    if(obtype==0){
+        Container->Points_List[jump+index].Attribute_Point[attr_index]=item->data(attr_index).toString();
+    }else if(obtype==1){
+
+        Container->Lines_List[jump+index].Attribute_Line[attr_index]=item->data(attr_index).toString();
+    }else{
+
+        Container->Polygens_List[jump+index].Attribute_Polygen[attr_index]=item->data(attr_index).toString();
+    }
 
 }
 
@@ -1112,18 +1180,15 @@ void MainWindow::on_action_Save_DataBase_triggered()
 
 void MainWindow::wheelEvent(QWheelEvent* e)
 {
-   view->setTransformationAnchor(QGraphicsView::NoAnchor);
-   view->setResizeAnchor(QGraphicsView::NoAnchor);
 
-   QPointF oldPoint=view->mapToScene(e->pos());
    if(e->delta()>0)
    {
        view->scale(1.2,1.2);
    }
-   else {
+   else if(e->delta()<0) {
        view->scale(1/1.2,1/1.2);
    }
-   QPointF newPoint=view->mapToScene(e->pos());
-   QPointF delta=newPoint-oldPoint;
-   view->translate(delta.x(),delta.y());
+
+
+
 }

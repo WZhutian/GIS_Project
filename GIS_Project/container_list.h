@@ -24,6 +24,7 @@ public:
 
 
     ///
+    QList<St_Temp> Tcp_Receive;
     QList<St_Items> Items_List;
     QList<St_Points> Points_List;
     QList<St_Lines> Lines_List;
