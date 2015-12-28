@@ -663,8 +663,6 @@ void MainWindow::on_action_ReadShp_triggered()//读shp文件
     }else if(path.right(4)==".jpg"||path.right(4)==".png"){
 
         qDebug()<<"inhere";
-        St_Raster_images temp;
-        temp.Image=new QImage(path);
         bool ok;
         QString text = QInputDialog::getText(this, tr("读取图片"),
                                              tr("依次输入左上角XY坐标以及右下角XY坐标，以逗号分隔开:"), QLineEdit::Normal,
@@ -797,7 +795,27 @@ void MainWindow::Add_Attr_Name(){
     }
 }
 void MainWindow::attrItemChanged(QTableWidgetItem * item){
-    qDebug()<<"good job";
+    int index = item->row();
+    int attr_index = item->column();
+    qDebug()<<index<<":"<<attr_index;
+    int obtype=Container->Layers_List.at(index).Ob_Type;
+    int jump=0;
+    for(int i=0;i<Container->Layers_List.size();i++){
+        if(Container->Layers_List.at(i)==obtype){
+            jump+=Container->Layers_List.at(i).Size;
+        }
+    }
+    if(obtype==0){
+        Container->Points_List[jump+index].Attribute_Point[attr_index]=item->data(attr_index).toString();
+    }else if(obtype==1){
+
+        Container->Lines_List[jump+index].Attribute_Line[attr_index]=item->data(attr_index).toString();
+    }else{
+
+        Container->Polygens_List[jump+index].Attribute_Polygen[attr_index]=item->data(attr_index).toString();
+    }
+
+
 }
 
 void MainWindow::Show_Attr(){
