@@ -34,6 +34,7 @@ struct St_Raster_images{//栅格图片 图片其实不能用TCP传递
     QList<QPointF> Image_Point;//图片四个角的位置
     QString Image_Name;
     QImage *Image;
+    QGraphicsItem *image_Item;
     int Layer_ID;//图层标记
 };
 
