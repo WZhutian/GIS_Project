@@ -6,10 +6,10 @@
 #include <QFutureWatcher>
 #include <QByteArray>
 
-#include <QTime>
 
 #include <container_list.h>
-
+#include "editwidget.h"
+#include <QMutex>
 class TcpSocket : public QTcpSocket
 {
     Q_OBJECT
@@ -19,7 +19,11 @@ public:
     QByteArray handleData(QByteArray data);//用来处理数据的函数
     Container_List *Container;//保存当前容器
     void Get_Container(Container_List &Container_out);
-
+    EditWidget *area;
+    void Get_Area(EditWidget &area_out){
+        area=&area_out;
+    }
+QMutex mutex;
     QByteArray  intToByte(int i);
     int bytesToInt(QByteArray bytes);
 signals:
