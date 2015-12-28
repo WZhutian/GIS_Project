@@ -84,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     St_Layers Layers_out;
                     Message>>Layers_out;
                     //初始化
+                    Container->PC_ID=Layers_out.Pc_numbers+1;
                     Layers_out.Size=0;
                     for(int j=0;j<10;j++){
                         Layers_out.Every_size[j]=0;
@@ -95,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Layers_List.append(Layers_out);
                     St_Items temp_item;
                     Container->Items_List.append(temp_item);
+                    Show_TreeView();
                 }
                 //Step3:将数据包添加到本地容器中去
                 //按顺序添加后面的包
@@ -115,6 +117,17 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Point_Item(Points_out.Point,Points_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+
+                    QGraphicsEllipseItem *newPointCircle=
+                            new QGraphicsEllipseItem(Points_out.Point.x()-5,Points_out.Point.y()-5,10,10);
+                    // newPointCircle->setBrush(Qt::red);
+                    newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    newPointCircle->setData(0,Points_out.PC_ID);
+                    newPointCircle->setData(1,Points_out.Layer_ID);
+                    newPointCircle->setData(2,Points_out.Index_Part);
+                    Container->Items_List[Points_out.Layer_ID].Cur_Item.append(newPointCircle);
+                    area->addItem(newPointCircle);
                 }
                 QByteArray Ln_size;
                 Message>>Ln_size;
@@ -132,6 +145,22 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+
+                    QPainterPath *path=new QPainterPath(Lines_out.Line_FromTo[0]);
+                    for(int i=1;i<Lines_out.Line_FromTo.count();++i)
+                    {
+                        path->lineTo(Lines_out.Line_FromTo[i]);
+                    }
+                    QGraphicsPathItem *cur=new QGraphicsPathItem();
+                    cur->setPath(*path);
+                    //cur->setPen(*pen);
+                    cur->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    cur->setData(0,Lines_out.PC_ID);
+                    cur->setData(1,Lines_out.Layer_ID);
+                    cur->setData(2,Lines_out.Index_Part);
+                    Container->Items_List[Lines_out.Layer_ID].Cur_Item.append(cur);
+                    area->addItem(cur);
                 }
                 QByteArray Pl_size;
                 Message>>Pl_size;
@@ -149,6 +178,25 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Polygen_Item(Polygens_out.Polygen_Round,Polygens_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+
+                    QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
+                    QVector<QPointF>Poly_Item_Out;
+                    for(int i=0;i<Polygens_out.Polygen_Round.size();i++){
+                        Poly_Item_Out.append(Polygens_out.Polygen_Round.at(i));
+                    }
+                    qDebug()<<Polygens_out.Polygen_Round.size();
+                    qDebug()<<Poly_Item_Out.size();
+                    QPolygonF *curPolygon=new QPolygonF(Poly_Item_Out);
+                    cur->setPolygon(*curPolygon);
+                    cur->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    //    cur->setPen(*pen);
+                    //    cur->setBrush(brushColor);
+                    cur->setData(0,Polygens_out.PC_ID);
+                    cur->setData(1,Polygens_out.Layer_ID);
+                    cur->setData(2,Polygens_out.Index_Part);
+                    Container->Items_List[Polygens_out.Layer_ID].Cur_Item.append(cur);
+                    area->addItem(cur);
                 }
             }else{
                 //将客户端的修改内容添加到服务器的容器中，并对相应图元进行删除操作
@@ -196,6 +244,17 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Point_Item(Points_out.Point,Points_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+
+                    QGraphicsEllipseItem *newPointCircle=
+                            new QGraphicsEllipseItem(Points_out.Point.x()-5,Points_out.Point.y()-5,10,10);
+                    // newPointCircle->setBrush(Qt::red);
+                    newPointCircle->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    newPointCircle->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    newPointCircle->setData(0,Points_out.PC_ID);
+                    newPointCircle->setData(1,Points_out.Layer_ID);
+                    newPointCircle->setData(2,Points_out.Index_Part);
+                    Container->Items_List[Points_out.Layer_ID].Cur_Item.append(newPointCircle);
+                    area->addItem(newPointCircle);
                 }
                 QByteArray Ln_size;
                 Message>>Ln_size;
@@ -214,6 +273,22 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Line_Item(Lines_out.Line_FromTo,Lines_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+
+                    QPainterPath *path=new QPainterPath(Lines_out.Line_FromTo[0]);
+                    for(int i=1;i<Lines_out.Line_FromTo.count();++i)
+                    {
+                        path->lineTo(Lines_out.Line_FromTo[i]);
+                    }
+                    QGraphicsPathItem *cur=new QGraphicsPathItem();
+                    cur->setPath(*path);
+                    //cur->setPen(*pen);
+                    cur->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    cur->setData(0,Lines_out.PC_ID);
+                    cur->setData(1,Lines_out.Layer_ID);
+                    cur->setData(2,Lines_out.Index_Part);
+                    Container->Items_List[Lines_out.Layer_ID].Cur_Item.append(cur);
+                    area->addItem(cur);
                 }
                 QByteArray Pl_size;
                 Message>>Pl_size;
@@ -231,6 +306,25 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Polygen_Item(Polygens_out.Polygen_Round,Polygens_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+
+                    QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
+                    QVector<QPointF>Poly_Item_Out;
+                    for(int i=0;i<Polygens_out.Polygen_Round.size();i++){
+                        Poly_Item_Out.append(Polygens_out.Polygen_Round.at(i));
+                    }
+                    qDebug()<<Polygens_out.Polygen_Round.size();
+                    qDebug()<<Poly_Item_Out.size();
+                    QPolygonF *curPolygon=new QPolygonF(Poly_Item_Out);
+                    cur->setPolygon(*curPolygon);
+                    cur->setFlag(QGraphicsItem::ItemIsMovable,false);
+                    cur->setFlag(QGraphicsItem::ItemIsSelectable,false);
+                    //    cur->setPen(*pen);
+                    //    cur->setBrush(brushColor);
+                    cur->setData(0,Polygens_out.PC_ID);
+                    cur->setData(1,Polygens_out.Layer_ID);
+                    cur->setData(2,Polygens_out.Index_Part);
+                    Container->Items_List[Polygens_out.Layer_ID].Cur_Item.append(cur);
+                    area->addItem(cur);
                 }
             }
             willtoRead=false;
@@ -671,16 +765,33 @@ void MainWindow::slotCustomContextMenu(const QPoint &){
         qDebug()<<index;
         menu->addAction(QString("属性"), this, SLOT(Show_Attr()));
         menu->addAction(QString("修改样式"), this, SLOT(Change_Style()));
+        menu->addAction(QString("添加字段"), this, SLOT(Add_Attr_Name()));
         Change_Style_ID=layer_index;//设置当前修改的layer索引
         menu->exec(QCursor::pos());
         ui->treeView->setCurrentIndex(init_modeIndex);
     }
 }
+void MainWindow::Add_Attr_Name(){
+    bool ok;
+    if(Change_Style_ID>=Container->Layers_List.size())return;
+    QString text = QInputDialog::getText(this, tr("新建图层属性字段"),
+                                         tr("请输入字段名："), QLineEdit::Normal,
+                                         "New Name", &ok);
+    if (ok && !text.isEmpty()){
+        Container->Add_Layer_Attr(Change_Style_ID,text);
+    }
+}
+void MainWindow::attrItemChanged(QTableWidgetItem * item){
+    qDebug()<<"good job";
+}
+
 void MainWindow::Show_Attr(){
     int Attr_size=Container->Layers_List.at(Change_Style_ID).Attribute_Name.size();
     int Elements_size=Container->Layers_List.at(Change_Style_ID).Size;
     QTableWidget *tableWidget = new QTableWidget(Elements_size,Attr_size); // 构造了一个QTableWidget的对象
     tableWidget->setWindowTitle("查看属性");
+    connect(tableWidget,
+        SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(attrItemChanged(QTableWidgetItem *)));
     //     tableWidget->resize(350, 200);  //设置表格
     QStringList header;
     for(int i=0;i<Attr_size;i++){

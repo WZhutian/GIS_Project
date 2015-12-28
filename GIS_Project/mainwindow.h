@@ -11,6 +11,7 @@
 #include "tcpserver.h"
 #include<QMouseEvent>
 #include <database.h>
+#include<QTableWidgetItem>
 namespace Ui {
 class MainWindow;
 }
@@ -59,9 +60,11 @@ private slots:
     //图层widget选框被点击
     void treeItemChanged ( QStandardItem * item );
     void slotCustomContextMenu(const QPoint &);
-
+    void Add_Attr_Name();
     void Show_Attr();
     void Change_Style();
+    //属性被修改
+    void attrItemChanged(QTableWidgetItem * item );
     //socket部分,客户端client
     void ReadError(QAbstractSocket::SocketError);
     void on_action_Tcp_Connect_triggered();
