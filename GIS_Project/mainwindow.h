@@ -24,10 +24,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     Container_List *Container;
     EditWidget *area;
-
+    QGraphicsView *view;
     Database database;
     ~MainWindow();
     int checked_bug=0;
+    int newtable_bug=0;
     QString ipAdd;//服务器IP地址
     QString portd;//服务器端口号
     int h_time;//定时器时间
@@ -44,6 +45,8 @@ public:
     QColor Temp_Color_Pen;
     QColor Temp_Color_Brush;
     bool willtoRead;
+    void wheelEvent(QWheelEvent *);
+
 private slots:
     //绘图部分
     void on_penStyleComboBox_currentIndexChanged(const QString penStyle);

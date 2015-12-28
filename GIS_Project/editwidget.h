@@ -8,6 +8,8 @@
 #include <QPen>
 #include<QPointF>
 #include<container_list.h>
+#include<QGraphicsSceneWheelEvent>
+#include<QWheelEvent>
 class Container_List;
 class EditWidget: public QGraphicsScene
 {
@@ -65,6 +67,7 @@ public:
     void showpoints();
     void showpicture();
 
+
     ~EditWidget();
 
 protected:
@@ -81,6 +84,7 @@ private:
 
     ShapeType curShape;
     viewState curState;
+
 
     void mousePressClear(QGraphicsSceneMouseEvent *);
     void mousePressDraw(QGraphicsSceneMouseEvent *);
