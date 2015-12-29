@@ -56,8 +56,9 @@ void Container_List::Add_Point(QPointF Point_Out){
     Layers_List[layer_index].Every_size[PC_ID]++;
     Layers_List[layer_index].Size++;
     Layers_List[layer_index].PC_ID.append(PC_ID);
-    Layers_List[layer_index].Index_Part.append(index);
+    Layers_List[layer_index].Index_Part.append(Part_Index);
     Layers_List[layer_index].Change_Way.append(2);
+    Layers_List[layer_index].Accept_PC.append("");
 }
 //void Container_List::Modify_Point_Item(QPointF Point_Item_Out_New,QPointF origPoint,EditWidget *area)
 //{
@@ -67,6 +68,18 @@ void Container_List::Add_Point(QPointF Point_Out){
 
 void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    int Part_Index=0;
+    if(index>0){
+        if(Points_List.at(index-1).Layer_ID==Layer_ID&&
+                Points_List.at(index-1).PC_ID==PC_ID){
+            if(Points_List.at(index-1).Index_Part!=0){
+                Part_Index=Points_List.at(index-1).Index_Part+1;
+            }else
+                Part_Index=1;
+        }
+    }else{
+        Part_Index=0;
+    }
     qDebug()<<"index"<<index;
 //    //修改Items部分
 //    this->Modify_Point_Item(Point_Out_New,index);
@@ -84,8 +97,9 @@ void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
     }
     //解决查询效率问题：将每次修改的内容添加到数组的开头，
     Layers_List[layer_index].PC_ID.insert(0,PC_ID);
-    Layers_List[layer_index].Index_Part.insert(0,index);
+    Layers_List[layer_index].Index_Part.insert(0,Part_Index);
     Layers_List[layer_index].Change_Way.insert(0,1);
+    Layers_List[layer_index].Accept_PC.insert(0,"");
 }
 //void Container_List::Delete_Point_Item(int Index)
 //{
@@ -95,6 +109,18 @@ void Container_List::Modify_Point(int Index_Part_Out,QPointF Point_Out_New){
 
 void Container_List::Delete_Point(int Index_Part_Out){
     int index=Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    int Part_Index=0;
+    if(index>0){
+        if(Points_List.at(index-1).Layer_ID==Layer_ID&&
+                Points_List.at(index-1).PC_ID==PC_ID){
+            if(Points_List.at(index-1).Index_Part!=0){
+                Part_Index=Points_List.at(index-1).Index_Part+1;
+            }else
+                Part_Index=1;
+        }
+    }else{
+        Part_Index=0;
+    }
 //    //修改Items部分
 //    this->Delete_Point_Item(index);
     //修改数据部分
@@ -104,8 +130,9 @@ void Container_List::Delete_Point(int Index_Part_Out){
     Layers_List[layer_index].Every_size[PC_ID]--;
     Layers_List[layer_index].Size--;
     Layers_List[layer_index].PC_ID.insert(0,PC_ID);
-    Layers_List[layer_index].Index_Part.insert(0,index);
+    Layers_List[layer_index].Index_Part.insert(0,Part_Index);
     Layers_List[layer_index].Change_Way.insert(0,0);
+    Layers_List[layer_index].Accept_PC.insert(0,"");
 }
 /**
  * @brief Add_Line
@@ -134,14 +161,18 @@ void Container_List::Add_Line_Item(QVector<QPointF> Line_Item_Out,int index)
 void Container_List::Add_Line(QVector<QPointF> Line_Out){
     int index =  Add_search(Layer_ID,PC_ID,1);
     int Part_Index=0;
-    if(index!=0){
+    if(index>0){
         if(Lines_List.at(index-1).Layer_ID==Layer_ID&&
                 Lines_List.at(index-1).PC_ID==PC_ID){
             if(Lines_List.at(index-1).Index_Part!=0){
                 Part_Index=Lines_List.at(index-1).Index_Part+1;
-            }
+            }else
+                Part_Index=1;
         }
+    }else{
+        Part_Index=0;
     }
+    qDebug()<<"part index="<<Part_Index;
     //添加Items
     this->Add_Line_Item(Line_Out,Part_Index);
     //添加数据部分
@@ -158,8 +189,9 @@ void Container_List::Add_Line(QVector<QPointF> Line_Out){
     Layers_List[layer_index].Every_size[PC_ID]++;
     Layers_List[layer_index].Size++;
     Layers_List[layer_index].PC_ID.append(PC_ID);
-    Layers_List[layer_index].Index_Part.append(index);
+    Layers_List[layer_index].Index_Part.append(Part_Index);
     Layers_List[layer_index].Change_Way.append(2);
+    Layers_List[layer_index].Accept_PC.append("");
 }
 //void Container_List::Modify_Line_Item(QPointF Line_Item_Out_new, int index,int index_Line)
 //{
@@ -179,6 +211,18 @@ void Container_List::Add_Line(QVector<QPointF> Line_Out){
 
 void Container_List::Modify_Line(int Index_Part_Out,int Index_Line,QPointF Line_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    int Part_Index=0;
+    if(index>0){
+        if(Lines_List.at(index-1).Layer_ID==Layer_ID&&
+                Lines_List.at(index-1).PC_ID==PC_ID){
+            if(Lines_List.at(index-1).Index_Part!=0){
+                Part_Index=Lines_List.at(index-1).Index_Part+1;
+            }else
+                Part_Index=1;
+        }
+    }else{
+        Part_Index=0;
+    }
 //    //修改Items部分
 //    this->Modify_Line_Item(Line_Out_New,index,Index_Line);
     //修改数据部分
@@ -195,8 +239,9 @@ void Container_List::Modify_Line(int Index_Part_Out,int Index_Line,QPointF Line_
     }
     //解决查询效率问题：将每次修改的内容添加到数组的开头，
     Layers_List[layer_index].PC_ID.insert(0,PC_ID);
-    Layers_List[layer_index].Index_Part.insert(0,index);
+    Layers_List[layer_index].Index_Part.insert(0,Part_Index);
     Layers_List[layer_index].Change_Way.insert(0,1);
+    Layers_List[layer_index].Accept_PC.insert(0,"");
 }
 //void Container_List::Delete_Line_Item(int Index)
 //{
@@ -206,6 +251,18 @@ void Container_List::Modify_Line(int Index_Part_Out,int Index_Line,QPointF Line_
 
 void Container_List::Delete_Line(int Index_Part_Out){
     int index=Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    int Part_Index=0;
+    if(index>0){
+        if(Lines_List.at(index-1).Layer_ID==Layer_ID&&
+                Lines_List.at(index-1).PC_ID==PC_ID){
+            if(Lines_List.at(index-1).Index_Part!=0){
+                Part_Index=Lines_List.at(index-1).Index_Part+1;
+            }else
+                Part_Index=1;
+        }
+    }else{
+        Part_Index=0;
+    }
 //    //修改Items部分
 //    this->Delete_Line_Item(index);
     //修改数据部分
@@ -215,8 +272,9 @@ void Container_List::Delete_Line(int Index_Part_Out){
     Layers_List[layer_index].Every_size[PC_ID]--;
     Layers_List[layer_index].Size--;
     Layers_List[layer_index].PC_ID.insert(0,PC_ID);
-    Layers_List[layer_index].Index_Part.insert(0,index);
+    Layers_List[layer_index].Index_Part.insert(0,Part_Index);
     Layers_List[layer_index].Change_Way.insert(0,0);
+    Layers_List[layer_index].Accept_PC.insert(0,"");
 }
 /**
  * @brief Add_Polygen
@@ -241,16 +299,20 @@ void Container_List::Add_Polygen_Item(QVector<QPointF> Poly_Item_Out,int index)
 }
 
 void Container_List::Add_Polygen(QVector<QPointF> Polygen_Out){
-    int index =  Add_search(Layer_ID,PC_ID,1);
+    int index =  Add_search(Layer_ID,PC_ID,2);
     int Part_Index=0;
-    if(index!=0){
+    if(index>0){
         if(Polygens_List.at(index-1).Layer_ID==Layer_ID&&
                 Polygens_List.at(index-1).PC_ID==PC_ID){
             if(Polygens_List.at(index-1).Index_Part!=0){
                 Part_Index=Polygens_List.at(index-1).Index_Part+1;
-            }
+            }else
+                Part_Index=1;
         }
+    }else{
+        Part_Index=0;
     }
+    qDebug()<<"index part:"<<Part_Index;
     //添加Items
     this->Add_Polygen_Item(Polygen_Out,Part_Index);
     //添加数据部分
@@ -268,8 +330,9 @@ void Container_List::Add_Polygen(QVector<QPointF> Polygen_Out){
     Layers_List[layer_index].Every_size[PC_ID]++;
     Layers_List[layer_index].Size++;
     Layers_List[layer_index].PC_ID.append(PC_ID);
-    Layers_List[layer_index].Index_Part.append(index);
+    Layers_List[layer_index].Index_Part.append(Part_Index);
     Layers_List[layer_index].Change_Way.append(2);
+    Layers_List[layer_index].Accept_PC.append("");
 }
 //void Container_List::Modify_Polygen_Item(QPointF Polygens_Item_Out_new, int index, int Index_Polygen)
 //{
@@ -284,6 +347,18 @@ void Container_List::Add_Polygen(QVector<QPointF> Polygen_Out){
 
 void Container_List::Modify_Polygen(int Index_Part_Out,int Index_Polygen,QPointF Polygen_Out_New){
     int index =  Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    int Part_Index=0;
+    if(index>0){
+        if(Polygens_List.at(index-1).Layer_ID==Layer_ID&&
+                Polygens_List.at(index-1).PC_ID==PC_ID){
+            if(Polygens_List.at(index-1).Index_Part!=0){
+                Part_Index=Polygens_List.at(index-1).Index_Part+1;
+            }else
+                Part_Index=1;
+        }
+    }else{
+        Part_Index=0;
+    }
 //    //修改Items 部分
 //    this->Modify_Polygen_Item(Polygen_Out_New,index,Index_Polygen);
     //修改数据部分
@@ -300,8 +375,9 @@ void Container_List::Modify_Polygen(int Index_Part_Out,int Index_Polygen,QPointF
     }
     //解决查询效率问题：将每次修改的内容添加到数组的开头，
     Layers_List[layer_index].PC_ID.insert(0,PC_ID);
-    Layers_List[layer_index].Index_Part.insert(0,index);
+    Layers_List[layer_index].Index_Part.insert(0,Part_Index);
     Layers_List[layer_index].Change_Way.insert(0,1);
+    Layers_List[layer_index].Accept_PC.insert(0,"");
 }
 //void Container_List::Delete_Polygen_Item(int Index)
 //{
@@ -311,6 +387,18 @@ void Container_List::Modify_Polygen(int Index_Part_Out,int Index_Polygen,QPointF
 
 void Container_List::Delete_Polygen(int Index_Part_Out){
     int index=Current_search(Layer_ID,PC_ID,Index_Part_Out,0);
+    int Part_Index=0;
+    if(index>0){
+        if(Polygens_List.at(index-1).Layer_ID==Layer_ID&&
+                Polygens_List.at(index-1).PC_ID==PC_ID){
+            if(Polygens_List.at(index-1).Index_Part!=0){
+                Part_Index=Polygens_List.at(index-1).Index_Part+1;
+            }else
+                Part_Index=1;
+        }
+    }else{
+        Part_Index=0;
+    }
 //    //修改Items部分
 //    this->Delete_Polygen_Item(index);
     //修改数据部分
@@ -320,8 +408,9 @@ void Container_List::Delete_Polygen(int Index_Part_Out){
     Layers_List[layer_index].Every_size[PC_ID]--;
     Layers_List[layer_index].Size--;
     Layers_List[layer_index].PC_ID.insert(0,PC_ID);
-    Layers_List[layer_index].Index_Part.insert(0,index);
+    Layers_List[layer_index].Index_Part.insert(0,Part_Index);
     Layers_List[layer_index].Change_Way.insert(0,0);
+    Layers_List[layer_index].Accept_PC.insert(0,"");
 }
 //
 void Container_List::Add_Layer(QString Layer_Name,int Ob_Type){
@@ -408,6 +497,9 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
             }
         }
     }else if(Type==1){
+        for(int t=0;t<Lines_List.size();t++){
+            qDebug()<<"t="<<t<<":"<<Lines_List.at(t).Index_Part<<"pcid:"<<Lines_List.at(t).PC_ID;
+        }
         int len=Lines_List.size();
         bool finished=false;//判断是否停止
         //先找到对应的Layer
@@ -432,9 +524,11 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
                 int low = i;
                 int high = i+PC_id_size-1;
                 int mid = 0;
+
                 while ( low <= high )
                 {
                     mid = (low + high )/2;
+                    qDebug()<<low<<","<<high<<","<<Index_Part<<","<<Lines_List.at(mid).Index_Part;
 
                     if ( Lines_List.at(mid).Index_Part < Index_Part)
                         low = mid + 1;
@@ -459,6 +553,9 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
             }
         }
     }else{
+        for(int t=0;t<Polygens_List.size();t++){
+            qDebug()<<"t="<<t<<":"<<Polygens_List.at(t).Index_Part<<"pcid:"<<Polygens_List.at(t).PC_ID;
+        }
         int len=Polygens_List.size();
         bool finished=false;//判断是否停止
         //先找到对应的Layer
@@ -478,6 +575,7 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
                         break;
                     }
                 }
+                qDebug()<<index_before<<","<<PC_id_size;
                 i+=index_before;
                 //二分查找确定值
                 int low = i;
@@ -486,10 +584,11 @@ int Container_List::Current_search(int Layer_ID,int PC_ID,int Index_Part,int Typ
                 while ( low <= high )
                 {
                     mid = (low + high )/2;
+                    qDebug()<<low<<","<<high<<","<<Index_Part<<","<<Polygens_List.at(mid).Index_Part;
 
                     if ( Polygens_List.at(mid).Index_Part < Index_Part)
                         low = mid + 1;
-                    else if (Lines_List.at(mid).Index_Part > Index_Part )
+                    else if (Polygens_List.at(mid).Index_Part > Index_Part )
                         high = mid - 1;
                     else
                     {
@@ -564,6 +663,7 @@ int Container_List::Add_search(int Layer_ID,int PC_ID,int Type)
                         break;
                     }
                 }
+                qDebug()<<"indexbefre"<<index_before;
                 i+=index_before;
                 Index_Return+=i;
                 finished=true;
@@ -698,13 +798,13 @@ int Container_List::Current_insert(int Layer_ID,int PC_ID,int Index_Part,int Typ
                 i+=index_before;
                 //二分查找确定值
                 int low = i;
-                int high = i+PC_id_size-1;
+                int high = i+PC_id_size;
                 int mid = 0;
                 while ( low <= high )
                 {
                     mid = (low + high )/2;
                     if(mid==low||mid==high){
-                        if(Points_List.size()<=low+1||Lines_List.at(low).Index_Part<Index_Part&&Lines_List.at(low+1).Index_Part>Index_Part)
+                        if(Lines_List.size()<=low+1||Lines_List.at(low).Index_Part<Index_Part&&Lines_List.at(low+1).Index_Part>Index_Part)
                         {
                             finished=true;
                             Index_Return=low+1;
@@ -765,7 +865,7 @@ int Container_List::Current_insert(int Layer_ID,int PC_ID,int Index_Part,int Typ
                     mid = (low + high )/2;
                     if(mid==low||mid==high){
 
-                        if(Points_List.size()<=low+1||Polygens_List.at(low).Index_Part<Index_Part&&Polygens_List.at(low+1).Index_Part>Index_Part)
+                        if(Polygens_List.size()<=low+1||Polygens_List.at(low).Index_Part<Index_Part&&Polygens_List.at(low+1).Index_Part>Index_Part)
                         {
                             finished=true;
                             Index_Return=low+1;

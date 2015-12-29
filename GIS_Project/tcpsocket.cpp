@@ -24,6 +24,20 @@ TcpSocket::~TcpSocket()
 {
 }
 
+int qchar2int(QChar temp){
+    int return_num=0;
+   if(temp=='0')return_num=0;
+   else if(temp=='1')return_num=1;
+   else if(temp=='2')return_num=2;
+   else if(temp=='3')return_num=3;
+   else if(temp=='4')return_num=4;
+   else if(temp=='5')return_num=5;
+   else if(temp=='6')return_num=6;
+   else if(temp=='7')return_num=7;
+   else if(temp=='8')return_num=8;
+   else if(temp=='9')return_num=9;
+    return return_num;
+}
 
 void TcpSocket::sentData(const QByteArray &data, const int id)
 {
@@ -116,55 +130,72 @@ void TcpSocket::readData()
         int Point_Mod_size=0,Line_Mod_size=0,Polygen_Mod_size=0;//记录修改操作中的3种要素的数量
 
         for(int i=0;i<layer_size;i++){
-            qDebug()<<"accept pc1 size"<<Container->Layers_List.at(i).Accept_PC.at(0).size();
+            qDebug()<<"accept pc1 size"<<Container->Layers_List.at(i).Accept_PC.size();
             //统计各修改元素的数量
             if(Container->Layers_List.at(i).Ob_Type==0){
                 for(int j =0;j<Container->Layers_List.at(i).PC_ID.size();j++){
 
-                        for(int k=0;k<Container->Layers_List[i].Accept_PC.at(j).size();k++){
-                            if(Container->Layers_List[i].Accept_PC.at(j).toInt()==Container->PC_ID)
-                                Container->Layers_List[i].Accept_PC[j]="";
+                    for(int k=0;k<Container->Layers_List[i].Accept_PC.at(j).size();k++){
+                        if(qchar2int(Container->Layers_List[i].Accept_PC.at(j).at(k))==Container->PC_ID){
+                            Container->Layers_List[i].Accept_PC[j]="";
+                            qDebug()<<"yes";
                         }
-                        qDebug()<<"accept pc size"<<Container->Layers_List.at(i).Accept_PC.at(0).size();
-                        if(Container->Layers_List[i].Accept_PC.at(j).size()>=Container->Layers_List.at(i).Pc_numbers){//冗余值发现
-                            qDebug()<<"删除冗余";
-                            Container->Layers_List[i].PC_ID.removeAt(j);
-                            Container->Layers_List[i].Index_Part.removeAt(j);
-                            Container->Layers_List[i].Change_Way.removeAt(j);
-                            Container->Layers_List[i].Accept_PC.removeAt(j);
-                        }else{
-
-                            Point_Mod_size++;
-                        }
+                    }
+                    qDebug()<<"accept pc size"<<Container->Layers_List.at(i).Accept_PC.at(0).size();
+                    if(Container->Layers_List[i].Accept_PC.at(j).size()>=Container->Layers_List.at(i).Pc_numbers){//冗余值发现
+                        qDebug()<<"删除冗余"<<Container->Layers_List[i].PC_ID.size();
+                        Container->Layers_List[i].PC_ID.removeAt(j);
+                        Container->Layers_List[i].Index_Part.removeAt(j);
+                        Container->Layers_List[i].Change_Way.removeAt(j);
+                        Container->Layers_List[i].Accept_PC.removeAt(j);
+                         qDebug()<<"删除冗余zhihou"<<Container->Layers_List[i].PC_ID.size();
+                         j--;
+                    }else{
+                        Point_Mod_size++;
+                        qDebug()<<"错误！！！！！！！！！！！！！！";
+                        qDebug()<<Container->Layers_List[i].Accept_PC.at(j).size()<<","<<Container->Layers_List.at(i).Pc_numbers;
+                    }
                 }
             }else if(Container->Layers_List.at(i).Ob_Type==1){
 
                 for(int j =0;j<Container->Layers_List.at(i).PC_ID.size();j++){
 
-                        if(Container->Layers_List[i].Accept_PC.at(j).size()>=Container->Layers_List.at(i).Pc_numbers){//冗余值发现
-                            qDebug()<<"删除冗余";
-                            Container->Layers_List[i].PC_ID.removeAt(j);
-                            Container->Layers_List[i].Index_Part.removeAt(j);
-                            Container->Layers_List[i].Change_Way.removeAt(j);
-                            Container->Layers_List[i].Accept_PC.removeAt(j);
-                        }else{
+                    for(int k=0;k<Container->Layers_List[i].Accept_PC.at(j).size();k++){
+                        if(qchar2int(Container->Layers_List[i].Accept_PC.at(j).at(k))==Container->PC_ID)
+                            Container->Layers_List[i].Accept_PC[j]="";
+                    }
+                    qDebug()<<"accept pc size"<<Container->Layers_List.at(i).Accept_PC.at(0).size();
+                    if(Container->Layers_List[i].Accept_PC.at(j).size()>=Container->Layers_List.at(i).Pc_numbers){//冗余值发现
+                        qDebug()<<"删除冗余";
+                        Container->Layers_List[i].PC_ID.removeAt(j);
+                        Container->Layers_List[i].Index_Part.removeAt(j);
+                        Container->Layers_List[i].Change_Way.removeAt(j);
+                        Container->Layers_List[i].Accept_PC.removeAt(j);
+                        j--;
+                    }else{
 
-                            Line_Mod_size++;
-                        }
+                        Line_Mod_size++;
+                    }
                 }
             }else{
                 for(int j =0;j<Container->Layers_List.at(i).PC_ID.size();j++){
 
-                        if(Container->Layers_List[i].Accept_PC.at(j).size()>=Container->Layers_List.at(i).Pc_numbers){//冗余值发现
-                            qDebug()<<"删除冗余";
-                            Container->Layers_List[i].PC_ID.removeAt(j);
-                            Container->Layers_List[i].Index_Part.removeAt(j);
-                            Container->Layers_List[i].Change_Way.removeAt(j);
-                            Container->Layers_List[i].Accept_PC.removeAt(j);
-                        }else{
+                    for(int k=0;k<Container->Layers_List[i].Accept_PC.at(j).size();k++){
+                        if(qchar2int(Container->Layers_List[i].Accept_PC.at(j).at(k))==Container->PC_ID)
+                            Container->Layers_List[i].Accept_PC[j]="";
+                    }
+                    qDebug()<<"accept pc size"<<Container->Layers_List.at(i).Accept_PC.at(0).size();
+                    if(Container->Layers_List[i].Accept_PC.at(j).size()>=Container->Layers_List.at(i).Pc_numbers){//冗余值发现
+                        qDebug()<<"删除冗余";
+                        Container->Layers_List[i].PC_ID.removeAt(j);
+                        Container->Layers_List[i].Index_Part.removeAt(j);
+                        Container->Layers_List[i].Change_Way.removeAt(j);
+                        Container->Layers_List[i].Accept_PC.removeAt(j);
+                        j--;
+                    }else{
 
-                            Polygen_Mod_size++;
-                        }
+                        Polygen_Mod_size++;
+                    }
                 }
             }
             out<<Container->Layers_List.at(i);
@@ -180,8 +211,6 @@ void TcpSocket::readData()
                     Container->Layers_List[i].Accept_PC[j].append(QString::number(pc_id));
                     out<<Container->Points_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,0));
                     //识别Accpet中是否有对应PCid,分发完毕则执行冗余清除工作
-                    qDebug()<<"accept PCs"<<Container->Layers_List[i].Accept_PC[j];
-                    qDebug()<<Container->Layers_List[i].Accept_PC.at(j).size();
 
                 }
             }
@@ -253,12 +282,13 @@ void TcpSocket::readData()
             St_Points Points_out;
             Message>>Points_out;
             //添加到本地容器
+
+
             int insert_index=Container->Current_insert(Points_out.Layer_ID,Points_out.PC_ID,Points_out.Index_Part,0);
             Container->Points_List.insert(insert_index,Points_out);
-
-
             Container->Layers_List[Points_out.Layer_ID].Every_size[Points_out.PC_ID]++;
             Container->Layers_List[Points_out.Layer_ID].Size++;
+
             St_Temp temp_receive;
             temp_receive.Layer_ID=Points_out.Layer_ID;
             temp_receive.PC_ID=Points_out.PC_ID;
@@ -273,13 +303,15 @@ void TcpSocket::readData()
             St_Lines Lines_out;
             Message>>Lines_out;
             //添加到本地容器
+
             int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
             Container->Lines_List.insert(insert_index,Lines_out);
 
-
-
             Container->Layers_List[Lines_out.Layer_ID].Every_size[Lines_out.PC_ID]++;
             Container->Layers_List[Lines_out.Layer_ID].Size++;
+            qDebug()<<"line indexpart"<<Lines_out.Index_Part;
+
+
             St_Temp temp_receive;
             temp_receive.Layer_ID=Lines_out.Layer_ID;
             temp_receive.PC_ID=Lines_out.PC_ID;
@@ -297,9 +329,10 @@ void TcpSocket::readData()
             int insert_index=Container->Current_insert(Polygens_out.Layer_ID,Polygens_out.PC_ID,Polygens_out.Index_Part,2);
             Container->Polygens_List.insert(insert_index,Polygens_out);
 
-
             Container->Layers_List[Polygens_out.Layer_ID].Every_size[Polygens_out.PC_ID]++;
             Container->Layers_List[Polygens_out.Layer_ID].Size++;
+
+
             St_Temp temp_receive;
             temp_receive.Layer_ID=Polygens_out.Layer_ID;
             temp_receive.PC_ID=Polygens_out.PC_ID;

@@ -76,6 +76,10 @@ MainWindow::MainWindow(QWidget *parent) :
     tcpClient->abort();
     connect(tcpClient,&QTcpSocket::readyRead,
             [&](){
+        /////
+//        for(int t=0;t<Container->Lines_List.size();t++){
+//            qDebug()<<"t="<<t<<":"<<Container->Lines_List.at(t).Index_Part<<"pcid:"<<Container->Lines_List.at(t).PC_ID;
+//        }
         if(willtoRead==true){
             QByteArray Byte_size;
             QDataStream Message(this->tcpClient->readAll());
@@ -120,6 +124,8 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
 
+                    Container->Layers_List[Points_out.Layer_ID].Every_size[Points_out.PC_ID]++;
+                    Container->Layers_List[Points_out.Layer_ID].Size++;
                     QGraphicsEllipseItem *newPointCircle=
                             new QGraphicsEllipseItem(Points_out.Point.x()-5,Points_out.Point.y()-5,10,10);
                     // newPointCircle->setBrush(Qt::red);
@@ -148,6 +154,8 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
 
+                    Container->Layers_List[Lines_out.Layer_ID].Every_size[Lines_out.PC_ID]++;
+                    Container->Layers_List[Lines_out.Layer_ID].Size++;
                     QPainterPath *path=new QPainterPath(Lines_out.Line_FromTo[0]);
                     for(int i=1;i<Lines_out.Line_FromTo.count();++i)
                     {
@@ -180,6 +188,8 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Add_Polygen_Item(Polygens_out.Polygen_Round,Polygens_out.Index_Part);
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
+                    Container->Layers_List[Polygens_out.Layer_ID].Every_size[Polygens_out.PC_ID]++;
+                    Container->Layers_List[Polygens_out.Layer_ID].Size++;
 
                     QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
                     QVector<QPointF>Poly_Item_Out;
@@ -215,6 +225,7 @@ MainWindow::MainWindow(QWidget *parent) :
                                 //TODO删除判断
                                 area->removeItem(area->itemAt(Container->Points_List.at(index).Point,area->items()[0]->transform()));
                                 Container->Points_List.removeAt(index);
+
                             }else if(Layers_out.Ob_Type==1){
                                 //TODO删除判断
                                 area->removeItem( area->itemAt(Container->Lines_List.at(index).Line_FromTo.at(0),area->items()[0]->transform()));
@@ -224,6 +235,28 @@ MainWindow::MainWindow(QWidget *parent) :
                                 area->removeItem( area->itemAt(Container->Polygens_List.at(index).Polygen_Round.at(0),area->items()[0]->transform()));
                                 Container->Polygens_List.removeAt(index);
                             }
+                            Container->Layers_List[Layers_out.Layer_ID].Size--;
+                            Container->Layers_List[Layers_out.Layer_ID].Every_size[Layers_out.PC_ID.at(t)]--;
+                        }
+                        else if(Layers_out.PC_ID.at(t)==Container->PC_ID){
+                            int index=Container->Current_search(Layers_out.Layer_ID,Layers_out.PC_ID.at(t),Layers_out.Index_Part.at(t),Layers_out.Ob_Type);
+                            if(Layers_out.Ob_Type==0){
+                                qDebug()<<"remmoved Point:";
+                                qDebug()<<Container->Points_List.at(index).Point;
+                                //TODO删除判断
+                                area->removeItem(area->itemAt(Container->Points_List.at(index).Point,area->items()[0]->transform()));
+                                Container->Points_List.removeAt(index);
+                            }else if(Layers_out.Ob_Type==1){
+                                //TODO删除判断
+                                area->removeItem( area->itemAt(Container->Lines_List.at(index).Line_FromTo.at(0),area->items()[0]->transform()));
+                                Container->Lines_List.removeAt(index);
+                            }else{
+                                //TODO删除判断
+                                area->removeItem( area->itemAt(Container->Polygens_List.at(index).Polygen_Round.at(0),area->items()[0]->transform()));
+                                Container->Polygens_List.removeAt(index);
+                            }
+                            Container->Layers_List[Layers_out.Layer_ID].Size--;
+                            Container->Layers_List[Layers_out.Layer_ID].Every_size[Layers_out.PC_ID.at(t)]--;
                         }
                     }
                 }
@@ -232,7 +265,6 @@ MainWindow::MainWindow(QWidget *parent) :
                 QByteArray Pt_size;
                 Message>>Pt_size;
                 int size_Pt=bytesToInt(Pt_size);
-                qDebug()<<size_Pt;
                 for(int j=0;j<size_Pt;j++){
                     St_Points Points_out;
                     Message>>Points_out;
@@ -247,6 +279,9 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
 
+                    Container->Layers_List[Points_out.Layer_ID].Every_size[Points_out.PC_ID]++;
+                    Container->Layers_List[Points_out.Layer_ID].Size++;
+
                     QGraphicsEllipseItem *newPointCircle=
                             new QGraphicsEllipseItem(Points_out.Point.x()-5,Points_out.Point.y()-5,10,10);
                     // newPointCircle->setBrush(Qt::red);
@@ -257,15 +292,16 @@ MainWindow::MainWindow(QWidget *parent) :
                     newPointCircle->setData(2,Points_out.Index_Part);
                     Container->Items_List[Points_out.Layer_ID].Cur_Item.append(newPointCircle);
                     area->addItem(newPointCircle);
+
                 }
                 QByteArray Ln_size;
                 Message>>Ln_size;
                 int size_Ln=bytesToInt(Ln_size);
+                qDebug()<<size_Ln;
                 for(int j=0;j<size_Ln;j++){
                     St_Lines Lines_out;
                     Message>>Lines_out;
                     //添加到本地容器
-                    qDebug()<<Lines_out.Line_FromTo.size();
                     int insert_index=Container->Current_insert(Lines_out.Layer_ID,Lines_out.PC_ID,Lines_out.Index_Part,1);
                     Container->Lines_List.insert(insert_index,Lines_out);
                     int tempPcID=Container->PC_ID;
@@ -276,6 +312,9 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
 
+
+                    Container->Layers_List[Lines_out.Layer_ID].Every_size[Lines_out.PC_ID]++;
+                    Container->Layers_List[Lines_out.Layer_ID].Size++;
                     QPainterPath *path=new QPainterPath(Lines_out.Line_FromTo[0]);
                     for(int i=1;i<Lines_out.Line_FromTo.count();++i)
                     {
@@ -309,6 +348,8 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->PC_ID=tempPcID;
                     Container->Layer_ID=tempLayerID;
 
+                    Container->Layers_List[Polygens_out.Layer_ID].Every_size[Polygens_out.PC_ID]++;
+                    Container->Layers_List[Polygens_out.Layer_ID].Size++;
                     QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
                     QVector<QPointF>Poly_Item_Out;
                     for(int i=0;i<Polygens_out.Polygen_Round.size();i++){
@@ -337,6 +378,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&tm,&QTimer::timeout,[&](){
         qDebug()<<"run"<<Container->Tcp_Receive.size();
         qDebug()<<"items:"<<Container->Items_List.at(0).Cur_Item.size();
+        qDebug()<<"every size:"<<Container->Layers_List.at(0).Every_size[0];
         if(!Container->Tcp_Receive.isEmpty()){
             tm.stop();
             for(int i=0;i<Container->Tcp_Receive.size();i++){
@@ -357,7 +399,10 @@ MainWindow::MainWindow(QWidget *parent) :
                     Container->Items_List[Points_out.Layer_ID].Cur_Item.append(newPointCircle);
                     area->addItem(newPointCircle);
                 }else if(obtype==1){
+
+                    ///////
                     St_Lines Lines_out;
+                    qDebug()<<"line index"<<index;
                     Lines_out=Container->Lines_List.at(index);
                     QPainterPath *path=new QPainterPath(Lines_out.Line_FromTo[0]);
                     for(int i=1;i<Lines_out.Line_FromTo.count();++i)
@@ -641,7 +686,7 @@ void MainWindow::on_action_Tcp_Sent_triggered()
         //统计各修改元素的数量
         if(Container->Layers_List.at(i).Ob_Type==0){
             Point_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
-        }else if(Container->Layers_List.at(i).Ob_Type==0){
+        }else if(Container->Layers_List.at(i).Ob_Type==1){
             Line_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
         }else{
             Polygen_Mod_size+=Container->Layers_List.at(i).PC_ID.size();
@@ -666,7 +711,9 @@ void MainWindow::on_action_Tcp_Sent_triggered()
             for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
                 int pc_id = Container->PC_ID;//获取自身PCID
                 int index = Container->Layers_List.at(i).Index_Part.at(j);
+                qDebug()<<index;
 
+                qDebug()<<"send size="<<Container->Layers_List.at(i).Every_size[1];
                 out<<Container->Lines_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,1));
 
             }
@@ -678,6 +725,9 @@ void MainWindow::on_action_Tcp_Sent_triggered()
             for(int j=0;j<Container->Layers_List.at(i).PC_ID.size();j++){
                 int pc_id = Container->PC_ID;//获取自身PCID
                 int index = Container->Layers_List.at(i).Index_Part.at(j);
+                qDebug()<<index;
+
+                qDebug()<<"send size="<<Container->Layers_List.at(i).Every_size[1];
                 out<<Container->Polygens_List.at(Container->Current_search(Container->Layers_List.at(i).Layer_ID,pc_id,index,2));
             }
         }
@@ -1169,7 +1219,7 @@ void MainWindow::on_action_Save_DataBase_triggered()
                                              "New Project", &ok);
         if (ok && !text.isEmpty()){
             database.Add_Project(text);
-            database.Add_Info(database.Get_Project_Last());
+            database.Add_Info(database.Get_Project_Last()-1);
             Container->Project_ID=database.Get_Project_Last()-1;
         }
     }else{
