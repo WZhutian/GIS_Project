@@ -2,7 +2,7 @@
 #define PIANXIN_H
 
 #include <QDialog>
-
+#include<editwidget.h>
 namespace Ui {
 class pianxin;
 }
@@ -13,8 +13,11 @@ class pianxin : public QDialog
 
 public:
     explicit pianxin(QWidget *parent = 0);
+    EditWidget *area;
     ~pianxin();
-
+    void Get_Area(EditWidget &Area_out){
+        area=&Area_out;
+    }
 private slots:
     void on_pushButton_2_clicked();
 

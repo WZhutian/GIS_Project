@@ -64,6 +64,7 @@ public:
     QList<QGraphicsItem*> shapes;//交互操作图形容器
 
     QVector<QPointF> points2; //存从数据库读出来的点
+    QVector<QPointF> points3;
     void showpoints();
     void showpicture();
     void showNet();
