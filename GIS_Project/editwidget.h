@@ -66,7 +66,7 @@ public:
     QVector<QPointF> points2; //存从数据库读出来的点
     void showpoints();
     void showpicture();
-
+    void showNet();
 
     ~EditWidget();
 

@@ -772,7 +772,69 @@ void EditWidget::mousePressClear(QGraphicsSceneMouseEvent *event)
         }
     }
 }
+void EditWidget::showNet()
+{
+    qreal x=497020;
+    qreal y=3518020;
+    for(int i=0;i<5;i++)
+    {
+        QPointF p(x,y);
+        points.append(p);
+        x+=100;
+    }
+   x=497020;
+   y=3518120;
+   for(int i=0;i<5;i++)
+   {
+       QPointF p(x,y);
+       points.append(p);
+       x+=100;
+   }
 
+   x=497020;
+   y=3518220;
+   for(int i=0;i<5;i++)
+   {
+       QPointF p(x,y);
+       points.append(p);
+       x+=100;
+   }
+   x=497020;
+   y=3518320;
+   for(int i=0;i<5;i++)
+   {
+       QPointF p(x,y);
+       points.append(p);
+       x+=100;
+   }
+   x=497020;
+   y=3518420;
+   for(int i=0;i<5;i++)
+   {
+       QPointF p(x,y);
+       points.append(p);
+       x+=100;
+   }
+  for(int i=0;i<21;i+=5)
+  {
+      QPainterPath *path=new QPainterPath(points[i]);
+      path->lineTo(points[i+4]);
+      QGraphicsPathItem *cur =new QGraphicsPathItem();
+      cur->setPen(*pen);
+      cur->setPath(*path);
+      this->addItem(cur);
+  }
+  for(int i=0;i<5;i++)
+  {
+      QPainterPath *path=new QPainterPath(points[i]);
+      path->lineTo(points[i+20]);
+      QGraphicsPathItem *cur =new QGraphicsPathItem();
+      cur->setPen(*pen);
+      cur->setPath(*path);
+      this->addItem(cur);
+  }
+
+}
 
 EditWidget::~EditWidget()
 {

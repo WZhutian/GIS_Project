@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //绘图部分，scene初始化
     area=new EditWidget(this);
     view = new QGraphicsView(area,this);
+    area->showNet();//显示方里网
     area->Get_Graphicview(*view);
     area->setSceneRect(497000,3518000,3500,3000);
     view->setMouseTracking(true);
