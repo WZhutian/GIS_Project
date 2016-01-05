@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     tcpserver.cpp \
     tcpsocket.cpp \
     threadhandle.cpp \
-    database.cpp
+    database.cpp \
+    pianxin.cpp
 
 HEADERS  += mainwindow.h \
     GDAL_include/cpl_atomic_ops.h \
@@ -99,9 +100,11 @@ HEADERS  += mainwindow.h \
     tcpserver.h \
     tcpsocket.h \
     threadhandle.h \
-    database.h
+    database.h \
+    pianxin.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    pianxin.ui
 
 LIBS += D:\GIS_Project\GIS_Project\GIS_Project\DLLs\libgdal.dll
 

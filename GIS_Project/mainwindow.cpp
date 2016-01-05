@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QBrush>
 #include <QTableWidget>
+#include"pianxin.h"
 #include<QScrollBar>
 QByteArray  MainWindow::intToByte(int i)
 {
@@ -1242,4 +1243,10 @@ void MainWindow::wheelEvent(QWheelEvent* e)
 
 
 
+}
+
+void MainWindow::on_action_triggered()
+{
+    pianxin *p=new pianxin;
+    p->show();
 }

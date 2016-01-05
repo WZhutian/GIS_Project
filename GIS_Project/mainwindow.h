@@ -96,6 +96,8 @@ private slots:
 
     void on_action_Save_DataBase_triggered();
 
+    void on_action_triggered();
+
 protected:
 //    void mousePressEvent(QMouseEvent *);
 //    void mouseMoveEvent(QMouseEvent *);
