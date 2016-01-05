@@ -779,7 +779,7 @@ void EditWidget::showNet()
     for(int i=0;i<5;i++)
     {
         QPointF p(x,y);
-        points.append(p);
+        points3.append(p);
         x+=100;
     }
    x=497020;
@@ -787,7 +787,7 @@ void EditWidget::showNet()
    for(int i=0;i<5;i++)
    {
        QPointF p(x,y);
-       points.append(p);
+       points3.append(p);
        x+=100;
    }
 
@@ -796,7 +796,7 @@ void EditWidget::showNet()
    for(int i=0;i<5;i++)
    {
        QPointF p(x,y);
-       points.append(p);
+       points3.append(p);
        x+=100;
    }
    x=497020;
@@ -804,7 +804,7 @@ void EditWidget::showNet()
    for(int i=0;i<5;i++)
    {
        QPointF p(x,y);
-       points.append(p);
+       points3.append(p);
        x+=100;
    }
    x=497020;
@@ -812,13 +812,13 @@ void EditWidget::showNet()
    for(int i=0;i<5;i++)
    {
        QPointF p(x,y);
-       points.append(p);
+       points3.append(p);
        x+=100;
    }
   for(int i=0;i<21;i+=5)
   {
-      QPainterPath *path=new QPainterPath(points[i]);
-      path->lineTo(points[i+4]);
+      QPainterPath *path=new QPainterPath(points3[i]);
+      path->lineTo(points3[i+4]);
       QGraphicsPathItem *cur =new QGraphicsPathItem();
       cur->setPen(*pen);
       cur->setPath(*path);
@@ -826,8 +826,8 @@ void EditWidget::showNet()
   }
   for(int i=0;i<5;i++)
   {
-      QPainterPath *path=new QPainterPath(points[i]);
-      path->lineTo(points[i+20]);
+      QPainterPath *path=new QPainterPath(points3[i]);
+      path->lineTo(points3[i+20]);
       QGraphicsPathItem *cur =new QGraphicsPathItem();
       cur->setPen(*pen);
       cur->setPath(*path);

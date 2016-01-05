@@ -1249,4 +1249,6 @@ void MainWindow::on_action_triggered()
 {
     pianxin *p=new pianxin;
     p->show();
+    p->Get_Area(*area);
+
 }
