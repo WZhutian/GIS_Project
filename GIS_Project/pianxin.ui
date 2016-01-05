@@ -148,8 +148,8 @@
     <widget class="QRadioButton" name="radioButton_right">
      <property name="geometry">
       <rect>
-       <x>370</x>
-       <y>130</y>
+       <x>360</x>
+       <y>120</y>
        <width>16</width>
        <height>16</height>
       </rect>
@@ -161,10 +161,10 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>-10</x>
-       <y>10</y>
-       <width>411</width>
-       <height>301</height>
+       <x>0</x>
+       <y>20</y>
+       <width>391</width>
+       <height>291</height>
       </rect>
      </property>
      <property name="styleSheet">

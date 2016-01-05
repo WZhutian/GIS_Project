@@ -1233,13 +1233,6 @@ void MainWindow::on_action_Save_DataBase_triggered()
 void MainWindow::wheelEvent(QWheelEvent* e)
 {
 
-   if(e->delta()>0)
-   {
-       view->scale(1.2,1.2);
-   }
-   else if(e->delta()<0) {
-       view->scale(1/1.2,1/1.2);
-   }
 
 
 
