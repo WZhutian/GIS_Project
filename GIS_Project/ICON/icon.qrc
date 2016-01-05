@@ -53,5 +53,6 @@
         <file>kalarm.ico</file>
         <file>server.ico</file>
         <file>tab_duplicate.ico</file>
+        <file>pianxin.png</file>
     </qresource>
 </RCC>
