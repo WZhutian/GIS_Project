@@ -835,6 +835,28 @@ void EditWidget::showNet()
   }
 
 }
+void EditWidget::showlines(QList<QPointF> linespoints)
+{
+    QPainterPath *path=new QPainterPath(linespoints[0]);
+    for(int i=1;i<linespoints.size();i++)
+    {
+        path->lineTo(linespoints[i]);
+    }
+    QGraphicsPathItem *cur=new QGraphicsPathItem();
+    cur->setPen(*pen);
+    cur->setPath(*path);
+    this->addItem(cur);
+
+}
+void EditWidget::showpologon(QVector<QPoint> pologonpoints)
+{
+    QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
+    QPolygon *curpologon=new QPolygon(pologonpoints);
+    cur->setPolygon(*curpologon);
+    cur->setPen(*pen);
+    cur->setBrush(brushColor);
+    this->addItem(cur);
+}
 
 EditWidget::~EditWidget()
 {

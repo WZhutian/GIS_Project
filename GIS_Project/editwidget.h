@@ -68,6 +68,8 @@ public:
     void showpoints();
     void showpicture();
     void showNet();
+    void showlines(QList<QPointF>linespoints);
+    void showpologon(QVector<QPoint>pologonpoints);
 
     ~EditWidget();
 

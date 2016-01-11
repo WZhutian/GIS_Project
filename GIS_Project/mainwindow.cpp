@@ -1244,4 +1244,6 @@ void MainWindow::on_action_triggered()
     p->show();
     p->Get_Area(*area);
 
+
+
 }
