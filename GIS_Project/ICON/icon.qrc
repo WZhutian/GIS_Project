@@ -54,5 +54,6 @@
         <file>server.ico</file>
         <file>tab_duplicate.ico</file>
         <file>pianxin.png</file>
+        <file>pianxinfa.png</file>
     </qresource>
 </RCC>
