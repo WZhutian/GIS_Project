@@ -60,9 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //绘图部分，scene初始化
     area=new EditWidget(this);
     view = new QGraphicsView(area,this);
-    area->showNet();//显示方里网
+   // area->showNet();//显示方里网
     area->Get_Graphicview(*view);
-    area->setSceneRect(497000,3518000,3500,3000);
     view->setMouseTracking(true);
     setCentralWidget(view);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -79,9 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tcpClient,&QTcpSocket::readyRead,
             [&](){
         /////
-//        for(int t=0;t<Container->Lines_List.size();t++){
-//            qDebug()<<"t="<<t<<":"<<Container->Lines_List.at(t).Index_Part<<"pcid:"<<Container->Lines_List.at(t).PC_ID;
-//        }
+        //        for(int t=0;t<Container->Lines_List.size();t++){
+        //            qDebug()<<"t="<<t<<":"<<Container->Lines_List.at(t).Index_Part<<"pcid:"<<Container->Lines_List.at(t).PC_ID;
+        //        }
         if(willtoRead==true){
             QByteArray Byte_size;
             QDataStream Message(this->tcpClient->readAll());
@@ -1245,5 +1244,230 @@ void MainWindow::on_action_triggered()
     p->Get_Area(*area);
 
 
+
+}
+//位序转换程序
+unsigned long OnChangeByteOrder (int indata)
+{
+    char ss[8];
+    char ee[8];
+    unsigned long val = (unsigned long)indata;
+    _ultoa( val, ss, 16 );//将十六进制的数(val)转到一个字符串(ss)中
+    int i;
+    int length=strlen(ss);
+    if(length!=8)
+    {
+        for(i=0;i<8-length;i++)
+            ee[i]='0';
+        for(i=0;i<length;i++)
+            ee[i+8-length]=ss[i];
+        for(i=0;i<8;i++)
+            ss[i]=ee[i];
+    }
+    ////******进行倒序
+    int t;
+    t      =ss[0];
+    ss[0]       =ss[6];
+    ss[6]       =t;
+    t      =ss[1];
+    ss[1]       =ss[7];
+    ss[7]       =t;
+    t      =ss[2];
+    ss[2]       =ss[4];
+    ss[4]       =t;
+    t      =ss[3];
+    ss[3]       =ss[5];
+    ss[5]       =t;
+    ////******
+    //******将存有十六进制数(val)的字符串(ss)中的十六进制数转成十进制数
+    int value=0;
+    for(i=0;i<8;i++)
+    {
+        int k;
+        QString mass;
+        mass=ss[i];
+        if(ss[i]=='a' ||
+                ss[i]=='b' ||
+                ss[i]=='c' ||
+                ss[i]=='d' ||
+                ss[i]=='e' ||
+                ss[i]=='f')
+            k=10+ss[i]-'a';
+        else
+            sscanf(mass.toLatin1().data(),"%d",&k);
+        value=value+int(k*pow(16,7-i));
+    }
+    return (value);
+}
+void MainWindow::on_actionRead_Shpfile_triggered()
+{
+    view->setAlignment(Qt::AlignCenter);/////////////////////////////////////////////////////////////////////设置不可移动
+    QString ShpFileName = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr(".Shp Files(*.shp)"));
+    if(ShpFileName.right(4)==".shp"){
+        FILE*   m_ShpFile_fp;       //****Shp文件指针
+        //打开坐标文件
+        if((m_ShpFile_fp=fopen(ShpFileName.toLatin1().data(),"rb"))==NULL)
+        {
+            exit(1);
+        }
+        //读取坐标文件头的内容 开始
+        int FileCode;
+        int Unused;
+        int FileLength;
+        int Version;
+        int ShapeType;
+        double Xmin;
+        double Ymin;
+        double Xmax;
+        double Ymax;
+        double Zmin;
+        double Zmax;
+        double Mmin;
+        double Mmax;
+        fread(&FileCode,     sizeof(int),   1,m_ShpFile_fp);
+        FileCode  = OnChangeByteOrder (FileCode);
+        for(int i=0;i<5;i++)
+            fread(&Unused,sizeof(int),   1,m_ShpFile_fp);
+        fread(&FileLength,   sizeof(int),   1,m_ShpFile_fp);
+        FileLength      = OnChangeByteOrder (FileLength);
+        fread(&Version,          sizeof(int),   1,m_ShpFile_fp);
+        fread(&ShapeType,    sizeof(int),   1,m_ShpFile_fp);
+        fread(&Xmin,         sizeof(double),1,m_ShpFile_fp);
+        fread(&Ymin,         sizeof(double),1,m_ShpFile_fp);
+        fread(&Xmax,         sizeof(double),1,m_ShpFile_fp);
+        fread(&Ymax,         sizeof(double),1,m_ShpFile_fp);
+        fread(&Zmin,         sizeof(double),1,m_ShpFile_fp);
+        fread(&Zmax,        sizeof(double),1,m_ShpFile_fp);
+        fread(&Mmin,         sizeof(double),1,m_ShpFile_fp);
+        fread(&Mmax,         sizeof(double),1,m_ShpFile_fp);
+        //读取坐标文件头的内容 结束
+        //根据几何类型读取实体信息
+        if(ShapeType==1){
+            //读取点状目标的实体信息
+            int RecordNumber;//记录号
+            int ContentLength;//坐标记录长度
+            while((fread(&RecordNumber,    sizeof(int),   1,m_ShpFile_fp)!=0))
+            {
+                fread(&ContentLength,sizeof(int),   1,m_ShpFile_fp);
+                RecordNumber      = OnChangeByteOrder (RecordNumber);
+                ContentLength       = OnChangeByteOrder (ContentLength);
+                int shapeType;//几何类型
+                double x;//X方向坐标
+                double y;//Y方向坐标
+                fread(&shapeType, sizeof(int),   1,m_ShpFile_fp);
+                fread(&x, sizeof(double),   1,m_ShpFile_fp);
+                fread(&y, sizeof(double),   1,m_ShpFile_fp);
+                QPointF temp(x*10,-y*10);
+//                qDebug()<<temp.x();
+//                qDebug()<<temp.y();
+                area->showpoint(temp);
+            }
+        }else if(ShapeType==3){
+            int RecordNumber;//记录号
+            int ContentLength;//坐标记录长度
+            while((fread(&RecordNumber,    sizeof(int),   1,m_ShpFile_fp)!=0))
+            {
+                fread(&ContentLength,sizeof(int),   1,m_ShpFile_fp);
+                RecordNumber      = OnChangeByteOrder (RecordNumber);
+                ContentLength       = OnChangeByteOrder (ContentLength);
+                int shapeType;//几何类型
+                double Box[4];//坐标范围
+                int NumParts;//子线段个数
+                int NumPoints;//坐标点数
+                int *Parts;//每个子线段的坐标在points数组中的起始位置
+                fread(&shapeType,    sizeof(int),   1,m_ShpFile_fp);
+                //读Box
+                int i;
+                for(i=0;i<4;i++)
+                    fread(Box+i,     sizeof(double),1,m_ShpFile_fp);
+                //读NumParts和NumPoints
+                fread(&NumParts,     sizeof(int),   1,m_ShpFile_fp);
+                fread(&NumPoints,    sizeof(int),   1,m_ShpFile_fp);
+                //读Parts和Points
+                Parts       =new int[NumParts];
+                for(i=0;i<NumParts;i++)
+                    fread(Parts+i,   sizeof(int),   1,m_ShpFile_fp);
+                int pointNum;//用以计算每个子线段中point所占用的长度
+                QList<QPointF> PolyLine_S;
+                for(i=0;i<NumParts;i++)
+                {
+                    if(i!=NumParts-1)
+                        pointNum       =Parts[i+1]-Parts[i];
+                    else
+                        pointNum       =NumPoints-Parts[i];
+                    double PointsX;
+                    double PointsY;
+
+                    for(int j=0;j<pointNum;j++)
+                    {
+                        fread(&PointsX, sizeof(double),1,m_ShpFile_fp);
+                        fread(&PointsY, sizeof(double),1,m_ShpFile_fp);
+                        QPointF temp(PointsX*10,-PointsY*10);
+                        PolyLine_S.append(temp);
+                    }
+
+                }
+//                qDebug()<<PolyLine_S.size();
+//                qDebug()<<PolyLine_S.at(0).x();
+//                qDebug()<<PolyLine_S.at(0).y();
+                area->showlines(PolyLine_S);
+                delete[] Parts;
+            }
+
+        }else if(ShapeType==5){
+            int RecordNumber;//记录号
+            int ContentLength;//坐标记录长度
+            while((fread(&RecordNumber,    sizeof(int),   1,m_ShpFile_fp)!=0))
+            {
+                fread(&ContentLength,sizeof(int),   1,m_ShpFile_fp);
+                RecordNumber      = OnChangeByteOrder (RecordNumber);
+                ContentLength       = OnChangeByteOrder (ContentLength);
+                int shapeType;//几何类型
+                double Box[4];//坐标范围
+                int NumParts;//子面个数
+                int NumPoints;//坐标点数
+                int *Parts;//每个子面的坐标在points数组中的起始位置
+                fread(&shapeType,    sizeof(int),   1,m_ShpFile_fp);
+                //读Box
+                int i;
+                for(i=0;i<4;i++)
+                    fread(Box+i,     sizeof(double),1,m_ShpFile_fp);
+                //读NumParts和NumPoints
+                fread(&NumParts,     sizeof(int),   1,m_ShpFile_fp);
+                fread(&NumPoints,    sizeof(int),   1,m_ShpFile_fp);
+                //读Parts和Points
+                Parts       =new int[NumParts];
+                for(i=0;i<NumParts;i++)
+                    fread(Parts+i,   sizeof(int),   1,m_ShpFile_fp);
+                int pointNum;//计算每个子面占的长度
+                QVector<QPointF> Polygon_S;
+                for(i=0;i<NumParts;i++)
+                {
+                    if(i!=NumParts-1)
+                        pointNum       =Parts[i+1]-Parts[i];
+                    else
+                        pointNum       =NumPoints-Parts[i];
+
+                    double PointsX;
+                    double PointsY;
+                    for(int j=0;j<pointNum;j++)
+                    {
+                        fread(&PointsX, sizeof(double),1,m_ShpFile_fp);
+                        fread(&PointsY, sizeof(double),1,m_ShpFile_fp);
+                        QPointF temp(PointsX*10,-PointsY*10);
+                        Polygon_S.append(temp);
+                    }
+                    //绘图函数
+                }
+//                qDebug()<<Polygon_S.size();
+//                qDebug()<<Polygon_S.at(0).x();
+//                qDebug()<<Polygon_S.at(0).y();
+                area->showpologon(Polygon_S);
+                delete[] Parts;
+            }
+
+        }
+        fclose(m_ShpFile_fp);
+    }
 
 }

@@ -98,6 +98,8 @@ private slots:
 
     void on_action_triggered();
 
+    void on_actionRead_Shpfile_triggered();
+
 protected:
 //    void mousePressEvent(QMouseEvent *);
 //    void mouseMoveEvent(QMouseEvent *);

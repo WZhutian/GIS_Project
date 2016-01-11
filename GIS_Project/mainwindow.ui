@@ -23,7 +23,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -77,10 +77,17 @@
     </property>
     <addaction name="action"/>
    </widget>
+   <widget class="QMenu" name="menu_8">
+    <property name="title">
+     <string>空间数据库</string>
+    </property>
+    <addaction name="actionRead_Shpfile"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
    <addaction name="menu_6"/>
    <addaction name="menu_7"/>
+   <addaction name="menu_8"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="mainToolBar">
@@ -608,6 +615,11 @@
   <action name="action">
    <property name="text">
     <string>算法</string>
+   </property>
+  </action>
+  <action name="actionRead_Shpfile">
+   <property name="text">
+    <string>Read_Shpfile</string>
    </property>
   </action>
  </widget>

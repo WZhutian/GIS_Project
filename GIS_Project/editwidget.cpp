@@ -848,14 +848,22 @@ void EditWidget::showlines(QList<QPointF> linespoints)
     this->addItem(cur);
 
 }
-void EditWidget::showpologon(QVector<QPoint> pologonpoints)
+void EditWidget::showpologon(QVector<QPointF> pologonpoints)
 {
     QGraphicsPolygonItem *cur=new QGraphicsPolygonItem();
-    QPolygon *curpologon=new QPolygon(pologonpoints);
+    QPolygonF *curpologon=new QPolygonF(pologonpoints);
     cur->setPolygon(*curpologon);
     cur->setPen(*pen);
     cur->setBrush(brushColor);
     this->addItem(cur);
+}
+void EditWidget::showpoint(QPointF Point)
+{
+    QGraphicsEllipseItem *cur=new QGraphicsEllipseItem(Point.x()-2,Point.y()-2,4,4);
+    cur->setPen(*pen);
+    cur->setBrush(brushColor);
+    this->addItem(cur);
+
 }
 
 EditWidget::~EditWidget()
