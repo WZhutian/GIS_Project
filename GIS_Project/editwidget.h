@@ -68,7 +68,9 @@ public:
     void showpoints();
     void showpicture();
     void showNet();
-
+    void showlines(QList<QPointF>linespoints);
+    void showpologon(QVector<QPointF>pologonpoints);
+    void showpoint(QPointF Point);
     ~EditWidget();
 
 protected:
